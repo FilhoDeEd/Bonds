@@ -27,8 +27,7 @@
                   <div class="w-full lg:w-3/12 lg:order-2" style="padding-left: 100px;">
                     <div class="relative group">
                       <!-- Exibe a imagem de perfil -->
-                      <img alt="Profile Picture" :src="profileImage || team2"
-                        :value="userStore.user.username"
+                      <img alt="Profile Picture" :src="profileImage || team2" :value="userStore.user.username"
                         class="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px" />
 
                       <!-- Botão de upload visível no modo de edição -->
@@ -62,19 +61,13 @@
                   <div class="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
                     <i class="fas mr-2 text-lg text-blueGray-400"></i>
                     <!-- Campo editável para o Nome -->
-                    <input type="text" id="name" 
-                    v-model="form.name" 
-                    :readonly="!editMode" 
-                    @focus="onFocus"
-                    @blur="onBlur"
-                    class="border-none outline-none text-blueGray-700 font-bold uppercase focus:ring-0 focus:outline-none text-center" />
-                    
-                    <input type="text" id="surname" 
-                    v-model="form.surname" 
-                    :readonly="!editMode" 
-                    @focus="onFocus"
-                    @blur="onBlur"
-                    class="border-none outline-none text-blueGray-700 font-bold uppercase focus:ring-0 focus:outline-none text-center" />
+                    <input type="text" id="name" v-model="form.name" :readonly="!editMode" @focus="onFocus"
+                      @blur="onBlur"
+                      class="border-none outline-none text-blueGray-700 font-bold uppercase focus:ring-0 focus:outline-none text-center" />
+
+                    <input type="text" id="surname" v-model="form.surname" :readonly="!editMode" @focus="onFocus"
+                      @blur="onBlur"
+                      class="border-none outline-none text-blueGray-700 font-bold uppercase focus:ring-0 focus:outline-none text-center" />
                   </div>
                   <!-- Input username -->
                   <div class="text-sm leading-normal mt-2 text-blueGray-400 font-semibold uppercase">
@@ -88,11 +81,9 @@
                 <div class="relative mt-6">
                   <label for="bio-textarea" class="block mb-2 text-sm font-medium text-blueGray-700">Biografia</label>
                   <div class="overflow-hidden">
-                    <textarea id="bio-textarea" 
-                    v-model="form.biography" 
-                    :readonly="!editMode"
-                    class="w-full resize-none border border-gray-300 rounded-lg px-3 py-2 align-top sm:text-sm focus:ring-blue-500 focus:border-blue-500"
-                    rows="4" placeholder="Escreva sua biografia aqui..."></textarea>
+                    <textarea id="bio-textarea" v-model="form.biography" :readonly="!editMode"
+                      class="w-full resize-none border border-gray-300 rounded-lg px-3 py-2 align-top sm:text-sm focus:ring-blue-500 focus:border-blue-500"
+                      rows="4" placeholder="Escreva sua biografia aqui..."></textarea>
                   </div>
                   <p v-if="errors.biography" class="text-red-500 text-xs mt-2">{{ errors.biography }}</p>
                 </div>
@@ -113,9 +104,7 @@
                             d="M18 13.446a3.02 3.02 0 0 0-.946-1.985l-1.4-1.4a3.054 3.054 0 0 0-4.218 0l-.7.7a.983.983 0 0 1-1.39 0l-2.1-2.1a.983.983 0 0 1 0-1.389l.7-.7a2.98 2.98 0 0 0 0-4.217l-1.4-1.4a2.824 2.824 0 0 0-4.218 0c-3.619 3.619-3 8.229 1.752 12.979C6.785 16.639 9.45 18 11.912 18a7.175 7.175 0 0 0 5.139-2.325A2.9 2.9 0 0 0 18 13.446Z" />
                         </svg>
                       </div>
-                      <input type="text" id="cellphone" 
-                      v-model="form.cellphone" 
-                      :readonly="!editMode"
+                      <input type="text" id="cellphone" v-model="form.cellphone" :readonly="!editMode"
                         @change="validateField('phone')" aria-describedby="helper-text-explanation"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required />
@@ -125,8 +114,7 @@
 
                   <!-- Email -->
                   <div class="itemForProfile">
-                    <label for="UserEmail"
-                      class="block mb-2 text-sm font-medium text-gray-900 ">Email:</label>
+                    <label for="UserEmail" class="block mb-2 text-sm font-medium text-gray-900 ">Email:</label>
                     <div class="relative">
                       <div class="absolute inset-y-0 start-0 flex items-center pl-4 pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -135,9 +123,7 @@
                           <path d="M18 8.9l-7 4.2-7-4.2V14.5a2.5 2.5 0 002.5 2.5h9a2.5 2.5 0 002.5-2.5V8.9z" />
                         </svg>
                       </div>
-                      <input type="email" id="UserEmail" 
-                      v-model="form.email" 
-                      :readonly="!editMode"
+                      <input type="email" id="UserEmail" v-model="form.email" :readonly="!editMode"
                         @change="validateField('email')"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         required />
@@ -169,57 +155,65 @@
                   </div>
                 </div> -->
 
-                <!-- Linha inferior -->
-                <div class="rowForProfile mt-10 py-10 text-center">
+                  <!-- Linha inferior -->
+                  <div class="rowForProfile mt-10 py-10 text-center">
 
-                  <!-- Data de Nascimento -->
-                  <div class="itemForProfile">
-                    <label for="birthday-input"
-                      class="block mb-2 text-sm font-medium text-gray-900 ">Data
-                      de Nascimento:</label>
-                    <div class="relative">
-                      <div class="absolute inset-y-0 start-0 flex items-center pl-4 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 dark:text-gray-400"
-                          fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            d="M6 2a2 2 0 00-2 2v1H2v2h2v9a2 2 0 002 2h8a2 2 0 002-2V7h2V5h-2V4a2 2 0 00-2-2H6zm8 15H6v-9h8v9z" />
-                        </svg>
+                    <!-- Data de Nascimento -->
+                    <div class="itemForProfile">
+                      <label for="birthday-input" class="block mb-2 text-sm font-medium text-gray-900 ">Data
+                        de Nascimento:</label>
+                      <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center pl-4 pointer-events-none">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                            fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              d="M6 2a2 2 0 00-2 2v1H2v2h2v9a2 2 0 002 2h8a2 2 0 002-2V7h2V5h-2V4a2 2 0 00-2-2H6zm8 15H6v-9h8v9z" />
+                          </svg>
+                        </div>
+                        <input type="date" id="birthday-input" v-model="form.birthday" :readonly="!editMode"
+                          @change="validateField('birthday')"
+                          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          required />
+                        <p v-if="errors.birthday" class="text-red-500 text-xs">{{ errors.birthday }}</p>
                       </div>
-                      <input type="date" id="birthday-input" 
-                      v-model="form.birthday" 
-                      :readonly="!editMode"
-                        @change="validateField('birthday')"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required />
-                      <p v-if="errors.birthday" class="text-red-500 text-xs">{{ errors.birthday }}</p>
                     </div>
+
+                    <!-- Gênero -->
+                    <div class="itemForProfile">
+                      <label for="gender-select" class="block mb-2 text-sm font-medium text-gray-900">
+                        Gênero:
+                      </label>
+                      <div class="relative">
+                        <select id="gender-select" name="gender" v-model="form.gender" :disabled="!editMode" class="
+                            custom-bg bg-blue-100 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                            focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 
+                            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  
+                            dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="" disabled selected>Selecione um gênero</option>
+                          <option value="M">Masculino</option>
+                          <option value="F">Feminino</option>
+                          <option value="O">Outro</option>
+                        </select>
+                      </div>
+                    </div>
+                    <section>
+                      <div>
+                        <button @click="openModal" class="mt-3 px-4 py-2 bg-black text-white fredoka rounded-md">Alterar Bairro</button>
+                        <LocationModal
+                            v-if="isModalOpen"
+                            :isOpen="isModalOpen"
+                            :formData="locationData"
+                            :states="states"
+                            :cities="cities"
+                            :neighborhoods="neighborhoods"
+                            @close="closeModal"
+                            @save="handleSave"
+                            @state-change="fetchCities"
+                            @city-change="fetchNeighborhoods"
+                          />
+                      </div>
+                  </section>
                   </div>
-
-                  <!-- Gênero -->
-                  <div class="itemForProfile">
-  <label for="gender-select" class="block mb-2 text-sm font-medium text-gray-900">
-    Gênero:
-  </label>
-  <div class="relative">
-    <select
-      id="gender-select"
-      name="gender"
-      v-model="form.gender"
-      :disabled="!editMode"
-      class="custom-bg bg-blue-100 border border-gray-300 text-gray-900 text-sm rounded-lg 
-             focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 
-             dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  
-             dark:focus:ring-blue-500 dark:focus:border-blue-500"
-    >
-      <option value="" disabled selected>Selecione um gênero</option>
-      <option value="M">Masculino</option>
-      <option value="F">Feminino</option>
-      <option value="O">Outro</option>
-    </select>
-  </div>
-</div>
-
-                </div>
                 </div>
               </div>
             </div>
@@ -227,56 +221,6 @@
         </div>
       </section>
 
-      <section id="dataLocation" class="relative py-16 bg-blueGray-200">
-        <div class="container mx-auto px-4">
-          <form @submit.prevent="handleSubmit">
-            <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
-              <div class="px-6 justify-end">
-                <div class="relative w-full mb-3">
-                  <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Estado</label>
-                  <select 
-                  v-model="form.state"
-                  :value="userStore.user.state"
-                  @change="[fetchCities, validateField('state')]" 
-                  :disabled="!editMode"
-                    class="border-0 px-3 py-3 bg-white text-blueGray-600 rounded text-sm shadow focus:outline-none focus:ring w-full">
-                    <option v-for="state in states" :key="state.code" :value="state.code">
-                      {{ state.name }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="relative w-full mb-3">
-                  <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Cidade</label>
-                  <select 
-                  v-model="form.locality" 
-                  @change="[fetchNeighborhoods, validateField('locality')]"
-                    :disabled="!editMode"
-                    class="border-0 px-3 py-3 bg-white text-blueGray-600 rounded text-sm shadow focus:outline-none focus:ring w-full">
-                    <option v-for="city in cities" :key="city.name" :value="city.name">
-                      {{ city.name }}
-
-                    </option>
-                  </select>
-                </div>
-
-                <div class="relative w-full mt-4">
-                  <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Bairro</label>
-                  <select 
-                  v-model="form.neighborhood"
-                   @change="validateField('neighborhood')" 
-                   :disabled="!editMode"
-                    class="w-full bg-white border border-gray-300 rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring focus:border-blue-500">
-                    <option v-for="neighborhood in neighborhoods" :key="neighborhood.id" :value="neighborhood.id">
-                      {{ neighborhood.name }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
 
     </main>
     <footer-component />
@@ -286,34 +230,23 @@
 <script>
 /* eslint-disable */
 import axios from "axios";
-import Navbar from "@/components/Navbars/AuthNavbar.vue";
-import FooterComponent from "@/components/Footers/Footer.vue";
-import { onBeforeMount, reactive } from "vue";
-import { useUserStore, apiClient } from "@/store/user.js"; // Ajuste o caminho conforme necessário
+import Navbar from "../components/Navbars/AuthNavbar.vue";
+import LocationModal from "../components/Modals/LocationModal.vue";
+import FooterComponent from "../components/Footers/Footer.vue";
+import { reactive, ref, nextTick } from "vue";
+import { useUserStore, apiClient } from "../store/user.js"; // Ajuste o caminho conforme necessário
 import { ENDPOINTS } from "../../../api.js";
 import team2 from "@/assets/img/team-2-800x800.jpg";
+import { useRouter } from "vue-router";
 
 export default {
   components: {
     Navbar,
     FooterComponent,
+    LocationModal,
   },
   data() {
     return {
-      form: {
-        name: "",
-        surname: "",
-        email: "",
-        cellphone: "",
-        gender: "",
-        biography: "",
-        birthday: "",
-        state: "",
-        locality: "",
-        neighborhood: "",
-        neighborhood_id: "",
-        neighborhood_changed: "",
-      },
       states: [], // Lista de estados
       cities: [], // Lista de cidades
       neighborhoods: [], // Lista de bairros
@@ -321,21 +254,14 @@ export default {
       errors: {},
       editMode: false, // Determina se o formulário está em modo de edição
       team2,
+      isModalOpen: false,
+      locationData: { state: "", locality: "", neighborhood: "" }
     };
   },
   setup() {
     const userStore = useUserStore();
-    
-    // // Inicializar o store e configurar o token
-    // onBeforeMount(() => {
-    //   const token = userStore.user?.access;
-    //   if (token) {
-    //     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    //   } else {
-    //     axios.defaults.headers.common["Authorization"] = "";
-    //   }
-    // });
-    
+    const router = useRouter();
+    const errors = reactive({});
     // Reactive form state
     const form = reactive({
       name: userStore.user?.name || "",
@@ -351,169 +277,189 @@ export default {
       neighborhood_id: userStore.user?.neighborhood_id || "",
       neighborhood_changed: false,
     });
-    console.log(form)
 
-    return {
-      userStore, // Expor o store para uso no template
-      form, // Expor o formulário reativo
-    };
-},
+    // Modal state
+    const isModalOpen = ref(false);
 
-async mounted() {
-    await this.fetchStates();
-  },
+    async function openModal() {
+      isModalOpen.value = true;
+      await fetchStates(); // Chama diretamente a função fetchStates
+    }
 
+    async function closeModal() {
+      isModalOpen.value = false;
+    }
 
-  methods: {
-    onStateChange(event){
-      this.fetchCities();
-      this.validateField('state');
-    },
-    async fetchStates() {
+    function handleSave(updatedData) {
+      form.state = updatedData.state;
+      form.locality = updatedData.locality;
+      form.neighborhood = updatedData.neighborhood;
+      form.neighborhood_id = updatedData.neighborhood_id;
+      form.neighborhood_changed = true; // Indica que houve uma alteração crítica
+      closeModal();
+    }
+
+    async function fetchStates() {
       try {
         const response = await axios.get(ENDPOINTS.STATES);
-        this.states = response.data;
+        states = response.data;
       } catch (error) {
-        alert("Erro ao carregar os estados.");
+        console.error("Erro ao carregar os estados:", error);
       }
-    },
-    async fetchCities() {
-      if (!this.form.state) {
-        this.cities = [];
-        this.neighborhoods = [];
+    }
+
+    async function onStateChange(){
+      fetchCities();
+      validateField('state');
+    }
+
+    async function fetchCities() {
+      if (!form.state) {
+        cities = [];
+        neighborhoods = [];
         return;
       }
+
       try {
-        const response = await axios.get(`${ENDPOINTS.CITIES}/${this.form.state}/`);
-        this.cities = response.data;
-        this.neighborhoods = []; // Resetar bairros ao alterar a cidade
+        const response = await axios.get(`${ENDPOINTS.CITIES}/${form.state}/`);
+        cities = response.data;
+        neighborhoods = []; // Resetar bairros ao alterar a cidade
       } catch (error) {
         alert("Erro ao carregar as cidades.");
       }
-    },
-    onCityChange(event){
-      this.fetchNeighborhoods();
-      this.validateField('locality');
-    },
-    async fetchNeighborhoods() {
-      if (!this.form.locality) {
-        this.neighborhoods = [];
+    }
+
+
+    async function onCityChange(){
+      fetchNeighborhoods();
+      validateField('locality');
+    }
+
+    async function fetchNeighborhoods() {
+      if (!form.locality) {
+        neighborhoods = [];
         return;
       }
       try {
-        const response = await axios.get(`${ENDPOINTS.NEIGHBORHOODS}/${this.form.state}/${this.form.locality}/`);
-        this.neighborhoods = response.data;
+        const response = await axios.get(`${ENDPOINTS.NEIGHBORHOODS}/${form.state}/${form.locality}/`);
+        neighborhoods = response.data;
       } catch (error) {
         alert("Erro ao carregar os bairros.");
       }
-    },
+    }
 
-    toggleEdition() {
-      if (this.editMode) {
-        // Salvar: valida campos antes de alternar
-        Object.keys(this.form).forEach((field) => this.validateField(field));
-        if (Object.keys(this.errors).some((key) => this.errors[key])) {
-          alert("Por favor, corrija os erros antes de salvar.");
-          return;
-        }
-      }
-      this.editMode = !this.editMode;
-      if (this.editMode==false){
-        this.handleSubmit()
-      }
-    },
-
-    onFocus() {
-    },
-    onBlur() {
-    },
-
-
-
-    validateField(field) {
-      const calculateAge = (birthDate) => {
+    function validateField(field) {
+      const calculateAge = (birthday) => {
         const today = new Date();
-        const birth = new Date(birthDate);
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDifference = today.getMonth() - birth.getMonth();
-        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+        const birthDate = new Date(birthday);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
           age--;
         }
         return age;
       };
 
       switch (field) {
-        case "birthDate":
-          if (!this.form.birthDate) {
-            this.errors.birthDate = "Birth Date is required.";
-          } else if (calculateAge(this.form.birthDate) < 16) {
-            this.errors.birthDate = "You must be at least 16 years old.";
+        case "birthday":
+          if (!form.birthday) {
+            errors.birthday = "Data de nascimento é obrigatória.";
+          } else if (calculateAge(form.birthday) < 16) {
+            errors.birthday = "Você precisa ter ao menos 16 anos.";
           } else {
-            this.errors.birthDate = "";
+            errors.birthday = "";
           }
           break;
+
         case "email":
-          if (!this.form.email) {
-            this.errors.email = "Email is required.";
-          } else if (!/\S+@\S+\.\S+/.test(this.form.email)) {
-            this.errors.email = "Invalid email format.";
+          if (!form.email) {
+            errors.email = "Email é necessário.";
+          } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+            errors.email = "Formato inválido de email.";
           } else {
-            this.errors.email = "";
+            errors.email = "";
           }
           break;
-        case "username":
-          // this.errors.username = this.form.username ? "" : "Username is required.";
-          break;
+
         case "password":
-          this.errors.password = this.form.password
-            ? (/[A-Z]/.test(this.form.password) ? "" : "A senha deve conter ao menos uma letra maiúscula.") ||
-              (/[a-z]/.test(this.form.password) ? "" : "A senha deve conter ao menos uma letra minúscula.") ||
-              (/\d/.test(this.form.password) ? "" : "A senha deve conter ao menos um número.") ||
-              (/[\W_]/.test(this.form.password) ? "" : "A senha deve conter ao menos um caractere especial.") ||
-              (this.form.password.length >= 8 ? "" : "A senha deve ter no mínimo 8 caracteres.")
+          errors.password = form.password
+            ? (/[A-Z]/.test(form.password) ? "" : "A senha deve conter ao menos uma letra maiúscula.") ||
+            (/[a-z]/.test(form.password) ? "" : "A senha deve conter ao menos uma letra minúscula.") ||
+            (/\d/.test(form.password) ? "" : "A senha deve conter ao menos um número.") ||
+            (/[\W_]/.test(form.password) ? "" : "A senha deve conter ao menos um caractere especial.") ||
+            (form.password.length >= 8 ? "" : "A senha deve ter no mínimo 8 caracteres.")
             : "A senha é obrigatória.";
           break;
+
+        case "cellphone":
+          const cellphoneRegex = /^(\+?[0-9]{1,3})?[-.\s]?(\([0-9]{1,4}\)|[0-9]{1,4})[-.\s]?[0-9]{3,4}[-.\s]?[0-9]{3,4}$/;
+          errors.cellphone = form.cellphone && !cellphoneRegex.test(form.cellphone)
+            ? "Número de celular inválido. Use um formato válido."
+            : null;
+          break;
+
+        case "biography":
+          errors.biography = form.biography && form.biography.length > 300
+            ? "A biografia não pode exceder 300 caracteres."
+            : null;
+          break;
+
+        default:
+          break;
       }
-    },
+    }
 
-    async handleSubmit() {
-      const userStore = useUserStore(); // Acessa o userStore diretamente
-      this.form.neighborhood_changed =
-        this.form.neighborhood_id !== userStore.user?.neighborhood_id;
+    async function handleSubmit() {
+      form.neighborhood_changed =
+        form.neighborhood_id !== userStore.user?.neighborhood_id;
+      // Validação de campos
+      Object.keys(form).forEach((field) => validateField(field));
 
-      Object.keys(this.form).forEach((field) => this.validateField(field));
+      if (Object.keys(form.errors || {}).some((key) => form.errors[key])) return;
 
-      if (Object.keys(this.errors).some((key) => this.errors[key])) return;
-
-
-      if (userStore.user.isAuthenticated){
-          try {
-            const response = await apiClient
-            .post(ENDPOINTS.EDIT, this.form, {
+      if (userStore.user?.isAuthenticated) {
+        try {
+          const response = await apiClient.post(ENDPOINTS.EDIT, form, {
             headers: { "Content-Type": "application/json" },
           });
 
-          const data = response.data;
-          userStore.setUserInfo(this.form); // Atualiza as informações do usuário no store
-
-
           if (!response.ok) {
-            if (data.errors) {
-              for (const [field, messages] of Object.entries(data.errors)) {
-                this.errors[field] = messages.join(" ");
-              }
-            }
-            throw new Error(data.message || "Failed to save.");
+            console.error("Erro ao salvar os dados.");
+            return;
           }
-
         } catch (error) {
-          alert(error.message || "Something went wrong.");
+          alert(error.message || "Erro inesperado.");
         }
+      } else {
+        alert("Usuário não autenticado.");
       }
-        else{
-          alert("User not authenticated")
-        }
-    },
+
+      try {
+        const userDetailsResponse = await apiClient.get(ENDPOINTS.DETAIL);
+        userStore.setUserInfo(userDetailsResponse.data);
+        router.push("/home");
+      } catch (error) {
+        console.error("Erro ao buscar detalhes do usuário:", error.message);
+      }
+    };
+
+    return {
+      form,
+      userStore,
+      router,
+      isModalOpen,
+      openModal,
+      closeModal,
+      handleSave,
+      handleSubmit,
+      validateField,
+      fetchStates,
+      fetchCities,
+      fetchNeighborhoods,
+      onCityChange,
+      onStateChange,
+    };
+
   },
 };
 </script>
@@ -526,7 +472,8 @@ async mounted() {
 }
 
 .custom-bg {
-  background-color: #ffffff; /* Cor azul personalizada */
+  background-color: #ffffff;
+  /* Cor azul personalizada */
 }
 
 .bg-white {
@@ -536,18 +483,24 @@ async mounted() {
 }
 
 input {
-  background-color: #f9fafb; /* Cor padrão */
-  color: #1f2937; /* Cor do texto */
-  border: 1px solid transparent; /* Sem borda em modo readonly */
+  background-color: #f9fafb;
+  /* Cor padrão */
+  color: #1f2937;
+  /* Cor do texto */
+  border: 1px solid transparent;
+  /* Sem borda em modo readonly */
 }
 
 input:focus {
-  border-color: #60a5fa; /* Ajuste a borda ao focar */
+  border-color: #60a5fa;
+  /* Ajuste a borda ao focar */
   outline: none;
 }
 
 input:not([readonly]) {
-  background-color: #ffffff; /* Mantenha a mesma cor de fundo */
-  border: 1px solid #d1d5db; /* Adicione borda suave */
+  background-color: #ffffff;
+  /* Mantenha a mesma cor de fundo */
+  border: 1px solid #d1d5db;
+  /* Adicione borda suave */
 }
 </style>
