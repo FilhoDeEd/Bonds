@@ -1,5 +1,6 @@
 <template>
-  <main-layout>
+  <div>
+    <navbar />
     <main class="profile-page">
       <section class="relative block h-600-px">
         <div class="absolute top-0 w-full h-full bg-center bg-cover" style="
@@ -71,7 +72,7 @@
                   <!-- Input username -->
                   <div class="text-sm leading-normal mt-2 text-blueGray-400 font-semibold uppercase">
                     <!-- Exibição somente leitura do Username -->
-                    <span>@{{ userStore.user?.username }}</span>
+                    <span>{{ userStore.user.username }}</span>
                   </div>
                 </div>
 
@@ -183,10 +184,11 @@
                         Gênero:
                       </label>
                       <div class="relative">
-                        <select id="gender-select" name="gender" v-model="form.gender" :disabled="!editMode" class="custom-bg bg-blue-100 border border-gray-300 text-gray-900 text-sm rounded-lg 
-             focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 
-             dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  F
-             dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <select id="gender-select" name="gender" v-model="form.gender" :disabled="!editMode" class="
+                            custom-bg bg-blue-100 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                            focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 
+                            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400  
+                            dark:focus:ring-blue-500 dark:focus:border-blue-500">
                           <option value="" disabled selected>Selecione um gênero</option>
                           <option value="M">Masculino</option>
                           <option value="F">Feminino</option>
@@ -221,7 +223,8 @@
 
 
     </main>
-  </main-layout>
+    <footer-component />
+  </div>
 </template>
 
 <script>
@@ -230,9 +233,8 @@ import axios from "axios";
 import Navbar from "../components/Navbars/AuthNavbar.vue";
 import LocationModal from "../components/Modals/LocationModal.vue";
 import FooterComponent from "../components/Footers/Footer.vue";
-import { reactive, ref } from "vue";
-import MainLayout from "@/layouts/mainLayout.vue";
-import { useUserStore, apiClient } from "@/store/user.js"; // Ajuste o caminho conforme necessário
+import { reactive, ref, nextTick } from "vue";
+import { useUserStore, apiClient } from "../store/user.js"; // Ajuste o caminho conforme necessário
 import { ENDPOINTS } from "../../../api.js";
 import team2 from "@/assets/img/team-2-800x800.jpg";
 import { useRouter } from "vue-router";
@@ -242,7 +244,6 @@ export default {
     Navbar,
     FooterComponent,
     LocationModal,
-    MainLayout,
   },
   data() {
     return {

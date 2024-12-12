@@ -1,49 +1,58 @@
 <template>
-    <MainLayout>
-        <div class="w-8/12 h-full py-8 pr-20 pl-20 bg-gray-50 space-y-4">
-          <main>
+  <div class="flex flex-col h-screen">
+    <!-- Navbar na parte superior -->
+    <div class="bg-gray-800 text-white shadow-lg">
+      <NavbarHome />
+    </div>
+
+    <!-- Conteúdo Principal com Sidebars -->
+    <div class="flex flex-1 overflow-hidden justify-between">
+      <!-- Sidebar Esquerda -->
+      <div class="w-64 bg-gray-900 text-white p-4 hidden lg:block">
+        <Sidebar />
+      </div>
+
+      <!-- Conteúdo Principal -->
+      <div class="flex-1 bg-gray-100 p-6 overflow-y-auto">
+        <main>
           <section id="contenido">
             <h1 class="text-xl font-bold mb-4">Postagens</h1>
             <div class="space-y-4">
+              <!-- Simulação de Postagens -->
               <article 
                 v-for="forum in forumStore.forums" 
-                :key="forum.forum_id"  
-                class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-                style="background-color: rgba(124, 122, 187, 1); width: 1500px; height: 415px;"
+                :key="forum.forum_id" 
+                class="p-4 bg-white shadow rounded"
               >
-                <div class="flex h-full">
-                  <!-- Imagem à esquerda -->
-                  <div class="w-1/4 flex items-center">
-                    <img 
-                      src="https://via.placeholder.com/300x200" 
-                      alt="Forum image" 
-                      class="object-cover w-full"
-                      style="height: 70%;"
-                    >
+                <a href="#">
+                  <h2 
+                    :value="forum.title" 
+                    class="text-lg font-semibold"
+                  >
+                    {{ forum.title }}
+                  </h2>
+                  <div class="text-sm text-gray-600 space-between">
+                    <p>{{ forum.description }}</p>
+                    <p>Popularidade: {{ forum.popularity }}</p>
                   </div>
-                  
-                  <!-- Conteúdo à direita - agora ocupando todo o espaço restante -->
-                  <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                    <a href="#" class="text-white flex flex-col h-full justify-between">
-                      <h2 
-                        :value="forum.title" 
-                        class="text-4xl font-semibold mb-8"
-                      >
-                        {{ forum.title }}
-                      </h2>
-                      <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
-                        <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
-                        <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
-                      </div>
-                    </a>
-                  </div>
-                </div>
+                </a>
               </article>
             </div>
           </section>
         </main>
-        </div>
-    </MainLayout>
+      </div>
+
+      <!-- Sidebar Direita -->
+      <div class="w-64 bg-gray-100 text-black p-4 hidden lg:block">
+        <SidebarSugere />
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="bg-gray-800 text-white p-2">
+      <FooterComponent />
+    </div>
+  </div>
 </template>
 
 
@@ -51,12 +60,18 @@
 import { useForumStore } from '@/store/forum.js'; // Certifique-se de ajustar o caminho
 import { useUserStore } from '@/store/user.js';
 import {onBeforeMount } from "vue";
-import MainLayout from '../layouts/mainLayout.vue';
+import NavbarHome from '../components/Navbars/NavbarHome.vue';
+import Sidebar from '../components/Sidebar/Sidebar.vue';
+import SidebarSugere from '../components/Sidebar/SidebarSugere.vue';
+import FooterComponent from '../components/Footers/FooterHome.vue';
 
 
 export default {
   components: {
-    MainLayout
+    NavbarHome,
+    FooterComponent,
+    Sidebar,
+    SidebarSugere,
   },
   
   setup() {
