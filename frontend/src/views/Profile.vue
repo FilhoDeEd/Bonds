@@ -230,10 +230,8 @@ import axios from "axios";
 import Navbar from "../components/Navbars/AuthNavbar.vue";
 import LocationModal from "../components/Modals/LocationModal.vue";
 import FooterComponent from "../components/Footers/Footer.vue";
-import { reactive, ref, nextTick } from "vue";
-import { useUserStore, apiClient } from "../store/user.js"; // Ajuste o caminho conforme necessário
+import { reactive, ref } from "vue";
 import MainLayout from "@/layouts/mainLayout.vue";
-import { onBeforeMount, reactive } from "vue";
 import { useUserStore, apiClient } from "@/store/user.js"; // Ajuste o caminho conforme necessário
 import { ENDPOINTS } from "../../../api.js";
 import team2 from "@/assets/img/team-2-800x800.jpg";
