@@ -24,10 +24,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'account',
     'corsheaders',
+    'comment',
     'forum',
     'rest_framework',
     'rest_framework.authtoken',
     'user_profile',
+    
 ]
 
 
