@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ######
 
-POST http://localhost:8000/comment/edit/3/
+POST http://localhost:8000/comment/edit/17/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
@@ -24,4 +24,8 @@ POST http://localhost:8000/comment/delete/3/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
-######
+####### 
+
+GET http://localhost:8000/comment/list/1/ 
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Content-Type: application/json
