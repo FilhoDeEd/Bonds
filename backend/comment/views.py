@@ -3,6 +3,7 @@ from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from account.views import add_errors
@@ -96,3 +97,13 @@ class CommentDeleteView(APIView):
         comment.delete()
 
         return Response({"detail": "Comment deleted successfully."}, status=status.HTTP_200_OK)
+    
+class CommentListView(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+    ordering = ['-post_date']  # Ordenação para mostrar os mais recentes
+
+    def get_queryset(self):
+        forum_id = self.kwargs.get('forum_id')
+        return Comment.objects.filter(forum_id=forum_id).order_by('-post_date')
