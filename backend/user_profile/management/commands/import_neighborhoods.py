@@ -38,7 +38,16 @@ states = [
 class Command(BaseCommand):
     help = 'Import data from an Excel file into the database'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--limit',
+            type=int,
+            help='Limit the number of neighborhoods to import'
+        )
+
     def handle(self, *args, **kwargs):
+        limit = int(kwargs.get('limit'))
+
         current_directory = os.path.dirname(os.path.abspath(__file__))
         excel_file = os.path.join(current_directory, 'neighborhoods.xlsx')
 
@@ -53,7 +62,11 @@ class Command(BaseCommand):
             if not required_columns.issubset(data.columns):
                 raise ValueError(f"The Excel file must contain the following columns: {required_columns}")
 
+            count = 0
             for _, row in data.iterrows():
+                if limit and count >= limit:
+                    break
+
                 try:
                     if row['estado'] not in states:
                         self.stdout.write(f"State '{row['estado']}' does not match the list of Federative Units.")
@@ -65,6 +78,7 @@ class Command(BaseCommand):
                         )
                         
                         self.stdout.write(f"Neighborhood '{row['bairro']}' | State '{row['estado']}' | City '{row['cidade']}' added.")
+                        count+=1
                 except:
                     continue
 
