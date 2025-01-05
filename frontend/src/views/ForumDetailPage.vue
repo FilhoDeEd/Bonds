@@ -186,15 +186,20 @@ const formatDate = (dateString) => {
 
 const editMode = ref(false);
 const route = useRoute();
+const slug = ref(localStorage.getItem('currentSlug') || route.params.slug); // Inicializa com slug armazenado ou da rota
+const new_slug = ref(false);
 
 const fetchForum = async () => {
-  const slug = route.params.slug;
   try {
-    const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${slug}/`);
-    console.log(response.data)
-    if (!response.status === 200) {
+    // Use o slug atualizado ou o original
+    const currentSlug = new_slug.value || slug.value;
+    const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${currentSlug}/`);
+
+    if (response.status !== 200) {
       throw new Error('Erro ao buscar dados do fórum');
     }
+
+    console.log(response.data);
     forumData.value = {
       title: response.data.title,
       description: response.data.description,
@@ -203,6 +208,9 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
     };
+
+    //Add list comments here
+
   } catch (error) {
     console.error(error);
     router.push('/home');
@@ -214,12 +222,33 @@ onMounted(() => {
   fetchForum();
 });
 
-const toggleEdition = () => {
+// Alterna entre os modos de edição e atualiza o slug se necessário
+const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
-    alert('Alterações salvas (simulado)');
+    try {
+      const response = await axios.post(
+        `${ENDPOINTS.EDIT_FORUM}/${slug.value}/`,
+        { title: forumData.value.title, description: forumData.value.description }
+      );
+
+      // Atualize o new_slug se um novo for retornado
+      if (response.data.slug) {
+        new_slug.value = response.data.slug;
+
+        // Persistindo o novo slug no localStorage
+        localStorage.setItem('currentSlug', new_slug.value);
+
+        // Atualize o slug reativo e recarregue os dados
+        slug.value = new_slug.value;
+        await fetchForum();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 };
+
 </script>
 
 <style scoped>
