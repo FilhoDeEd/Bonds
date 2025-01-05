@@ -24,4 +24,5 @@ export const ENDPOINTS = {
   LIST_FORUNS: `${FORUM_URL}/list/`,
   FORUM_DETAIL: `${FORUM_URL}/detail`,
   REGISTER_FORUM: `${FORUM_URL}/register/`,
+  EDIT_FORUM: `${FORUM_URL}/edit`,
 };

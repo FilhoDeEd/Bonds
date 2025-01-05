@@ -103,7 +103,7 @@ class ForumEditView(APIView):
             # Atualiza o slug com base no novo título
             forum.slug = slugify(forum.title)
             forum.save()
-            return Response({"success": "success"}, status=status.HTTP_200_OK)
+            return Response({"success": "success", "slug": forum.slug}, status=status.HTTP_200_OK)
         else:
             return Response({"errors": forum_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
