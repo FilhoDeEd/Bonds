@@ -165,7 +165,9 @@ import MainLayout from '../layouts/mainLayout.vue';
 import { ENDPOINTS } from '../../../api';
 import axios from "axios";
 import router from "../router/index.js";
+import { useToast } from 'vue-toastification'; 
 
+const toast = useToast();
 const forumData = ref({
   title: '',
   description: '',
@@ -174,6 +176,15 @@ const forumData = ref({
   creator: '',
   members: 0,
 });
+
+const comments = [ref({
+  title: '',
+  content: '',
+  createdAt: '',
+  creator: '',
+  upvotes: 0,
+  downvotes: 0,
+})];
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -196,10 +207,10 @@ const fetchForum = async () => {
     const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${currentSlug}/`);
 
     if (response.status !== 200) {
+      toast.error('Fórum não encontrado');
       throw new Error('Erro ao buscar dados do fórum');
     }
 
-    console.log(response.data);
     forumData.value = {
       title: response.data.title,
       description: response.data.description,
@@ -209,10 +220,27 @@ const fetchForum = async () => {
       members: response.data.subscribers_count,
     };
 
-    //Add list comments here
+    const fetchComments = async () => {
+      const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${currentSlug}/`);
+      if (commentsResponse.status !== 200) {
+        toast.error('Erro ao buscar comentários');
+        throw new Error('Erro ao buscar comentários');
+      }
+
+      comments.value = commentsResponse.data.map((comment) => ({
+        title: comment.title,
+        content: comment.content,
+        createdAt: formatDate(comment.creation_date),
+        creator: comment.creator,
+        upvotes: comment.upvotes,
+        downvotes: comment.downvotes,
+      }));
+    };
+    
 
   } catch (error) {
     console.error(error);
+    toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
   }
 };
@@ -241,6 +269,7 @@ const toggleEdition = async () => {
 
         // Atualize o slug reativo e recarregue os dados
         slug.value = new_slug.value;
+        toast.success('Fórum atualizado com sucesso');
         await fetchForum();
       }
     } catch (error) {

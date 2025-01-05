@@ -2,6 +2,7 @@ const BASE_URL = "http://localhost:8000";
 const ACCOUNT_URL = `${BASE_URL}/account`;
 const USER_PROFILE_URL = `${BASE_URL}/user_profile`;
 const FORUM_URL = `${BASE_URL}/forum`
+const COMMENT_URL = `${BASE_URL}/comment`
 
 // Endpoints centralizados
 export const ENDPOINTS = {
@@ -25,4 +26,6 @@ export const ENDPOINTS = {
   FORUM_DETAIL: `${FORUM_URL}/detail`,
   REGISTER_FORUM: `${FORUM_URL}/register/`,
   EDIT_FORUM: `${FORUM_URL}/edit`,
+
+  LIST_COMMENTS : `${COMMENT_URL}/list/`,
 };
