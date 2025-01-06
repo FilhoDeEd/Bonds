@@ -200,6 +200,7 @@ import { useToast } from 'vue-toastification';
 import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../../api';
+import MainLayout from '../layouts/mainLayout.vue';
 
 const toast = useToast();
 const forumData = ref({
@@ -210,6 +211,29 @@ const forumData = ref({
   creator: '',
   members: 0,
 });
+
+const toggleEdition = async () => {
+  editMode.value = !editMode.value;
+
+  if (!editMode.value) {
+    try {
+      const response = await axios.post(`${ENDPOINTS.EDIT_FORUM}/${slug.value}/`, {
+        title: forumData.value.title,
+        description: forumData.value.description,
+      });
+
+      if (response.data.slug) {
+        // Atualiza o slug na rota diretamente
+        await router.push({ name: 'ForumDetailPage', params: { slug: response.data.slug } });
+        toast.success('Fórum atualizado com sucesso');
+        await fetchForum(); // Recarrega os dados do fórum com o novo slug
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao atualizar o fórum');
+    }
+  }
+};
 
 const comments = ref([]);
 const newCommentContent = ref('');
@@ -257,12 +281,31 @@ const fetchComments = async () => {
       upvotes: comment.upvotes,
       downvotes: comment.downvotes,
     }));
-    toast.success('Comentários carregados com sucesso');
+    //toast.success('Comentários carregados com sucesso');
   } catch (error) {
     console.error(error);
     toast.error('Erro ao carregar comentários');
   }
 };
+
+const createComment = async () => {
+  try {
+    // Usamos diretamente o valor de `slug`, que reflete a rota atual
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, {
+      content: newCommentContent.value,
+      forum_slug: slug.value, // `slug` já é atualizado via rota
+    });
+
+    console.log(response);
+    toast.success('Comentário criado com sucesso');
+    newCommentContent.value = ''; // Limpa o campo de comentário
+    await fetchComments(); // Recarrega os comentários
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao criar comentário');
+  }
+};
+
 
 onMounted(() => {
   fetchForum();
