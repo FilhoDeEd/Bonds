@@ -117,7 +117,7 @@
                   </button>
                   
                   <!-- Exibe a quantidade de likes (se disponível) -->
-                  <span class="my-1">{{ comment.trust_rate !== null && comment.trust_rate !== undefined ? comment.trust_rate : 0 }}</span>
+                  <span class="my-1">{{ comment.trust_rate }}</span>
                   
                   <!-- Botão de Dislike -->
                   <button 
