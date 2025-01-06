@@ -9,8 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from account.views import add_errors
 from rest_framework.response import Response
 from rest_framework import status
+from forum.models import Forum
 
-from comment.models import Comment
+from comment.models import Comment, CommentLike
 from comment.serializers import CommentSerializer
 from user_profile.models import UserProfile
 
@@ -25,28 +26,32 @@ class CommentRegisterView(APIView):
         data = request.data
         errors = {}
 
+        # Obter o slug do fórum e buscar o objeto correspondente
+        forum_slug = data.get('forum_slug')
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        data['forum'] = forum.id  # Substituir pelo ID do fórum
+
         comment_serializer = CommentSerializer(data=data)
 
         if not comment_serializer.is_valid():
-             add_errors(errors=errors, serializer_errors=comment_serializer.errors)
+            add_errors(errors=errors, serializer_errors=comment_serializer.errors)
 
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             with transaction.atomic():
-                # Obtém o perfil do usuário logado
                 account = request.user.account
                 user_profile = UserProfile.objects.get(account=account, active=True)
 
-                # Cria o comentário
+                # Criar o comentário
                 comment = comment_serializer.save(user_profile=user_profile)
 
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'detail': 'Comment created successfully.', 'id': comment.id}, status=status.HTTP_201_CREATED)
-
+    
 
 class CommentEditView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -99,11 +104,102 @@ class CommentDeleteView(APIView):
         return Response({"detail": "Comment deleted successfully."}, status=status.HTTP_200_OK)
     
 class CommentListView(ListAPIView):
+    """
+    Lista os comentários de um fórum específico, filtrando pelo slug do fórum.
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CommentSerializer
-    ordering = ['-post_date']  # Ordenação para mostrar os mais recentes
 
     def get_queryset(self):
-        forum_id = self.kwargs.get('forum_id')
-        return Comment.objects.filter(forum_id=forum_id).order_by('-post_date')
+        # Obtém o slug do fórum da URL
+        forum_slug = self.kwargs.get('slug')
+        # Busca o fórum correspondente ou retorna 404
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        # Retorna os comentários relacionados ao fórum encontrado
+        return Comment.objects.filter(forum=forum)
+    
+
+class CommentLikeView(APIView):
+    """
+    Adiciona um like a um comentário.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user_profile = self.get_user_profile(request)
+
+        # Adiciona ou atualiza o like
+        like_instance, created = CommentLike.objects.update_or_create(
+            user_profile=user_profile,
+            comment=comment,
+            defaults={'is_like': True}  # Like
+        )
+
+        return Response({
+            "detail": "Like added successfully.",
+            "trust_rate": comment.trust_rate()
+        }, status=status.HTTP_200_OK)
+
+    def get_user_profile(self, request):
+        account = request.user.account
+        return get_object_or_404(UserProfile, account=account, active=True)
+
+
+class CommentDislikeView(APIView):
+    """
+    Adiciona um dislike a um comentário.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user_profile = self.get_user_profile(request)
+
+        # Adiciona ou atualiza o dislike
+        like_instance, created = CommentLike.objects.update_or_create(
+            user_profile=user_profile,
+            comment=comment,
+            defaults={'is_like': False}  # Dislike
+        )
+
+        return Response({
+            "detail": "Dislike added successfully.",
+            "trust_rate": comment.trust_rate()
+        }, status=status.HTTP_200_OK)
+
+    def get_user_profile(self, request):
+        account = request.user.account
+        return get_object_or_404(UserProfile, account=account, active=True)
+
+
+class CommentLikeDeleteView(APIView):
+    """
+    Remove um like ou dislike de um comentário.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user_profile = self.get_user_profile(request)
+
+        # Remove o like/dislike
+        deleted, _ = CommentLike.objects.filter(user_profile=user_profile, comment=comment).delete()
+
+        if deleted:
+            return Response({
+                "detail": "Interaction removed successfully.",
+                "trust_rate": comment.trust_rate()
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "detail": "No interaction to remove."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_user_profile(self, request):
+        account = request.user.account
+        return get_object_or_404(UserProfile, account=account, active=True)
