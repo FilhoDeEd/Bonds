@@ -9,20 +9,24 @@ class Comment(models.Model):
     """
 
     content = models.CharField(max_length=500)
-    post_date = models.DateTimeField() 
-    trust_rate = models.FloatField(default=0.0)
+    post_date = models.DateTimeField(auto_now_add=True) 
     # image = models.ForeignKey('ImageModel', on_delete=models.SET_NULL, null=True, blank=True)  
     denunciations = models.PositiveIntegerField(default=0)  
 
     ## confirmar esse on_delete CASCADE
-    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)  # Relacionamento com o UserProfile
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)  # Relacionamento com o Forum
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE) 
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE) 
+
+    def trust_rate(self):
+        likes = self.likes.filter(is_like=True).count()
+        dislikes = self.likes.filter(is_like=False).count()
+        return likes - dislikes
 
     def __str__(self):
         return f'Comment: "{self.content}" by User {self.user_profile} in {self.forum}'
 
     class Meta:
-        ordering = ['-post_date']  # Ordenação dos comentários pela data de postagem
+        ordering = ['-post_date'] 
 
     def save(self, *args, **kwargs):
         if not self.id: 
@@ -33,12 +37,28 @@ class Comment(models.Model):
         
         super().save(*args, **kwargs)
 
+    def get_like_count(self):
+        return self.likes.count()
+
     def get_creator_name(self):
         """
         Retorna o nome completo do criador do comentário a partir do modelo Account, que está relacionado ao UserProfile.
         Se o usuário não estiver relacionado, retorna 'Sistema'.
         """
-        if self.user_profile and self.user_profile.account:  # Verificando se existe o user_profile e o account
-            return self.user_profile.account.full_name()  # Acessa o nome completo através do campo account
+        if self.user_profile and self.user_profile.account: 
+            return self.user_profile.account.full_name()  
         else:
-            return 'Sistema'  # Retorna 'Sistema' caso não exista o user_profile ou o account
+            return 'Sistema'  
+
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment, related_name="likes", on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_like = models.BooleanField()
+
+    class Meta:
+        unique_together = ('comment', 'user_profile')
+
+    def __str__(self):
+        return f"Like by {self.user_profile} on Comment {self.comment.id}"
