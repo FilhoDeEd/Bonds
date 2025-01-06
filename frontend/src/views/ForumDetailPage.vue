@@ -108,9 +108,25 @@
 
                 <!-- Área de votação -->
                 <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
-                  <button class="hover:text-gray-300 transition-colors">^</button>
-                  <span class="my-1">0</span>
-                  <button class="hover:text-gray-300 transition-colors" style="transform: rotate(180deg)">^</button>
+                  <!-- Botão de Like -->
+                  <button 
+                    @click="likeComment(comment)" 
+                    :class="{'text-green-500': comment.has_liked === 1, 'hover:text-gray-300': comment.has_liked !== 1}" 
+                    class="transition-colors">
+                    ^
+                  </button>
+                  
+                  <!-- Exibe a quantidade de likes (se disponível) -->
+                  <span class="my-1">{{ comment.trust_rate || 0 }}</span>
+                  
+                  <!-- Botão de Dislike -->
+                  <button 
+                    @click="dislikeComment(comment)" 
+                    :class="{'text-red-500': comment.has_liked === -1, 'hover:text-gray-300': comment.has_liked !== -1}" 
+                    class="transition-colors" 
+                    style="transform: rotate(180deg)">
+                    ^
+                  </button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
@@ -311,6 +327,54 @@ const createComment = async () => {
   } catch (error) {
     console.error(error);
     toast.error('Erro ao criar comentário');
+  }
+};
+
+const likeComment = async (comment) => {
+  try {
+    if (comment.has_liked === 1) {
+      // Já está curtido, então "unlike"
+      await axios.delete(`${ENDPOINTS.UNLIKE_COMMENT}${comment.id}/`);
+      comment.has_liked = 0;
+      comment.trust_rate -= 1; // Remove o impacto do like
+    } else {
+      // Envia like
+      await axios.post(`${ENDPOINTS.LIKE_COMMENT}${comment.id}/`);
+      if (comment.has_liked === -1) {
+        // Remove dislike e adiciona like
+        comment.trust_rate += 2;
+      } else {
+        // Apenas adiciona like
+        comment.trust_rate += 1;
+      }
+      comment.has_liked = 1;
+    }
+  } catch (error) {
+    console.error("Erro ao curtir o comentário:", error);
+  }
+};
+
+const dislikeComment = async (comment) => {
+  try {
+    if (comment.has_liked === -1) {
+      // Já está descurtido, então "unlike"
+      await axios.delete(`${ENDPOINTS.UNLIKE_COMMENT}${comment.id}/`);
+      comment.has_liked = 0;
+      comment.trust_rate += 1; // Remove o impacto do dislike
+    } else {
+      // Envia dislike
+      await axios.post(`${ENDPOINTS.DISLIKE_COMMENT}${comment.id}/`);
+      if (comment.has_liked === 1) {
+        // Remove like e adiciona dislike
+        comment.trust_rate -= 2;
+      } else {
+        // Apenas adiciona dislike
+        comment.trust_rate -= 1;
+      }
+      comment.has_liked = -1;
+    }
+  } catch (error) {
+    console.error("Erro ao descurtir o comentário:", error);
   }
 };
 
