@@ -5,27 +5,50 @@ Content-Type: application/json
 
 {
     "content": "Este é um comentário de exemplo.",
-    "forum": 1 
+    "forum_slug": "centro-noticias-e-atualizacoes-locais"
 }
 
 ######
 
-POST http://localhost:8000/comment/edit/17/
+POST http://localhost:8000/comment/edit/18/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
-    "content": "Comentário para ser deletado"
+    "content": "Comentário editado"
 }
 
 ######
 
-POST http://localhost:8000/comment/delete/3/
+POST http://localhost:8000/comment/delete/17/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 ####### 
 
-GET http://localhost:8000/comment/list/1/ 
+GET http://localhost:8000/comment/list/centro-noticias-e-atualizacoes-locais/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
+
+
+### Teste: Adicionar um Like
+POST http://127.0.0.1:8000/comment/like/18/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Content-Type: application/json
+
+{
+  "is_like": true
+}
+
+### Teste: Adicionar um Dislike
+POST http://127.0.0.1:8000/comment/dislike/{comment_id}/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Content-Type: application/json
+
+{
+  "is_like": false
+}
+
+### Teste: Remover Like/Dislike
+DELETE http://127.0.0.1:8000/comment/unlike/{comment_id}/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
