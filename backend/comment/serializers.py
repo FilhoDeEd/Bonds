@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from comment.models import Comment, CommentLike
 from forum.models import Forum
+from user_profile.models import UserProfile
 
 class CommentSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='get_creator_name', read_only=True)
@@ -12,6 +13,7 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only=True,
         source='forum'
     )
+    has_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -24,11 +26,27 @@ class CommentSerializer(serializers.ModelSerializer):
             'forum',
             'forum_slug',
             'creator',
+            'has_liked'
         ]
-        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug']
+        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked']
 
     def get_trust_rate(self, obj):
         return obj.trust_rate()
+
+    def get_has_liked(self, obj):
+        user = self.context['request'].user
+        
+        if not user.is_authenticated:
+            return 0
+
+        try:
+            account = user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+            comment_like = CommentLike.objects.get(comment=obj, user_profile=user_profile)
+            return 1 if comment_like.is_like else -1
+        except (UserProfile.DoesNotExist, CommentLike.DoesNotExist):
+            return 0
+
     
 
 class CommentLikeSerializer(serializers.ModelSerializer):

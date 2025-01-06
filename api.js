@@ -29,4 +29,7 @@ export const ENDPOINTS = {
 
   LIST_COMMENTS : `${COMMENT_URL}/list`,
   CREATE_COMMENT : `${COMMENT_URL}/register/`,
+  LIKE_COMMENT: `${COMMENT_URL}/like/`,
+  DISLIKE_COMMENT: `${COMMENT_URL}/dislike/`,
+  UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`
 };

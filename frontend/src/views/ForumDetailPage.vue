@@ -108,9 +108,25 @@
 
                 <!-- Área de votação -->
                 <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
-                  <button class="hover:text-gray-300 transition-colors">^</button>
-                  <span class="my-1">0</span>
-                  <button class="hover:text-gray-300 transition-colors" style="transform: rotate(180deg)">^</button>
+                  <!-- Botão de Like -->
+                  <button 
+                    @click="likeComment(comment)" 
+                    :class="{'text-green-500': comment.has_liked === 1, 'hover:text-gray-300': comment.has_liked !== 1}"
+                    class="transition-colors">
+                    ^
+                  </button>
+                  
+                  <!-- Exibe a quantidade de likes (se disponível) -->
+                  <span class="my-1">{{ comment.trust_rate }}</span>
+                  
+                  <!-- Botão de Dislike -->
+                  <button 
+                    @click="dislikeComment(comment)" 
+                    :class="{'text-red-500': comment.has_liked === -1, 'hover:text-gray-300': comment.has_liked !== -1}" 
+                    class="transition-colors" 
+                    style="transform: rotate(180deg)">
+                    ^
+                  </button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
@@ -278,8 +294,8 @@ const fetchComments = async () => {
       id: comment.id,
       createdAt: formatDate(comment.post_date),
       creator: comment.creator,
-      upvotes: comment.upvotes,
-      downvotes: comment.downvotes,
+      trust_rate: comment.trust_rate,
+      has_liked: comment.has_liked,
     }));
     //toast.success('Comentários carregados com sucesso');
   } catch (error) {
@@ -306,6 +322,43 @@ const createComment = async () => {
   }
 };
 
+const likeComment = async (comment) => {
+  try {
+    let response;
+    if (comment.has_liked === 1) {
+      // Já está curtido, então "unlike"
+      response = await axios.delete(`${ENDPOINTS.UNLIKE_COMMENT}${comment.id}/`);
+    } else {
+      // Envia like
+      response = await axios.post(`${ENDPOINTS.LIKE_COMMENT}${comment.id}/`);
+    }
+
+    // Atualiza o trust_rate e o estado de like do comentário
+    comment.trust_rate = response.data.trust_rate;
+    comment.has_liked = comment.has_liked === 1 ? 0 : 1;
+  } catch (error) {
+    console.error("Erro ao curtir o comentário:", error);
+  }
+};
+
+const dislikeComment = async (comment) => {
+  try {
+    let response;
+    if (comment.has_liked === -1) {
+      // Já está descurtido, então "unlike"
+      response = await axios.delete(`${ENDPOINTS.UNLIKE_COMMENT}${comment.id}/`);
+    } else {
+      // Envia dislike
+      response = await axios.post(`${ENDPOINTS.DISLIKE_COMMENT}${comment.id}/`);
+    }
+
+    // Atualiza o trust_rate e o estado de dislike do comentário
+    comment.trust_rate = response.data.trust_rate;
+    comment.has_liked = comment.has_liked === -1 ? 0 : -1;
+  } catch (error) {
+    console.error("Erro ao descurtir o comentário:", error);
+  }
+};
 
 onMounted(() => {
   fetchForum();
