@@ -39,38 +39,17 @@
           </form>
 
           <div class="mt-6 text-center">
-            <div class="flex justify-center items-center mb-4">
-              <div class="border-t border-blueGray-300 flex-grow mr-8"></div>
-              <div class="border-t border-blueGray-300 flex-grow ml-8"></div>
-            </div>
+            
 
             <!-- Links Esqueci minha senha e Criar conta -->
-            <div
-              class="border-0 px-3 py-3 placeholder-blueGray-300 text-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-              style="background-color: #451724;">
-
-              <a href="javascript:void(0)" class="text-black-200">
-                <small>Esqueci minha senha</small>
-              </a>
-
-            </div>
-
-
-            <div class="flex justify-center items-center mb-4 mt-4">
-              <div class="border-t border-blueGray-300 flex-grow mr-2"></div>
-              <span class="text-xs text-blueGray-600">ou</span>
-              <div class="border-t border-blueGray-300 flex-grow ml-2"></div>
-            </div>
-
+          
 
             <div
-              class="border-0 px-3 py-3 placeholder-blueGray-300 text-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+              class="bg-blueGray-800 active:bg-blueGray-600 px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
               style="background-color: #142045;">
-
-              <router-link to="/auth/register" class="text-black-200">
+              <router-link to="/auth/register" class="block w-full h-full text-white">
                 <small>Quero criar uma conta</small>
               </router-link>
-
             </div>
           </div>
         </div>
