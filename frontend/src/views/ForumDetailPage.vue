@@ -71,6 +71,7 @@
               <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
                 <textarea
+                  v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
                   placeholder="No que você está pensando?" rows="3"></textarea>
 
@@ -155,14 +156,13 @@
 </template>
 
 <script setup>
- /* eslint-disable */
-import { ref, onMounted } from 'vue';
+/* eslint-disable */
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import MainLayout from '../layouts/mainLayout.vue';
+import { useToast } from 'vue-toastification';
+import axios from 'axios';
+import router from '../router/index.js';
 import { ENDPOINTS } from '../../../api';
-import axios from "axios";
-import router from "../router/index.js";
-import { useToast } from 'vue-toastification'; 
 
 const toast = useToast();
 const forumData = ref({
@@ -174,15 +174,15 @@ const forumData = ref({
   members: 0,
 });
 
-const comments = [ref({
-  content: '',
-  createdAt: '',
-  creator: '',
-  upvotes: 0,
-  downvotes: 0,
-})];
+const comments = ref([]);
+const newCommentContent = ref('');
+const editMode = ref(false);
+const route = useRoute();
+const slug = ref(localStorage.getItem('currentSlug') || route.params.slug);
+const new_slug = ref(false);
 
 const formatDate = (dateString) => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
@@ -191,22 +191,10 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
-const editMode = ref(false);
-const route = useRoute();
-const slug = ref(localStorage.getItem('currentSlug') || route.params.slug); // Inicializa com slug armazenado ou da rota
-const new_slug = ref(false);
-
 const fetchForum = async () => {
   try {
-    // Use o slug atualizado ou o original
     const currentSlug = new_slug.value || slug.value;
     const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${currentSlug}/`);
-
-    if (response.status !== 200) {
-      toast.error('Fórum não encontrado');
-      throw new Error('Erro ao buscar dados do fórum');
-    }
-
     forumData.value = {
       title: response.data.title,
       description: response.data.description,
@@ -215,9 +203,7 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
     };
-
-    fetchComments();    
-
+    await fetchComments();
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
@@ -226,45 +212,44 @@ const fetchForum = async () => {
 };
 
 const fetchComments = async () => {
-      const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${currentSlug}/`);
-      if (commentsResponse.status !== 200) {
-        toast.error('Erro ao buscar comentários');
-        throw new Error('Erro ao buscar comentários');
-      }
+  try {
+    const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${slug.value}/`);
 
-      comments.value = commentsResponse.data.map((comment) => ({
-        content: comment.content,
-        createdAt: formatDate(comment.creation_date),
-        creator: comment.creator,
-        upvotes: comment.upvotes,
-        downvotes: comment.downvotes,
-      }));
-    };
+    if (commentsResponse.status !== 200) {
+      toast.error('Erro ao buscar comentários');
+      throw new Error('Erro ao buscar comentários');
+    }
 
-// Carrega os dados ao montar o componente
-onMounted(() => {
-  fetchForum();
-});
+    // Acesse os resultados dentro de commentsResponse.data.results
+    comments.value = commentsResponse.data.results.map((comment) => ({
+      content: comment.content,
+      id: comment.id,
+      createdAt: formatDate(comment.post_date), // Use a chave correta para a data
+      creator: comment.creator,
+      upvotes: comment.upvotes,
+      downvotes: comment.downvotes,
+    }));
 
-// Alterna entre os modos de edição e atualiza o slug se necessário
+    toast.success('Comentários carregados com sucesso');
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao carregar comentários');
+  }
+};
+
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
     try {
-      const response = await axios.post(
-        `${ENDPOINTS.EDIT_FORUM}/${slug.value}/`,
-        { title: forumData.value.title, description: forumData.value.description }
-      );
+      const response = await axios.post(`${ENDPOINTS.EDIT_FORUM}`, {
+        title: forumData.value.title,
+        description: forumData.value.description,
+      });
 
-      // Atualize o new_slug se um novo for retornado
       if (response.data.slug) {
         new_slug.value = response.data.slug;
-
-        // Persistindo o novo slug no localStorage
-        localStorage.setItem('currentSlug', new_slug.value);
-
-        // Atualize o slug reativo e recarregue os dados
         slug.value = new_slug.value;
+        localStorage.setItem('currentSlug', new_slug.value);
         toast.success('Fórum atualizado com sucesso');
         await fetchForum();
       }
@@ -274,27 +259,32 @@ const toggleEdition = async () => {
   }
 };
 
-// Cria um novo comentário
 const createComment = async () => {
   try {
-    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}/${slug.value}/`, {
-      content: comments.value.content,
+    const currentSlug = new_slug.value || slug.value;
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, {
+      content: newCommentContent.value,
+      forum_slug: currentSlug,
     });
-
-    if (response.status !== 201) {
-      toast.error('Erro ao criar comentário');
-      throw new Error('Erro ao criar comentário');
-    }
-
+    console.log(response);
     toast.success('Comentário criado com sucesso');
-    comments.value.content = '';
-    await fetchForum();
+    newCommentContent.value = '';
+    await fetchComments();
   } catch (error) {
     console.error(error);
+    toast.error('Erro ao criar comentário');
   }
 };
 
+onMounted(() => {
+  fetchForum();
+});
+
+watch(slug, (newValue) => {
+  localStorage.setItem('currentSlug', newValue);
+});
 </script>
+
 
 <style scoped>
 .h-85 {

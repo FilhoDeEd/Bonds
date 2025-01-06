@@ -27,6 +27,6 @@ export const ENDPOINTS = {
   REGISTER_FORUM: `${FORUM_URL}/register/`,
   EDIT_FORUM: `${FORUM_URL}/edit`,
 
-  LIST_COMMENTS : `${COMMENT_URL}/list/`,
+  LIST_COMMENTS : `${COMMENT_URL}/list`,
   CREATE_COMMENT : `${COMMENT_URL}/register/`,
 };

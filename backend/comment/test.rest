@@ -1,6 +1,6 @@
 
 POST http://localhost:8000/comment/register/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Authorization: Token 44185d2d7c01e91fae7d2a8a03b1e72cdd183b25
 Content-Type: application/json
 
 {
