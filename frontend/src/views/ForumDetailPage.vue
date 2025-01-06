@@ -85,7 +85,9 @@
                     </button>
                   </div>
 
-                  <button class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
+                  <button 
+                  @click="createComment"
+                  class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     Publicar
                   </button>
                 </div>
@@ -102,28 +104,23 @@
           <div class="space-y-4">
             <article class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
               style="background-color: rgba(124, 122, 187, 1);">
-              <div class="flex h-full">
                 <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 flex items-center">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
-                </div>
-                
-                <!-- Conteúdo do comentário -->
-                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <a href="#" class="text-white flex flex-col h-full justify-between">
-                    <!-- Título ou nome do autor -->
-                    <h2 class="text-4xl font-semibold mb-8">Nome do Autor</h2>
-                    
-                    <!-- Texto do comentário -->
-                    <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
-                      <p class="mb-auto leading-relaxed">Este é o conteúdo fixo de um comentário. O autor compartilha sua opinião ou observação aqui.</p>
-                      
-                      <!-- Detalhes do comentário -->
-                      <p class="mt-8">Publicado há 2 horas</p>
-                    </div>
-                  </a>
-                </div>
+              <div v-for="comment in comments" :key="comment.createdAt" class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200" style="background-color: rgba(124, 122, 187, 1);">
+                <div class="flex h-full">
+                  <div class="w-1/4 flex items-center">
+                    <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
+                  </div>
+                  <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                    <a href="#" class="text-white flex flex-col h-full justify-between">
+                      <h2 class="text-4xl font-semibold mb-8">{{ comment.creator }}</h2>
+                      <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                        <p class="mb-auto leading-relaxed">{{ comment.content }}</p>
+                        <p class="mt-8">{{ comment.createdAt }}</p>
+                      </div>
+                    </a>
+                  </div>
               </div>
+            </div>
             </article>
           </div>
         </div>
@@ -178,7 +175,6 @@ const forumData = ref({
 });
 
 const comments = [ref({
-  title: '',
   content: '',
   createdAt: '',
   creator: '',
@@ -220,23 +216,7 @@ const fetchForum = async () => {
       members: response.data.subscribers_count,
     };
 
-    const fetchComments = async () => {
-      const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${currentSlug}/`);
-      if (commentsResponse.status !== 200) {
-        toast.error('Erro ao buscar comentários');
-        throw new Error('Erro ao buscar comentários');
-      }
-
-      comments.value = commentsResponse.data.map((comment) => ({
-        title: comment.title,
-        content: comment.content,
-        createdAt: formatDate(comment.creation_date),
-        creator: comment.creator,
-        upvotes: comment.upvotes,
-        downvotes: comment.downvotes,
-      }));
-    };
-    
+    fetchComments();    
 
   } catch (error) {
     console.error(error);
@@ -244,6 +224,22 @@ const fetchForum = async () => {
     router.push('/home');
   }
 };
+
+const fetchComments = async () => {
+      const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${currentSlug}/`);
+      if (commentsResponse.status !== 200) {
+        toast.error('Erro ao buscar comentários');
+        throw new Error('Erro ao buscar comentários');
+      }
+
+      comments.value = commentsResponse.data.map((comment) => ({
+        content: comment.content,
+        createdAt: formatDate(comment.creation_date),
+        creator: comment.creator,
+        upvotes: comment.upvotes,
+        downvotes: comment.downvotes,
+      }));
+    };
 
 // Carrega os dados ao montar o componente
 onMounted(() => {
@@ -275,6 +271,26 @@ const toggleEdition = async () => {
     } catch (error) {
       console.error(error);
     }
+  }
+};
+
+// Cria um novo comentário
+const createComment = async () => {
+  try {
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}/${slug.value}/`, {
+      content: comments.value.content,
+    });
+
+    if (response.status !== 201) {
+      toast.error('Erro ao criar comentário');
+      throw new Error('Erro ao criar comentário');
+    }
+
+    toast.success('Comentário criado com sucesso');
+    comments.value.content = '';
+    await fetchForum();
+  } catch (error) {
+    console.error(error);
   }
 };
 
