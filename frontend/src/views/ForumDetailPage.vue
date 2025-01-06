@@ -163,7 +163,7 @@ import { useToast } from 'vue-toastification';
 import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../../api';
-
+import MainLayout from '../layouts/mainLayout.vue';
 const toast = useToast();
 const forumData = ref({
   title: '',
