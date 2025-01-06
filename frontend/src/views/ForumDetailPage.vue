@@ -71,6 +71,7 @@
               <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
                 <textarea
+                  v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
                   placeholder="No que você está pensando?" rows="3"></textarea>
 
@@ -85,7 +86,9 @@
                     </button>
                   </div>
 
-                  <button class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
+                  <button 
+                  @click="createComment"
+                  class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     Publicar
                   </button>
                 </div>
@@ -102,28 +105,23 @@
           <div class="space-y-4">
             <article class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
               style="background-color: rgba(124, 122, 187, 1);">
-              <div class="flex h-full">
                 <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 flex items-center">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
-                </div>
-                
-                <!-- Conteúdo do comentário -->
-                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <a href="#" class="text-white flex flex-col h-full justify-between">
-                    <!-- Título ou nome do autor -->
-                    <h2 class="text-4xl font-semibold mb-8">Nome do Autor</h2>
-                    
-                    <!-- Texto do comentário -->
-                    <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
-                      <p class="mb-auto leading-relaxed">Este é o conteúdo fixo de um comentário. O autor compartilha sua opinião ou observação aqui.</p>
-                      
-                      <!-- Detalhes do comentário -->
-                      <p class="mt-8">Publicado há 2 horas</p>
-                    </div>
-                  </a>
-                </div>
+              <div v-for="comment in comments" :key="comment.createdAt" class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200" style="background-color: rgba(124, 122, 187, 1);">
+                <div class="flex h-full">
+                  <div class="w-1/4 flex items-center">
+                    <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
+                  </div>
+                  <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                    <a href="#" class="text-white flex flex-col h-full justify-between">
+                      <h2 class="text-4xl font-semibold mb-8">{{ comment.creator }}</h2>
+                      <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                        <p class="mb-auto leading-relaxed">{{ comment.content }}</p>
+                        <p class="mt-8">{{ comment.createdAt }}</p>
+                      </div>
+                    </a>
+                  </div>
               </div>
+            </div>
             </article>
           </div>
         </div>
@@ -158,14 +156,15 @@
 </template>
 
 <script setup>
- /* eslint-disable */
-import { ref, onMounted } from 'vue';
+/* eslint-disable */
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import MainLayout from '../layouts/mainLayout.vue';
+import { useToast } from 'vue-toastification';
+import axios from 'axios';
+import router from '../router/index.js';
 import { ENDPOINTS } from '../../../api';
-import axios from "axios";
-import router from "../router/index.js";
 
+const toast = useToast();
 const forumData = ref({
   title: '',
   description: '',
@@ -175,7 +174,15 @@ const forumData = ref({
   members: 0,
 });
 
+const comments = ref([]);
+const newCommentContent = ref('');
+const editMode = ref(false);
+const route = useRoute();
+const slug = ref(localStorage.getItem('currentSlug') || route.params.slug);
+const new_slug = ref(false);
+
 const formatDate = (dateString) => {
+  if (!dateString) return '';
   const date = new Date(dateString);
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
@@ -184,22 +191,10 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
-const editMode = ref(false);
-const route = useRoute();
-const slug = ref(localStorage.getItem('currentSlug') || route.params.slug); // Inicializa com slug armazenado ou da rota
-const new_slug = ref(false);
-
 const fetchForum = async () => {
   try {
-    // Use o slug atualizado ou o original
     const currentSlug = new_slug.value || slug.value;
     const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${currentSlug}/`);
-
-    if (response.status !== 200) {
-      throw new Error('Erro ao buscar dados do fórum');
-    }
-
-    console.log(response.data);
     forumData.value = {
       title: response.data.title,
       description: response.data.description,
@@ -208,39 +203,54 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
     };
-
-    //Add list comments here
-
+    await fetchComments();
   } catch (error) {
     console.error(error);
+    toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
   }
 };
 
-// Carrega os dados ao montar o componente
-onMounted(() => {
-  fetchForum();
-});
+const fetchComments = async () => {
+  try {
+    const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${slug.value}/`);
 
-// Alterna entre os modos de edição e atualiza o slug se necessário
+    if (commentsResponse.status !== 200) {
+      toast.error('Erro ao buscar comentários');
+      throw new Error('Erro ao buscar comentários');
+    }
+
+    // Acesse os resultados dentro de commentsResponse.data.results
+    comments.value = commentsResponse.data.results.map((comment) => ({
+      content: comment.content,
+      id: comment.id,
+      createdAt: formatDate(comment.post_date), // Use a chave correta para a data
+      creator: comment.creator,
+      upvotes: comment.upvotes,
+      downvotes: comment.downvotes,
+    }));
+
+    toast.success('Comentários carregados com sucesso');
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao carregar comentários');
+  }
+};
+
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
     try {
-      const response = await axios.post(
-        `${ENDPOINTS.EDIT_FORUM}/${slug.value}/`,
-        { title: forumData.value.title, description: forumData.value.description }
-      );
+      const response = await axios.post(`${ENDPOINTS.EDIT_FORUM}`, {
+        title: forumData.value.title,
+        description: forumData.value.description,
+      });
 
-      // Atualize o new_slug se um novo for retornado
       if (response.data.slug) {
         new_slug.value = response.data.slug;
-
-        // Persistindo o novo slug no localStorage
-        localStorage.setItem('currentSlug', new_slug.value);
-
-        // Atualize o slug reativo e recarregue os dados
         slug.value = new_slug.value;
+        localStorage.setItem('currentSlug', new_slug.value);
+        toast.success('Fórum atualizado com sucesso');
         await fetchForum();
       }
     } catch (error) {
@@ -249,7 +259,32 @@ const toggleEdition = async () => {
   }
 };
 
+const createComment = async () => {
+  try {
+    const currentSlug = new_slug.value || slug.value;
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, {
+      content: newCommentContent.value,
+      forum_slug: currentSlug,
+    });
+    console.log(response);
+    toast.success('Comentário criado com sucesso');
+    newCommentContent.value = '';
+    await fetchComments();
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao criar comentário');
+  }
+};
+
+onMounted(() => {
+  fetchForum();
+});
+
+watch(slug, (newValue) => {
+  localStorage.setItem('currentSlug', newValue);
+});
 </script>
+
 
 <style scoped>
 .h-85 {
