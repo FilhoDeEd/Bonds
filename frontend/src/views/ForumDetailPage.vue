@@ -103,26 +103,51 @@
             <article class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
               style="background-color: rgba(124, 122, 187, 1);">
               <div class="flex h-full">
-                <!-- Área de votação como uma coluna separada -->
+                <!-- Área de votação -->
                 <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
                   <button class="hover:text-gray-300 transition-colors">^</button>
                   <span class="my-1">0</span>
-                  <button class="hover:text-gray-300 transition-colors rotate-180">^</button>
+                  <button class="hover:text-gray-300 transition-colors" style="transform: rotate(180deg)">^</button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 flex items-center">
+                <div class="w-1/4 flex flex-col">
                   <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
+                  
+                  <!-- Menu dropdown -->
+                  <div class="relative mt-2 self-start">
+                    <button @click="isMenuOpen = !isMenuOpen" 
+                            class="text-white text-xl hover:text-gray-300 rotate-90">
+                      ⋮
+                    </button>
+                    
+                    <!-- Dropdown menu -->
+                    <div v-if="isMenuOpen" 
+                         class="absolute left-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                      <button @click="isMenuOpen = false" 
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                        Editar
+                      </button>
+                      <button @click="isMenuOpen = false" 
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                        Reportar
+                      </button>
+                      <button @click="isMenuOpen = false" 
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                        Deletar
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <a href="#" class="text-white flex flex-col h-full justify-between">
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-4xl font-semibold mb-8">Nome do Autor</h2>
+                    <h2 class="text-lg font-semibold mb-8">Nome do Autor</h2>
                     
                     <!-- Texto do comentário -->
-                    <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                    <div class="text-lg text-gray-100 flex flex-col justify-between flex-grow">
                       <p class="mb-auto leading-relaxed">Este é o conteúdo fixo de um comentário. O autor compartilha sua opinião ou observação aqui.</p>
                       
                       <!-- Detalhes do comentário -->
@@ -195,6 +220,7 @@ const editMode = ref(false);
 const route = useRoute();
 const slug = ref(localStorage.getItem('currentSlug') || route.params.slug); // Inicializa com slug armazenado ou da rota
 const new_slug = ref(false);
+const isMenuOpen = ref(false);
 
 const fetchForum = async () => {
   try {
