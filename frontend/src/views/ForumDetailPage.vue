@@ -108,9 +108,13 @@
 
                 <!-- Área de votação -->
                 <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
-                  <button class="hover:text-gray-300 transition-colors">^</button>
+                  <button class="hover:text-gray-300 transition-colors">
+                    ▲
+                  </button>
                   <span class="my-1">0</span>
-                  <button class="hover:text-gray-300 transition-colors" style="transform: rotate(180deg)">^</button>
+                  <button class="hover:text-gray-300 transition-colors">
+                    ▼
+                  </button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
@@ -218,6 +222,7 @@ const editMode = ref(false);
 const route = useRoute();
 const slug = ref(localStorage.getItem('currentSlug') || route.params.slug);
 const new_slug = ref(false);
+const isMenuOpen = ref(false);
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
