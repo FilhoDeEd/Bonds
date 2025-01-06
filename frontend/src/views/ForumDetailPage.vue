@@ -103,6 +103,13 @@
             <article class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
               style="background-color: rgba(124, 122, 187, 1);">
               <div class="flex h-full">
+                <!-- Área de votação como uma coluna separada -->
+                <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
+                  <button class="hover:text-gray-300 transition-colors">^</button>
+                  <span class="my-1">0</span>
+                  <button class="hover:text-gray-300 transition-colors rotate-180">^</button>
+                </div>
+
                 <!-- Imagem do autor do comentário -->
                 <div class="w-1/4 flex items-center">
                   <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
