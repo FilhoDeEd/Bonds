@@ -103,9 +103,9 @@
         <!-- Posts Section -->
         <div class="w-3/4">
           <div class="space-y-4">
-            <article class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-              style="background-color: rgba(124, 122, 187, 1);">
+            <article v-for="comment in comments" :key="comment.createdAt" class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200" style="background-color: rgba(124, 122, 187, 1);">
               <div class="flex h-full">
+
                 <!-- Área de votação -->
                 <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
                   <button class="hover:text-gray-300 transition-colors">^</button>
@@ -147,14 +147,14 @@
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <a href="#" class="text-white flex flex-col h-full justify-between">
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-lg font-semibold mb-8">Nome do Autor</h2>
+                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
                     
                     <!-- Texto do comentário -->
                     <div class="text-lg text-gray-100 flex flex-col justify-between flex-grow">
-                      <p class="mb-auto leading-relaxed">Este é o conteúdo fixo de um comentário. O autor compartilha sua opinião ou observação aqui.</p>
+                      <p class="mb-auto leading-relaxed">{{ comment.content }}</p>
                       
                       <!-- Detalhes do comentário -->
-                      <p class="mt-8">Publicado há 2 horas</p>
+                      <p class="mt-8">{{ comment.createdAt }}</p>
                     </div>
                   </a>
                 </div>
