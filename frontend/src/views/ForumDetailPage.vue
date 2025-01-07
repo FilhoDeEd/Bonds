@@ -107,61 +107,74 @@
               <div class="flex h-full">
 
                 <!-- Área de votação -->
-                <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
-                  <!-- Botão de Like -->
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
                   <button 
-                    @click="likeComment(comment)" 
-                    :class="{'text-green-500': comment.has_liked === 1, 'hover:text-gray-300': comment.has_liked !== 1}"
-                    class="transition-colors">
-                    ^
+                    @click="likeComment(comment)"
+                    class="vote"
+                    :class="{
+                      'on-up': comment.has_liked === 1,
+                      'hover:text-gray-300': comment.has_liked !== 1
+                    }"
+                  >
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" 
+                            stroke="white" 
+                            stroke-width="2" 
+                            fill="none"
+                            class="svg-path"></path>
+                    </svg>
                   </button>
-                  
-                  <!-- Exibe a quantidade de likes (se disponível) -->
-                  <span class="my-1">{{ comment.trust_rate }}</span>
-                  
-                  <!-- Botão de Dislike -->
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
                   <button 
-                    @click="dislikeComment(comment)" 
-                    :class="{'text-red-500': comment.has_liked === -1, 'hover:text-gray-300': comment.has_liked !== -1}" 
-                    class="transition-colors" 
-                    style="transform: rotate(180deg)">
-                    ^
+                    @click="dislikeComment(comment)"
+                    class="vote"
+                    :class="{
+                      'on-down': comment.has_liked === -1,
+                      'hover:text-gray-300': comment.has_liked !== -1
+                    }"
+                  >
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" 
+                            stroke="white" 
+                            stroke-width="2" 
+                            fill="none"
+                            class="svg-path"></path>
+                    </svg>
                   </button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 flex flex-col">
+                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
                   <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
                   
                   <!-- Menu dropdown -->
-                  <div class="relative mt-2 self-start">
-                    <button @click="isMenuOpen = !isMenuOpen" 
-                            class="text-white text-xl hover:text-gray-300 rotate-90">
-                      ⋮
-                    </button>
-                    
-                    <!-- Dropdown menu -->
-                    <div v-if="isMenuOpen" 
-                         class="absolute left-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                      <button @click="isMenuOpen = false" 
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Editar
-                      </button>
-                      <button @click="isMenuOpen = false" 
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Reportar
-                      </button>
-                      <button @click="isMenuOpen = false" 
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Deletar
-                      </button>
-                    </div>
-                  </div>
+                  
                 </div>
                 
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <a href="#" class="text-white flex flex-col h-full justify-between">
+                  <div class="text-white flex flex-col h-full justify-between">
+                    <!-- Menu dropdown -->
+                    <div class="relative self-end mb-2">
+                      <button @click="toggleMenu(comment.id)" 
+                              class="text-white text-xl hover:text-gray-300">
+                        ⋯
+                      </button>
+                      
+                      <!-- Dropdown menu -->
+                      <div v-if="menuStates[comment.id]" 
+                           class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="menuStates[comment.id] = false" 
+                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Deletar
+                        </button>
+                        <button @click="menuStates[comment.id] = false" 
+                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Reportar
+                        </button>
+                      </div>
+                    </div>
+
                     <!-- Título ou nome do autor -->
                     <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
                     
@@ -172,7 +185,7 @@
                       <!-- Detalhes do comentário -->
                       <p class="mt-8">{{ comment.createdAt }}</p>
                     </div>
-                  </a>
+                  </div>
                 </div>
               </div>
             </article>
@@ -217,6 +230,8 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../../api';
 import MainLayout from '../layouts/mainLayout.vue';
+import upvoteIcon from '@/assets/img/upvote.png';
+import downvoteIcon from '@/assets/img/downvote.png';
 
 const toast = useToast();
 const forumData = ref({
@@ -360,6 +375,14 @@ const dislikeComment = async (comment) => {
   }
 };
 
+// Adicione um map para controlar o estado do menu de cada comentário
+const menuStates = ref({});
+
+// Função para alternar o menu de um comentário específico
+const toggleMenu = (commentId) => {
+  menuStates.value[commentId] = !menuStates.value[commentId];
+};
+
 onMounted(() => {
   fetchForum();
 });
@@ -403,5 +426,26 @@ button {
 
 button:hover {
   transform: translateY(-1px);
+}
+
+.vote {
+  display: inline-block;
+  cursor: pointer;
+  color: #687074;
+  transition: all 0.2s ease;
+} 
+
+.vote.on-up {
+  color: #22c55e; /* verde */
+}
+
+.vote.on-down {
+  color: #ef4444; /* vermelho */
+}
+
+.vote.on-up .svg-path,
+.vote.on-down .svg-path {
+  fill: currentColor;
+  stroke: currentColor;
 }
 </style>

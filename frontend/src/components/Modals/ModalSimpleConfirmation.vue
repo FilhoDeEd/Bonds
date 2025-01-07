@@ -4,23 +4,28 @@
       <button class="close-btn" @click="closeModal">X</button>
       <h2>Confirmar Ação?</h2>
       
-      <!-- Confirmar ação -->
-      <button 
-        class="bg-emerald-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-emerald-600 
-         focus:outline-none focus:ring-2 focus:ring-emerald-500 
-         transition duration-300 transform hover:scale-105 w-full"
-        @click="handleConfirm"
-      >
-        Confirmar
-      </button>
+      <!-- Container para os botões lado a lado -->
+      <div class="flex gap-4 mt-4">
+        <!-- Confirmar ação -->
+        <button 
+          class="flex-1 bg-emerald-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-emerald-600 
+           focus:outline-none focus:ring-2 focus:ring-emerald-500 
+           transition duration-300 transform hover:scale-105"
+          @click="handleConfirm"
+        >
+          Confirmar
+        </button>
 
-      <!-- Cancelar ação -->
-      <button 
-        class="bg-red-500 text-white text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
-        @click="closeModal"
-      >
-        Cancelar
-      </button>
+        <!-- Cancelar ação -->
+        <button 
+          class="flex-1 bg-red-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-red-600 
+           focus:outline-none focus:ring-2 focus:ring-red-500 
+           transition duration-300 transform hover:scale-105"
+          @click="closeModal"
+        >
+          Cancelar
+        </button>
+      </div>
     </div>
   </div>
 </template>
