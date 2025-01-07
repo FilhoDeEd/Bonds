@@ -135,40 +135,34 @@ class ForumDeleteView(APIView):
 
         return Response({"detail": "Fórum excluído com sucesso."}, status=status.HTTP_200_OK)
 
-
 class SubscribeView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, forum_id):
-        
-
-        if not forum_id:
-            return Response({'detail': 'Forum ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
+    def post(self, request, slug):
         try:
-            # Obtém o fórum
-            forum = Forum.objects.get(id=forum_id)
+
+            forum = Forum.objects.get(slug=slug)
         except Forum.DoesNotExist:
             return Response({'detail': 'Forum not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            # Obtém o perfil do usuário autenticado
+
             account = request.user.account
             user_profile = UserProfile.objects.get(account=account, active=True)
         except UserProfile.DoesNotExist:
             return Response({'detail': 'Active user profile not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Verifica se o usuário já está inscrito no fórum
+
         if Subscriber.objects.filter(user_profile=user_profile, forum=forum).exists():
             return Response({'detail': 'User already subscribed to this forum.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             with transaction.atomic():
-                # Cria a inscrição
+
                 Subscriber.objects.create(user_profile=user_profile, forum=forum)
 
-                # Atualiza o contador de inscritos do fórum
+    
                 forum.subscribers_count += 1
                 forum.save()
 
