@@ -39,6 +39,7 @@
             <!-- Botões alinhados ao bottom -->
             <div class="px-6 pb-4 flex space-x-4 relative z-10">
               <button type="button" 
+                @click="subscribe"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 Participar
@@ -147,7 +148,6 @@
                 <div class="w-1/4 h-70-px flex flex-col pt-12 ">
                   <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
                   
-                  <!-- Menu dropdown -->
                   
                 </div>
                 
@@ -164,7 +164,12 @@
                       <!-- Dropdown menu -->
                       <div v-if="menuStates[comment.id]" 
                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                        <button @click="menuStates[comment.id] = false" 
+                           <button @click="() => { menuStates[comment.id] = false; editComment(comment); comment.isEditing = true }" 
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Editar
+                          </button>
+                           <button @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }" 
+                             
                                 class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
                         </button>
@@ -172,20 +177,36 @@
                                 class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Reportar
                         </button>
+
                       </div>
                     </div>
 
                     <!-- Título ou nome do autor -->
                     <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
                     
-                    <!-- Texto do comentário -->
-                    <div class="text-lg text-gray-100 flex flex-col justify-between flex-grow">
-                      <p class="mb-auto leading-relaxed">{{ comment.content }}</p>
-                      
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p 
+                        v-if="!comment.isEditing" 
+                        class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" 
+                        title="Clique duas vezes para editar"
+                      >
+                        {{ comment.content }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea 
+                        v-else 
+                        v-model="comment.tempContent" 
+                        @blur="cancelEdit(comment)" 
+                        @keyup.enter="saveEdit(comment)" 
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
                       <!-- Detalhes do comentário -->
                       <p class="mt-8">{{ comment.createdAt }}</p>
                     </div>
-                  </div>
                 </div>
               </div>
             </article>
@@ -292,6 +313,7 @@ const fetchForum = async () => {
       createdAt: formatDate(response.data.creation_date),
       creator: response.data.creator,
       members: response.data.subscribers_count,
+      tempContent: "",
     };
     await fetchComments();
   } catch (error) {
@@ -375,6 +397,65 @@ const dislikeComment = async (comment) => {
   }
 };
 
+const editComment = async(comment)=>{
+  try{
+    const response = await axios.post(`${ENDPOINTS.EDIT_COMMENT}/${comment.id}/`, {
+      content: comment.content,
+    });
+
+    // Atualiza o conteúdo do comentário com a resposta do servidor
+    toast.success('Comentário editado com sucesso');
+  }
+  catch(err){
+    console.log(err);
+    toast.error("Algo deu errado!");
+  }
+};
+
+const cancelEdit = async(comment) =>{
+  try{
+    comment.isEditing = false;
+    comment.tempContent = comment.content;
+  }
+  catch(err){
+    console.log(err)
+  }
+};
+
+const saveEdit = async(comment) =>{
+  try{
+    if (comment.tempContent !== comment.content && comment.tempContent){
+      comment.content = comment.tempContent;
+      editComment(comment);
+    }
+    comment.isEditing = false;
+  }
+  catch(err){
+    console.log(err)
+  }
+};
+
+const deleteComment = async (comment) => {
+  try {
+    await axios.post(`${ENDPOINTS.DELETE_COMMENT}/${comment.id}/`);
+    toast.success('Comentário deletado com sucesso');
+    await fetchComments(); // Recarrega os comentários
+  } catch (error) {
+    console.error("Erro ao deletar o comentário:", error);
+    toast.error('Erro ao deletar comentário');
+  }
+};
+
+const subscribe = async ()=>{
+  try{
+    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}`)
+    toast.success("Você se inscreveu no fórum!")
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
 // Adicione um map para controlar o estado do menu de cada comentário
 const menuStates = ref({});
 
@@ -405,6 +486,10 @@ onUnmounted(() => {
 <style scoped>
 .h-85 {
   height: 85%;
+}
+
+.bg-pattern{
+  background-color: #363474;
 }
 
 .h-400-px {

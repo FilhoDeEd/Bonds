@@ -26,9 +26,12 @@ export const ENDPOINTS = {
   FORUM_DETAIL: `${FORUM_URL}/detail`,
   REGISTER_FORUM: `${FORUM_URL}/register/`,
   EDIT_FORUM: `${FORUM_URL}/edit`,
+  SUBSCRIBE_FORUM: `${FORUM_URL}/subscribe`,
 
   LIST_COMMENTS : `${COMMENT_URL}/list`,
   CREATE_COMMENT : `${COMMENT_URL}/register/`,
+  EDIT_COMMENT : `${COMMENT_URL}/edit`,
+  DELETE_COMMENT : `${COMMENT_URL}/delete`,
   LIKE_COMMENT: `${COMMENT_URL}/like/`,
   DISLIKE_COMMENT: `${COMMENT_URL}/dislike/`,
   UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`
