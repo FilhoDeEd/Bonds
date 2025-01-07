@@ -1,7 +1,7 @@
 <template>
-  <main-layout>
-    <main>
-      <section class="relative block h-600-px -mt-24">
+  <MainLayout>
+    <div class="bg-blueGray-200 -mt-24">
+      <section class="relative block h-600-px">
         <div class="absolute top-0 w-full h-full bg-center bg-cover" style="
             background-image: url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80');
           ">
@@ -16,7 +16,7 @@
         </div>
       </section>
 
-      <section id="dataProfile" class="flex bg-blueGray-200 ">
+      <section id="dataProfile" class="flex bg-blueGray-200 min-h-[calc(100vh-600px)]">
         <div class="container mx-auto px-4 -pt-8 " id="infoProfile">
           
           <form @submit.prevent="openModalConfirmEdit">
@@ -212,8 +212,8 @@
       <ModalSimpleConfirmation :isSimpleConfirmModalOpen="isEditConfirmationModalOpen" @close="closeModalConfirmEdit"
         @confirm="handleEditConfirmation" />
 
-    </main>
-  </main-layout>
+    </div>
+  </MainLayout>
 </template>
 
 <script>
@@ -483,12 +483,7 @@ export default {
   background-color: #ffffff;
   /* Cor azul personalizada */
 }
-
-.bg-white {
-  padding-top: 20px;
-  padding-bottom: 2rem;
-  /* Adiciona um espaço interno inferior */
-}
+  
 
 input {
   background-color: #f9fafb;
@@ -514,5 +509,9 @@ input:not([readonly]) {
 
 #infoProfile form > div {
   min-height: 800px;
+}
+
+#dataProfile {
+  padding-top: 0;
 }
 </style>
