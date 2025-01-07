@@ -112,7 +112,7 @@
                     @click="likeComment(comment)"
                     class="vote"
                     :class="{
-                      'on': comment.has_liked === 1,
+                      'on-up': comment.has_liked === 1,
                       'hover:text-gray-300': comment.has_liked !== 1
                     }"
                   >
@@ -124,12 +124,12 @@
                             class="svg-path"></path>
                     </svg>
                   </button>
-                  <span class="my-1">{{ comment.trust_rate }}</span>
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
                   <button 
                     @click="dislikeComment(comment)"
                     class="vote"
                     :class="{
-                      'on': comment.has_liked === -1,
+                      'on-down': comment.has_liked === -1,
                       'hover:text-gray-300': comment.has_liked !== -1
                     }"
                   >
@@ -435,11 +435,16 @@ button:hover {
   transition: all 0.2s ease;
 } 
 
-.vote.on {
-  color: #f48024;
+.vote.on-up {
+  color: #22c55e; /* verde */
 }
 
-.vote.on .svg-path {
+.vote.on-down {
+  color: #ef4444; /* vermelho */
+}
+
+.vote.on-up .svg-path,
+.vote.on-down .svg-path {
   fill: currentColor;
   stroke: currentColor;
 }
