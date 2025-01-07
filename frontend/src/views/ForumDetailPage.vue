@@ -39,7 +39,7 @@
             <!-- Botões alinhados ao bottom -->
             <div class="px-6 pb-4 flex space-x-4 relative z-10">
               <button type="button" 
-                @click="subscribe"
+                @click="subscribe()"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 Participar
@@ -448,7 +448,7 @@ const deleteComment = async (comment) => {
 
 const subscribe = async ()=>{
   try{
-    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}`)
+    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`)
     toast.success("Você se inscreveu no fórum!")
   }
   catch(err){
