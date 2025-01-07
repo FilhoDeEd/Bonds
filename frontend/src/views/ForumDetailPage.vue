@@ -107,13 +107,39 @@
               <div class="flex h-full">
 
                 <!-- Área de votação -->
-                <div class="flex flex-col items-center text-white text-2xl font-bold w-12">
-                  <button class="hover:opacity-80 transition-opacity">
-                    <img :src="upvoteIcon" alt="Upvote" class="w-6 h-6">
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button 
+                    @click="likeComment(comment)"
+                    class="vote"
+                    :class="{
+                      'on': comment.has_liked === 1,
+                      'hover:text-gray-300': comment.has_liked !== 1
+                    }"
+                  >
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" 
+                            stroke="white" 
+                            stroke-width="2" 
+                            fill="none"
+                            class="svg-path"></path>
+                    </svg>
                   </button>
-                  <span class="my-1">0</span>
-                  <button class="hover:opacity-80 transition-opacity">
-                    <img :src="downvoteIcon" alt="Downvote" class="w-6 h-6">
+                  <span class="my-1">{{ comment.trust_rate }}</span>
+                  <button 
+                    @click="dislikeComment(comment)"
+                    class="vote"
+                    :class="{
+                      'on': comment.has_liked === -1,
+                      'hover:text-gray-300': comment.has_liked !== -1
+                    }"
+                  >
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" 
+                            stroke="white" 
+                            stroke-width="2" 
+                            fill="none"
+                            class="svg-path"></path>
+                    </svg>
                   </button>
                 </div>
 
@@ -400,5 +426,21 @@ button {
 
 button:hover {
   transform: translateY(-1px);
+}
+
+.vote {
+  display: inline-block;
+  cursor: pointer;
+  color: #687074;
+  transition: all 0.2s ease;
+} 
+
+.vote.on {
+  color: #f48024;
+}
+
+.vote.on .svg-path {
+  fill: currentColor;
+  stroke: currentColor;
 }
 </style>
