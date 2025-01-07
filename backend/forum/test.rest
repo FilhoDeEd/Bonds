@@ -1,6 +1,6 @@
 
 POST http://localhost:8000/forum/register/
-Authorization: Token 0b32659e7c17349859dd9e123c9ace264aed9520
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
@@ -10,12 +10,12 @@ Content-Type: application/json
 
 ######
 
-POST  http://localhost:8000/forum/edit/natal-chegando/ HTTP/1.1
-Authorization: Token 0b32659e7c17349859dd9e123c9ace264aed9520
+POST  http://localhost:8000/forum/edit/teste-1/ 
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
-  "title": "ano novo",
+  "title": "ano novo 1",
   "description": "This is an example description for the forum."
 }
 
@@ -37,8 +37,8 @@ Authorization: Token c55d674ffd9e375f61d3be0a32c5d7f6403404a1
 
 ######
 
-POST http://localhost:8000/forum/subscribe/1/
-Authorization: Token 056831ef3d4ee2f4043daaa50d7d60394aa7dd62
+POST http://localhost:8000/forum/subscribe/teste-1/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 
 ######
 
