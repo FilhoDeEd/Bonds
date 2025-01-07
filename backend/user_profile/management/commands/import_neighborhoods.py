@@ -45,8 +45,15 @@ class Command(BaseCommand):
             help='Limit the number of neighborhoods to import'
         )
 
+        parser.add_argument(
+            '--shuffle',
+            type=bool,
+            help='Shuffles neighborhood imports'
+        )
+
     def handle(self, *args, **kwargs):
         limit = int(kwargs.get('limit'))
+        shuffle = bool(kwargs.get('shuffle'))
 
         current_directory = os.path.dirname(os.path.abspath(__file__))
         excel_file = os.path.join(current_directory, 'neighborhoods.xlsx')
@@ -57,6 +64,9 @@ class Command(BaseCommand):
 
         try:
             data = pd.read_excel(excel_file)
+
+            if limit and shuffle:
+                data = data.sample(frac = 1).reset_index(drop=True)
 
             required_columns = {'bairro', 'cidade', 'estado'}
             if not required_columns.issubset(data.columns):
