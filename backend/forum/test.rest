@@ -4,7 +4,7 @@ Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
-  "title": "teste",
+  "title": "norte",
   "description": "This is an example description for the forum."
 }
 
@@ -37,8 +37,13 @@ Authorization: Token c55d674ffd9e375f61d3be0a32c5d7f6403404a1
 
 ######
 
-POST http://localhost:8000/forum/subscribe/teste-1/
+POST http://localhost:8000/forum/subscribe/norte/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+
+### Testar Cancelamento de Inscrição no Fórum
+POST http://127.0.0.1:8000/forum/unsubscribe/norte/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Content-Type: application/json
 
 ######
 
