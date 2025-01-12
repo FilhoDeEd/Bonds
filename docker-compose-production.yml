@@ -1,0 +1,89 @@
+services:
+  db:
+    image: postgres:13
+    container_name: postgres_production
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    expose:
+      - ${DB_PORT}
+    networks:
+      - compose_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Docker/backend.Dockerfile
+    image: backend_image
+    container_name: backend_production
+    environment:
+      ENVIRONMENT: production
+      SERVER_ADDRESS: ${SERVER_ADDRESS}
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_PORT: ${DJANGO_PORT}
+      USE_POSTGRES: True
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - ./backend:/app/django_server # Só serve em development, mover para lá depois
+    expose:
+      - ${DJANGO_PORT}
+    networks:
+      - compose_network
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Docker/frontend.Dockerfile
+    image: frontend_image
+    container_name: frontend_production
+    volumes:
+      - static_volume:/usr/share/nginx/html:ro
+    networks:
+      - compose_network
+
+  nginx:
+    image: nginx:1.27.1-bookworm
+    container_name: nginx_production
+    volumes:
+      - ./nginx/production_nginx.conf:/etc/nginx/conf.d/production_nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
+      - static_volume:/usr/share/nginx/html/static:ro
+      - media_volume:/usr/share/nginx/html/media:ro
+    ports:
+      - "${NGINX_HTTP_PORT}:80"
+      - "${NGINX_HTTPS_PORT}:443"
+    networks:
+      - compose_network
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  db_data:
+    name: production_db_data
+    driver: local
+  static_volume:
+    name: production_static_volume
+    driver: local
+  media_volume:
+    name: production_media_volume
+    driver: local
+
+networks:
+  compose_network:
+    name: production_network
+    driver: bridge
