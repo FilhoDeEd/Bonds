@@ -1,18 +1,50 @@
-from datetime import timedelta
+from enum import StrEnum
 from pathlib import Path
+import os
+
+
+class Envs(StrEnum):
+    PRODUCTION = 'production'
+    DEVELOPMENT = 'development'
+
+
+def get_secret(key: str, default: str = '') -> str:
+    value = os.getenv(key, default)
+    if os.path.isfile(value):
+        with open(value) as f:
+            return f.read()
+    return value
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-fb)^%h!peq-ivfve4bficos#5_dugsn(azg#fej!x!t__rgs(7'
+SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
 
-DEBUG = True
+ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
+SECRET_KEY = get_secret('SECRET_KEY')
+DJANGO_PORT = os.getenv('DJANGO_PORT', '8000')
 
-ALLOWED_HOSTS = []
+USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT', '5432')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = get_secret('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
 
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ['http://localhost:8080']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+if ENVIRONMENT == Envs.PRODUCTION:
+    DEBUG = False
+    ALLOWED_HOSTS = [SERVER_ADDRESS]
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOWED_ORIGINS = [f'https://{SERVER_ADDRESS}']
+    CSRF_TRUSTED_ORIGINS = [f'https://{SERVER_ADDRESS}']
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+elif ENVIRONMENT == Envs.DEVELOPMENT:
+    DEBUG = True
+    ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOWED_ORIGINS = ['http://localhost:8080']
+    CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
 
 
 INSTALLED_APPS = [
@@ -28,8 +60,7 @@ INSTALLED_APPS = [
     'forum',
     'rest_framework',
     'rest_framework.authtoken',
-    'user_profile',
-    
+    'user_profile'
 ]
 
 
@@ -47,18 +78,9 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    # )
+    'PAGE_SIZE': 10
 }
 
-
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=20),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
-#     'ROTATE_REFRESH_TOKENS': False
-# }
 
 ROOT_URLCONF = 'core.urls'
 
@@ -79,15 +101,28 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if USE_POSTGRES:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 AUTHENTICATION_BACKENDS = [
@@ -118,7 +153,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STATIC_URL = 'static/'
