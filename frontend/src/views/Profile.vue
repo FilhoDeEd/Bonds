@@ -84,8 +84,8 @@
                   </div>
                   
                   <!-- Título/Recompensa -->
-                  <div class="text-sm leading-normal mt-2 text-emerald-500 font-semibold">
-                    <span>🏆 Voluntário Dedicado</span>
+                  <div class="text-xl leading-normal mt-2 text-blue-500 font-semibold">
+                    <span>{{ userStore.user.account.status }}</span>
                   </div>
                 </div>
 
