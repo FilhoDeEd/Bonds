@@ -82,6 +82,11 @@
                     <!-- Exibição somente leitura do Username -->
                     <span>@{{ userStore.user.account.username }}</span>
                   </div>
+                  
+                  <!-- Título/Recompensa -->
+                  <div class="text-sm leading-normal mt-2 text-emerald-500 font-semibold">
+                    <span>🏆 Voluntário Dedicado</span>
+                  </div>
                 </div>
 
 
