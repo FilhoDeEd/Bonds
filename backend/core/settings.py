@@ -12,22 +12,29 @@ class Envs(StrEnum):
 def get_secret(key: str, default: str = '') -> str:
     value = os.getenv(key, default)
     if os.path.isfile(value):
-        with open(value) as f:
-            return f.read()
+        try:
+            with open(value) as f:
+                return f.read().strip()
+        except OSError as e:
+            raise Exception(f"Error reading the secret file at {value}: {e}")
     return value
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(f'{BASE_DIR}/development.env')
+ENVIRONMENT = os.getenv('ENVIRONMENT', Envs.DEVELOPMENT)
 
-SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
+if ENVIRONMENT == Envs.DEVELOPMENT and not get_secret('DJANGO_SECRET_KEY'):
+    if not load_dotenv(f'{BASE_DIR}/development.env'):
+        raise Exception(
+            f'Failed to load the development environment file at {BASE_DIR}/development.env. '
+            'Ensure the file exists and contains the necessary environment variables.'
+        )
 
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 SECRET_KEY = get_secret('DJANGO_SECRET_KEY')
 DJANGO_PORT = os.getenv('DJANGO_PORT', '8000')
 
-USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
+USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') in ['True', 'true']
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT', '5432')
 DB_USER = os.getenv('DB_USER')
@@ -36,6 +43,7 @@ DB_NAME = os.getenv('DB_NAME')
 
 
 if ENVIRONMENT == Envs.PRODUCTION:
+    SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
     DEBUG = False
     ALLOWED_HOSTS = [SERVER_ADDRESS]
     CORS_ALLOW_CREDENTIALS = True
