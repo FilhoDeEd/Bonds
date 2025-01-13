@@ -107,6 +107,8 @@ class DetailAccountView(APIView):
             user = request.user
             account = user.account
             user_profile = UserProfile.objects.get(account=account, active=True)
+            user_profile.update_status()
+            user_profile.save()
             neighborhood = user_profile.neighborhood
 
             user_serializer = UserSerializer(user)
