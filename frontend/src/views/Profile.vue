@@ -276,6 +276,7 @@ export default {
       cellphone: userStore.user.account.cellphone || "",
       gender: userStore.user.account.gender || "",
       biography: userStore.user.account.biography || "",
+      status: userStore.user.account.status || "",
     });
 
     return {
