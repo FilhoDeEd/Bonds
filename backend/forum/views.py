@@ -170,3 +170,41 @@ class SubscribeView(APIView):
 
         except Exception as e:
             return Response({'detail': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UnsubscribeView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        try:
+            # Obtém o fórum pelo slug
+            forum = Forum.objects.get(slug=slug)
+        except Forum.DoesNotExist:
+            return Response({'detail': 'Forum not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # Obtém o perfil do usuário logado
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({'detail': 'Active user profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verifica se o usuário já está inscrito no fórum
+        try:
+            subscription = Subscriber.objects.get(user_profile=user_profile, forum=forum)
+        except Subscriber.DoesNotExist:
+            return Response({'detail': 'User is not subscribed to this forum.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                # Remove a inscrição
+                subscription.delete()
+
+                # Atualiza o contador de inscritos no fórum
+                forum.subscribers_count -= 1
+                forum.save()
+
+            return Response({'detail': 'Successfully unsubscribed from the forum.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'detail': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,6 +1,7 @@
 from enum import StrEnum
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 
 class Envs(StrEnum):
@@ -18,10 +19,12 @@ def get_secret(key: str, default: str = '') -> str:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(f'{BASE_DIR}/development.env')
+
 SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
 
 ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
-SECRET_KEY = get_secret('SECRET_KEY')
+SECRET_KEY = get_secret('DJANGO_SECRET_KEY')
 DJANGO_PORT = os.getenv('DJANGO_PORT', '8000')
 
 USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'

@@ -2,12 +2,12 @@ POST http://localhost:8000/account/register/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "johndoet",
+    "username": "teste1",
     "password": "senha@19282",
     "name": "Márcio",
     "surname": "Silva",
     "birthday": "1920-01-01",
-    "email": "jhon.deot1@gmail.com",
+    "email": "jhon.teste1@gmail.com",
     "agree_policy": true,
     "neighborhood": 1
 }
@@ -28,14 +28,14 @@ POST http://localhost:8000/account/login/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "emailOrUsername": "johndoet",
+    "emailOrUsername": "teste1",
     "password": "senha@19282"
 }
 
 ######
 
 GET http://localhost:8000/account/detail/ HTTP/1.1
-Authorization: Token 1a8d0fe9333b673edb464a6a4332b41f416c77ff
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ######
 
@@ -85,6 +85,6 @@ Content-Type: application/json
 ######
 
 POST http://localhost:8000/account/anonymize/ HTTP/1.1
-Authorization: Token 1a8d0fe9333b673edb464a6a4332b41f416c77ff
+Authorization: Token a68e409fc50dc7a49d5a3caad1d2a6a8678da4e7
 Content-Type: application/json
 

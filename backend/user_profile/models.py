@@ -85,8 +85,34 @@ class UserProfile(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.create_date = timezone.now()
+
+        # Atualiza o status antes de salvar
+        self.update_status()
+
         self.update_date = timezone.now()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+    def update_status(self):
+        
+        seconds_active = (timezone.now() - self.create_date).total_seconds()
+        if seconds_active < 30:  # 30 segundos
+            self.status = self.StatusChoices.NEWCOMER
+        elif seconds_active < 90:  # 90 segundos
+            self.status = self.StatusChoices.CURIOUS_NEIGHBOR
+        elif seconds_active < 180:  # 3 minutos
+            self.status = self.StatusChoices.ATTENTIVE_NEIGHBOR
+        elif seconds_active < 600:  # 10 minutos
+            self.status = self.StatusChoices.COLLABORATIVE_NEIGHBOR
+        elif seconds_active < 1200:  # 20 minutos
+            self.status = self.StatusChoices.TRUSTWORTHY_NEIGHBOR
+        elif seconds_active < 1800:  # 30 minutos
+            self.status = self.StatusChoices.NOTABLE_NEIGHBOR
+        elif seconds_active < 3600:  # 1 hora
+            self.status = self.StatusChoices.INSPIRING_NEIGHBOR
+        elif seconds_active < 7200:  # 2 horas
+            self.status = self.StatusChoices.NEIGHBORHOOD_GUARDIAN
+        else:
+            self.status = self.StatusChoices.COMMUNITY_SAGE
 
     def __str__(self):
         if self.account:
