@@ -41,8 +41,8 @@ POST http://localhost:8000/forum/subscribe/norte/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 
 ### Testar Cancelamento de Inscrição no Fórum
-POST http://127.0.0.1:8000/forum/unsubscribe/norte/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+POST http://127.0.0.1:8000/forum/unsubscribe/ot/
+Authorization: Token 44185d2d7c01e91fae7d2a8a03b1e72cdd183b25
 Content-Type: application/json
 
 ######

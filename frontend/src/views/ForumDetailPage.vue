@@ -39,10 +39,10 @@
             <!-- Botões alinhados ao bottom -->
             <div class="px-6 pb-4 flex space-x-4 relative z-10">
               <button type="button" 
-                @click="subscribe()"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
-                style="background-color: rgb(252, 3, 94);">
-                Participar
+              @click="toggleSubscribe"
+              class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+              style="background-color: rgb(252, 3, 94);">
+              {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
               </button>
               
               <button type="button" 
@@ -82,8 +82,11 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Localização">
-                      <span>📍</span>
+                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
+                      <span>📢</span>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
+                      <span>📊</span>
                     </button>
                   </div>
 
@@ -164,7 +167,7 @@
                       <!-- Dropdown menu -->
                       <div v-if="menuStates[comment.id]" 
                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                           <button @click="() => { menuStates[comment.id] = false; editComment(comment); comment.isEditing = true }" 
+                           <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }" 
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Editar
                           </button>
@@ -446,15 +449,23 @@ const deleteComment = async (comment) => {
   }
 };
 
-const subscribe = async ()=>{
-  try{
-    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`)
-    toast.success("Você se inscreveu no fórum!")
+const toggleSubscribe = async () => {
+  try {
+    if (isSubscribed.value) {
+      await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
+      toast.success("Você cancelou sua inscrição no fórum!");
+    } else {
+      await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
+      toast.success("Você se inscreveu no fórum!");
+    }
+    isSubscribed.value = !isSubscribed.value;
+  } catch (err) {
+    console.log(err);
+    toast.error("Algo deu errado!");
   }
-  catch(err){
-    console.log(err)
-  }
-}
+};
+
+const isSubscribed = ref(false);
 
 // Adicione um map para controlar o estado do menu de cada comentário
 const menuStates = ref({});
