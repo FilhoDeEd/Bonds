@@ -1,0 +1,25 @@
+# Ignorar dependências locais
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+
+# Ignorar arquivos de build local
+dist
+
+# Ignorar arquivos e diretórios do sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar configurações locais e arquivos de controle de versão
+.env
+*.env
+.vscode
+.idea
+*.swp
+*.bak
+
+# Ignorar arquivos de teste e outros não necessários para produção
+*.spec.*
+*.test.*
+coverage

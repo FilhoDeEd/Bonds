@@ -12,22 +12,29 @@ class Envs(StrEnum):
 def get_secret(key: str, default: str = '') -> str:
     value = os.getenv(key, default)
     if os.path.isfile(value):
-        with open(value) as f:
-            return f.read()
+        try:
+            with open(value) as f:
+                return f.read().strip()
+        except OSError as e:
+            raise Exception(f"Error reading the secret file at {value}: {e}")
     return value
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(f'{BASE_DIR}/development.env')
+ENVIRONMENT = os.getenv('ENVIRONMENT', Envs.DEVELOPMENT)
 
-SERVER_ADDRESS = os.getenv('SERVER_ADDRESS')
+if ENVIRONMENT == Envs.DEVELOPMENT and not get_secret('DJANGO_SECRET_KEY'):
+    if not load_dotenv(f'{BASE_DIR}/development.env'):
+        raise Exception(
+            f'Failed to load the development environment file at {BASE_DIR}/development.env. '
+            'Ensure the file exists and contains the necessary environment variables.'
+        )
 
-ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
 SECRET_KEY = get_secret('DJANGO_SECRET_KEY')
 DJANGO_PORT = os.getenv('DJANGO_PORT', '8000')
 
-USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') == 'True'
+USE_POSTGRES = os.getenv('USE_POSTGRES', 'False') in ['True', 'true']
 DB_HOST = os.getenv('DB_HOST')
 DB_PORT = os.getenv('DB_PORT', '5432')
 DB_USER = os.getenv('DB_USER')
@@ -36,19 +43,21 @@ DB_NAME = os.getenv('DB_NAME')
 
 
 if ENVIRONMENT == Envs.PRODUCTION:
+    DOMAIN = os.getenv('DOMAIN')
     DEBUG = False
-    ALLOWED_HOSTS = [SERVER_ADDRESS]
-    CORS_ALLOW_CREDENTIALS = True
-    CORS_ALLOWED_ORIGINS = [f'https://{SERVER_ADDRESS}']
-    CSRF_TRUSTED_ORIGINS = [f'https://{SERVER_ADDRESS}']
+    ALLOWED_HOSTS = [f'api.{DOMAIN}']
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOWED_ORIGINS = [f'https://www.{DOMAIN}']
+    CSRF_TRUSTED_ORIGINS = [f'https://www.{DOMAIN}']
 elif ENVIRONMENT == Envs.DEVELOPMENT:
     DEBUG = True
     ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOWED_ORIGINS = ['http://localhost:8080']
     CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
-
+else:
+    raise Exception(f"Invalid environment named '{ENVIRONMENT}'.")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
