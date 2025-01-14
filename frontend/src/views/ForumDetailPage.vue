@@ -285,7 +285,7 @@ const toggleEdition = async () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error('Erro ao atualizar o fórum');
+      toast.error(error.response.data.detail || 'Erro ao editar fórum');
     }
   }
 };
@@ -454,9 +454,11 @@ const toggleSubscribe = async () => {
     if (isSubscribed.value) {
       await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
       toast.success("Você cancelou sua inscrição no fórum!");
+      forumData.value.members -= 1;
     } else {
       await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
       toast.success("Você se inscreveu no fórum!");
+      forumData.value.members += 1;
     }
     isSubscribed.value = !isSubscribed.value;
   } catch (err) {
