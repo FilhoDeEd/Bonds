@@ -285,7 +285,11 @@ const toggleEdition = async () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.response.data.detail || 'Erro ao editar fórum');
+      if (error.response.data.detail == "You do not have permission to edit this forum.") {
+        toast.error("Você não tem permissão para editar este fórum");
+      } else {
+        toast.error(error.response.data.detail || 'Erro ao editar fórum');
+      }
     }
   }
 };
