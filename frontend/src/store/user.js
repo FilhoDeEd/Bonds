@@ -20,7 +20,8 @@ export const useUserStore = defineStore({
         email: null,
         cellphone: null,
         agree_policy: null,
-        biography: null
+        biography: null,
+        status: null
       },
 
       user_profle: {
@@ -54,6 +55,7 @@ export const useUserStore = defineStore({
           this.user.account.cellphone = localStorage.getItem("user.account.cellphone");
           this.user.account.agree_policy = localStorage.getItem("user.account.agree_policy");
           this.user.account.biography = localStorage.getItem("user.account.biography");
+          this.user.account.status = localStorage.getItem("user.account.status");
       
           this.user.user_profle.id = localStorage.getItem("user.user_profle.id");
           this.user.user_profle.trust_rate = localStorage.getItem("user.user_profle.trust_rate");
@@ -96,7 +98,8 @@ export const useUserStore = defineStore({
         email: null,
         cellphone: null,
         agree_policy: null,
-        biography: null
+        biography: null,
+        status: null
       };
 
       this.user.user_profle = {
@@ -125,6 +128,7 @@ export const useUserStore = defineStore({
       localStorage.setItem("user.account.cellphone", "");
       localStorage.setItem("user.account.agree_policy", "");
       localStorage.setItem("user.account.biography", "");
+      localStorage.setItem("user.account.status", "");
     
       localStorage.setItem("user.user_profle.id", "");
       localStorage.setItem("user.user_profle.trust_rate", "");
@@ -157,6 +161,7 @@ export const useUserStore = defineStore({
           cellphone: data.cellphone || this.user.account.cellphone,
           agree_policy: data.agree_policy || this.user.account.agree_policy,
           biography: data.biography || this.user.account.biography,
+          status: data.status || this.user.account.status,
       };
   
       this.user.user_profle = {
@@ -187,6 +192,7 @@ export const useUserStore = defineStore({
       localStorage.setItem("user.account.cellphone", this.user.account.cellphone || "");
       localStorage.setItem("user.account.agree_policy", this.user.account.agree_policy || "");
       localStorage.setItem("user.account.biography", this.user.account.biography || "");
+      localStorage.setItem("user.account.status", this.user.account.status || "");
   
       localStorage.setItem("user.user_profle.id", this.user.user_profle.id || "");
       localStorage.setItem("user.user_profle.trust_rate", this.user.user_profle.trust_rate || "");

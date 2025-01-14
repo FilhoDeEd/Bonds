@@ -82,6 +82,11 @@
                     <!-- Exibição somente leitura do Username -->
                     <span>@{{ userStore.user.account.username }}</span>
                   </div>
+                  
+                  <!-- Título/Recompensa -->
+                  <div class="text-xl leading-normal mt-2 text-blue-500 font-semibold">
+                    <span>{{ userStore.user.account.status }}</span>
+                  </div>
                 </div>
 
 
@@ -276,6 +281,7 @@ export default {
       cellphone: userStore.user.account.cellphone || "",
       gender: userStore.user.account.gender || "",
       biography: userStore.user.account.biography || "",
+      status: userStore.user.account.status || "",
     });
 
     return {
