@@ -1,11 +1,11 @@
 # Ignorar dependências locais
-node_modules
+*/node_modules
 npm-debug.log
 yarn.lock
 pnpm-lock.yaml
 
 # Ignorar arquivos de build local
-dist
+*/dist
 
 # Ignorar arquivos e diretórios do sistema
 .DS_Store

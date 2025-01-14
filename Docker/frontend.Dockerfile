@@ -6,7 +6,9 @@ COPY frontend/package*.json .
 
 RUN npm install
 
-COPY api.js /
 COPY frontend/ .
 
-RUN npm run build
+COPY entrypoint.frontend.sh /app/
+RUN chmod +x /app/entrypoint.frontend.sh
+
+ENTRYPOINT ["/app/entrypoint.frontend.sh"]

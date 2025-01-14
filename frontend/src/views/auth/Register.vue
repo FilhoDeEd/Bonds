@@ -177,7 +177,7 @@
 <script>
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { ENDPOINTS } from '../../../../api.js';
+import { ENDPOINTS } from '../../../api.js';
 import { useToast } from 'vue-toastification';
 
 /*eslint-disable*/

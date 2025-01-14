@@ -252,7 +252,7 @@ import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
 import router from '../router/index.js';
-import { ENDPOINTS } from '../../../api';
+import { ENDPOINTS } from '../../api';
 import MainLayout from '../layouts/mainLayout.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';

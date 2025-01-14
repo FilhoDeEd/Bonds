@@ -63,7 +63,7 @@
 <script>
 /* eslint-disable */
 import router from '../../router/index.js';
-import { ENDPOINTS } from '../../../../api.js';
+import { ENDPOINTS } from '../../../api.js';
 import { useUserStore } from '../../store/user.js';
 import { useToast } from "vue-toastification";
 import axios from 'axios';

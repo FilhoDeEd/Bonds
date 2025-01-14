@@ -39,7 +39,7 @@
 /* eslint-disable */
 
 import axios from "axios";
-import { ENDPOINTS } from "../../../../api.js";
+import { ENDPOINTS } from "../../../api.js";
 import { useToast } from "vue-toastification";
 import { useUserStore } from "../../store/user.js";
 

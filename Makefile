@@ -10,11 +10,11 @@ build_frontend:
 
 build_up:
 	@echo "Building and starting all services..."
-	docker compose -f $(DOCKER_COMPOSE_FILE) --profile run --env-file $(DOCKER_COMPOSE_ENV_FILE) up --build
+	docker compose -f $(DOCKER_COMPOSE_FILE) --profile run --env-file $(DOCKER_COMPOSE_ENV_FILE) up --build -d
 
 up:
 	@echo "Starting all services..."
-	$(DOCKER_COMPOSE) $(DOCKER_COMPOSE_ENV_FILE) up
+	docker compose -f $(DOCKER_COMPOSE_FILE) --profile run --env-file $(DOCKER_COMPOSE_ENV_FILE) up -d
 
 down:
 	@echo "Stopping all services..."

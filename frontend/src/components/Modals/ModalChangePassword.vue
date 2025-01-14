@@ -43,7 +43,7 @@
 
 import axios from 'axios';
 import  router  from "../../router/index.js";
-import { ENDPOINTS } from '../../../../api.js';
+import { ENDPOINTS } from '../../../api.js';
 import { useToast } from 'vue-toastification';
 
 export default {

@@ -233,7 +233,7 @@ import { onBeforeMount, reactive } from "vue";
 import { useUserStore } from "../store/user.js";
 import axios from "axios";
 import router from "../router/index.js";
-import { ENDPOINTS } from "../../../api.js";
+import { ENDPOINTS } from "../../api.js";
 import team2 from "@/assets/img/team-2-800x800.jpg";
 import { useToast } from "vue-toastification";
 

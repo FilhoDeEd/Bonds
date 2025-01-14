@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ENDPOINTS } from '../../../api';
+import { ENDPOINTS } from '../../api';
 import axios from 'axios';
 
 
