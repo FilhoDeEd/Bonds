@@ -65,6 +65,13 @@
             @close="isModalOpen = false"
           />
         </div>
+        <div>
+          <ModalCreateEvent
+            v-if="isModalOpen"
+            :isModalOpen="isModalOpen"
+            @close="isModalOpen = false"
+          />
+        </div>
       </main>
     </div>
   </mainLayout>
@@ -79,6 +86,7 @@ import { onBeforeMount } from "vue";
 import InfiniteLoading from "v3-infinite-loading/lib/v3-infinite-loading.es.js";
 import "v3-infinite-loading/lib/style.css";
 import ModalCreateForum from "../components/Modals/ModalCreateForum.vue";
+import ModalCreateEvent from "../components/Modals/ModalCreateEvent.vue";
 
 export default {
   name: "Landing",
@@ -86,6 +94,7 @@ export default {
     mainLayout,
     InfiniteLoading,
     ModalCreateForum,
+    ModalCreateEvent,
   },
   data() {
     return {
@@ -134,7 +143,7 @@ export default {
       this.isModalOpen = false; // Fecha o modal
     },
     openModalEvent() {
-      console.log("Not implemented yet");
+      this.isModalOpen = true; // Abre o modal
     },
   },
 };
