@@ -66,7 +66,7 @@
 
 import axios from 'axios';
 import router from "../../router/index.js";
-import { ENDPOINTS } from '../../../../api.js';
+import { ENDPOINTS } from '../../../api.js';
 import { useUserStore } from '../../store/user.js';
 import ModalComplexConfimation from './ModalComplexConfimation.vue';
 import { useToast } from 'vue-toastification';

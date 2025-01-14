@@ -55,7 +55,7 @@ services:
     image: frontend_image
     container_name: frontend_production
     environment:
-      BASE_URL: ${API_URL}
+      VUE_APP_BASE_URL: ${API_URL}
     volumes:
       - static_volume:/app/dist
     profiles:
@@ -67,7 +67,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
       - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
-      - static_volume:/usr/share/nginx/html/dist:ro
+      - static_volume:/usr/share/nginx/html/static:ro
       # - media_volume:/usr/share/nginx/html/media:ro # Será?
     ports:
       - "${NGINX_HTTP_PORT}:80"

@@ -34,7 +34,7 @@
   
   <script>
   import axios from 'axios';
-  import { ENDPOINTS } from '../../../../api';
+  import { ENDPOINTS } from '../../../api';
   import { useToast } from 'vue-toastification';
   export default {
     props: {
