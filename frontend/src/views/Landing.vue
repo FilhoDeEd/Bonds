@@ -5,6 +5,12 @@
       <div class="w-full flex justify-end h-[40px] py-4" style="background-color: rgba(124, 122, 187, 1);">
         <button class="px-6 py-2 mr-10 text-white font-semibold rounded-lg transition-all duration-200 hover:bg-opacity-90"
           style="background-color: rgb(240, 117, 117);"
+          @click="openModalEvent"
+          >
+          <span>Criar Evento</span>
+        </button>
+        <button class="px-6 py-2 mr-10 text-white font-semibold rounded-lg transition-all duration-200 hover:bg-opacity-90"
+          style="background-color: rgb(240, 117, 117);"
           @click="openModal"
           >
           <span>Criar Fórum</span>
@@ -126,6 +132,9 @@ export default {
     },
     closeModal() {
       this.isModalOpen = false; // Fecha o modal
+    },
+    openModalEvent() {
+      console.log("Not implemented yet");
     },
   },
 };
