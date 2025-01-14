@@ -17,6 +17,8 @@ services:
       - ${DB_PORT}
     networks:
       - compose_network
+    profiles:
+      - run
 
   backend:
     build:
@@ -26,8 +28,8 @@ services:
     container_name: backend_production
     environment:
       ENVIRONMENT: production
-      SERVER_ADDRESS: ${SERVER_ADDRESS}
-      SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DOMAIN: ${DOMAIN}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DJANGO_PORT: ${DJANGO_PORT}
       USE_POSTGRES: True
       DB_HOST: db
@@ -41,6 +43,8 @@ services:
       - ${DJANGO_PORT}
     networks:
       - compose_network
+    profiles:
+      - run
     depends_on:
       - db
 
@@ -50,27 +54,30 @@ services:
       dockerfile: Docker/frontend.Dockerfile
     image: frontend_image
     container_name: frontend_production
+    environment:
+      BASE_URL: ${API_URL}
     volumes:
-      - static_volume:/usr/share/nginx/html:ro
-    networks:
-      - compose_network
+      - static_volume:/app/dist
+    profiles:
+      - build
 
   nginx:
     image: nginx:1.27.1-bookworm
     container_name: nginx_production
     volumes:
-      - ./nginx/production_nginx.conf:/etc/nginx/conf.d/production_nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
       - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
-      - static_volume:/usr/share/nginx/html/static:ro
-      - media_volume:/usr/share/nginx/html/media:ro
+      - static_volume:/usr/share/nginx/html/dist:ro
+      # - media_volume:/usr/share/nginx/html/media:ro # Será?
     ports:
       - "${NGINX_HTTP_PORT}:80"
       - "${NGINX_HTTPS_PORT}:443"
     networks:
       - compose_network
+    profiles:
+      - run
     depends_on:
       - backend
-      - frontend
 
 volumes:
   db_data:
