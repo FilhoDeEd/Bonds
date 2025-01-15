@@ -41,7 +41,6 @@ DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = get_secret('DB_PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
 
-
 if ENVIRONMENT == Envs.PRODUCTION:
     DOMAIN = os.getenv('DOMAIN')
     DEBUG = False
@@ -51,13 +50,15 @@ if ENVIRONMENT == Envs.PRODUCTION:
     CORS_ALLOWED_ORIGINS = [f'https://www.{DOMAIN}']
     CSRF_TRUSTED_ORIGINS = [f'https://www.{DOMAIN}']
 elif ENVIRONMENT == Envs.DEVELOPMENT:
+    NODE_PORT = os.getenv('NODE_PORT')
     DEBUG = True
     ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ALLOWED_ORIGINS = ['http://localhost:8080']
-    CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+    CORS_ALLOWED_ORIGINS = [f'http://localhost:{NODE_PORT}']
+    CSRF_TRUSTED_ORIGINS = [f'http://localhost:{NODE_PORT}']
 else:
     raise Exception(f"Invalid environment named '{ENVIRONMENT}'.")
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
