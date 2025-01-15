@@ -9,6 +9,9 @@ from forum.views import (
     ForumDeleteView,
     EventRegisterView,
     EventListView,
+    EventDetailView,
+    EventEditView,
+    EventDeleteView
 
 )
  
@@ -23,6 +26,9 @@ urlpatterns = [
     path('detail/<slug:slug>/', ForumDetailView.as_view(), name='forum_detail'),
     path('event/register/',EventRegisterView.as_view(), name='event_register'),
     path('event/list/', EventListView.as_view(), name='event_list'),
+    path('event/edit/<slug:slug>/',EventEditView.as_view(), name='event_edit'),
+    path('event/detail/<slug:slug>/', EventDetailView.as_view(), name='event_detail'),
+    path('event/delete/<slug:slug>/', ForumDeleteView.as_view(), name='forum_delete'),
 
 
 ]

@@ -83,3 +83,28 @@ Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 
 ######
+
+GET  http://localhost:8000/forum/event/detail/teste-de-evento/ 
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+
+######
+
+POST  http://localhost:8000/forum/event/edit/teste-de-evento/ 
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+{
+  "title": "teste de evento",
+  "description": "This is an example description for the forum.",
+  "date": "2025-01-29",
+  "location":"rua da casa do carvalho"
+}
+
+######
+
+POST  http://localhost:8000/forum/event/delete/teste-de-evento-1/ 
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
