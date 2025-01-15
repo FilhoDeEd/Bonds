@@ -28,7 +28,7 @@ services:
       ENVIRONMENT: development
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DJANGO_PORT: ${DJANGO_PORT}
-      USE_POSTGRES: True
+      USE_POSTGRES: true
       DB_HOST: db
       DB_PORT: ${DB_PORT}
       DB_USER: ${DB_USER}
