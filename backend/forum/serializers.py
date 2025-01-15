@@ -1,4 +1,4 @@
-from forum.models import Forum
+from forum.models import Forum, Event
 from rest_framework import serializers
 
 
@@ -40,4 +40,54 @@ class ForumEditSerializer(serializers.ModelSerializer):
         fields = [
             'title',
             'description'
+        ]
+
+class EventSerializer(serializers.ModelSerializer):
+    creator = serializers.CharField(source='get_creator_name', read_only=True)
+
+    class Meta:
+        model = Event
+        fields = [
+            'id',
+            'title',
+            'slug',
+            'description',
+            'date',
+            'location',
+            'creation_date',
+            'update_date',
+            'creator'
+        ]
+        read_only_fields = [
+            'id',
+            'slug',
+            'creation_date',
+            'update_date',
+            'creator'
+        ]
+
+
+class EventListSerializer(serializers.ModelSerializer):
+    event_id = serializers.IntegerField(source='id', read_only=True)
+
+    class Meta:
+        model = Event
+        fields = [
+            'event_id',
+            'title',
+            'description',
+            'location',
+            'slug',
+            'date',
+        ]
+
+
+class EventEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = [
+            'title',
+            'description',
+            'location',
+            'date',
         ]
