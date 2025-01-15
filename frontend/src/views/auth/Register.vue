@@ -269,10 +269,14 @@ export default {
 
       switch (field) {
         case "name":
-          this.errors.name = this.form.name ? "" : "O nome é obrigatório.";
+          this.errors.name = this.form.name
+            ? (/^[a-zA-Z\s]+$/.test(this.form.name) ? "" : "O nome deve conter apenas letras e espaços.")
+            : "O nome é obrigatório.";
           break;
         case "surname":
-          this.errors.surname = this.form.surname ? "" : "O sobrenome é obrigatório.";
+          this.errors.surname = this.form.surname 
+            ? (/^[a-zA-Z\s]+$/.test(this.form.surname) ? "" : "O sobrenome deve conter apenas letras e espaços.")
+            : "O sobrenome é obrigatório.";
           break;
         case "birthday":
           if (!this.form.birthday) {
