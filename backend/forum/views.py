@@ -108,8 +108,6 @@ class ForumEditView(APIView):
             return Response({"errors": forum_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class ForumDeleteView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -181,6 +179,60 @@ class EventListView(ListAPIView):
 
         return Event.objects.all()
 
+class EventEditView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        event = get_object_or_404(Event, slug=slug)
+        account = request.user.account
+
+        try:
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Invalid or inactive user."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if event.owner != user_profile:
+            return Response({"detail": "You do not have permission to edit this event."}, status=status.HTTP_403_FORBIDDEN)
+
+        event_serializer = EventEditSerializer(event, data=request.data)
+        if event_serializer.is_valid():
+            event = event_serializer.save()
+            event.slug = slugify(event.title)
+            event.save()
+            return Response({"success": "Event updated successfully.", "slug": event.slug}, status=status.HTTP_200_OK)
+        else:
+            return Response({"errors": event_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EventDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, slug):
+        event = get_object_or_404(Event, slug=slug)
+        serializer = EventSerializer(event)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class EventDeleteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        event = get_object_or_404(Event, slug=slug)
+        account = request.user.account
+
+        try:
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Active user profile not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if event.owner != user_profile:
+            return Response({"detail": "You do not have permission to delete this event."}, status=status.HTTP_403_FORBIDDEN)
+
+        event.delete()
+        return Response({"detail": "Event deleted successfully."}, status=status.HTTP_200_OK)
+    
 
 class SubscribeView(APIView):
     authentication_classes = [TokenAuthentication]
