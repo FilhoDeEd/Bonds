@@ -12,6 +12,7 @@ echo "Starting frontend setup..."
 
 if [ "$ENVIRONMENT" = "development" ]; then
     echo "Running Vue.js development server..."
+    npm install
     exec npm run serve -- --port $NODE_PORT
 elif [ "$ENVIRONMENT" = "production" ]; then
     echo "Building Vue.js project for production..."
