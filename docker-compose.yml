@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:13
-    container_name: postgres_production
+    container_name: postgres_development
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -17,18 +17,15 @@ services:
       - ${DB_PORT}
     networks:
       - compose_network
-    profiles:
-      - run
 
   backend:
     build:
       context: .
       dockerfile: Docker/backend.Dockerfile
-    image: backend_image
-    container_name: backend_production
+    image: backend_image_development
+    container_name: backend_development
     environment:
-      ENVIRONMENT: production
-      DOMAIN: ${DOMAIN}
+      ENVIRONMENT: development
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DJANGO_PORT: ${DJANGO_PORT}
       USE_POSTGRES: true
@@ -37,12 +34,13 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    expose:
-      - ${DJANGO_PORT}
+      NODE_PORT: ${NODE_PORT}
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "${DJANGO_PORT}:${DJANGO_PORT}"
     networks:
       - compose_network
-    profiles:
-      - run
     depends_on:
       - db
 
@@ -50,46 +48,27 @@ services:
     build:
       context: .
       dockerfile: Docker/frontend.Dockerfile
-    image: frontend_image
-    container_name: frontend_production
+    image: frontend_image_development
+    container_name: frontend_development
     environment:
-      ENVIRONMENT: production
-      VUE_APP_API_URL: ${API_URL}
+      ENVIRONMENT: development
+      NODE_PORT: ${NODE_PORT}
+      VUE_APP_API_URL: http://localhost:${DJANGO_PORT}
     volumes:
-      - static_volume:/app/frontend/dist
-    profiles:
-      - build
-
-  nginx:
-    image: nginx:1.27.1-bookworm
-    container_name: nginx_production
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-      - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
-      - static_volume:/usr/share/nginx/html/dist:ro
-      # - media_volume:/usr/share/nginx/html/media:ro # Será?
+      - ./frontend:/app/frontend/
     ports:
-      - "${NGINX_HTTP_PORT}:80"
-      - "${NGINX_HTTPS_PORT}:443"
+      - "${NODE_PORT}:${NODE_PORT}"
     networks:
       - compose_network
-    profiles:
-      - run
     depends_on:
       - backend
 
 volumes:
   db_data:
-    name: production_db_data
-    driver: local
-  static_volume:
-    name: production_static_volume
-    driver: local
-  media_volume:
-    name: production_media_volume
+    name: development_db_data
     driver: local
 
 networks:
   compose_network:
-    name: production_network
+    name: development_network
     driver: bridge

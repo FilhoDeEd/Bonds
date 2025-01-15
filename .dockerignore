@@ -19,7 +19,8 @@ Thumbs.db
 *.swp
 *.bak
 
-# Ignorar arquivos de teste e outros não necessários para produção
+# Ignorar arquivos de teste e outros não necessários
 *.spec.*
 *.test.*
 coverage
+*.sqlite3

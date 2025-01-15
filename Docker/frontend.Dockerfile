@@ -1,14 +1,14 @@
 FROM node:20
 
-WORKDIR /app
+WORKDIR /app/frontend
 
 COPY frontend/package*.json .
 
 RUN npm install
 
-COPY frontend/ .
+COPY frontend/ /app/frontend/
 
-COPY entrypoint.frontend.sh /app/
-RUN chmod +x /app/entrypoint.frontend.sh
+COPY entrypoint.frontend.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["/app/entrypoint.frontend.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
