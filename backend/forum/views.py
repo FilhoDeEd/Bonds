@@ -5,9 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
-from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer
+from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer, EventSerializer, EventListSerializer, EventEditSerializer
 from account.views import add_errors
-from forum.models import Forum , Subscriber 
+from forum.models import Forum , Subscriber , Event
 from django.utils.text import slugify
 
 
@@ -134,6 +134,53 @@ class ForumDeleteView(APIView):
         forum.delete()
 
         return Response({"detail": "Fórum excluído com sucesso."}, status=status.HTTP_200_OK)
+
+class EventRegisterView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        event_serializer = EventSerializer(data=data)
+        errors = {}
+
+        if not event_serializer.is_valid():
+            add_errors(errors=errors, serializer_errors=event_serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                account = request.user.account
+                user_profile = UserProfile.objects.get(account=account, active=True)
+                event = event_serializer.save(owner=user_profile, neighborhood=user_profile.neighborhood)
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'detail': 'Event created successfully.', 'slug': event.slug}, status=status.HTTP_201_CREATED)
+
+
+class EventListView(ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = EventListSerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['title', 'location']
+    ordering_fields = ['date', 'creation_date']
+    ordering = ['-date']
+
+    def get_queryset(self):
+        account = self.request.user.account
+
+        try:
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Event.objects.none()
+
+        return Event.objects.all()
+
 
 class SubscribeView(APIView):
     authentication_classes = [TokenAuthentication]

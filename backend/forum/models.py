@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 from user_profile.models import Neighborhood, UserProfile
+from django.db.models import Avg
 
 
 class Forum(models.Model):
@@ -88,6 +89,34 @@ class Forum(models.Model):
     def __str__(self):
         return self.title
 
+class Event(Forum):
+
+    date = models.DateField(editable=True)
+    location = models.TextField(max_length=1023)
+    cancelled = models.BooleanField(default=False)
+    
+    five_star_mean = models.FloatField(default=0.0)
+
+    def calculate_five_star_mean(self):
+       
+        reviews = self.review_set.all()
+        self.five_star_mean = reviews.aggregate(Avg('five_star'))['five_star__avg'] or 0.0
+        self.save()
+
+class Review(models.Model):
+
+    FIVE_STAR_CHOICES = [
+        (1, '1 - Terrível'),
+        (2, '2 - Ruim'),
+        (3, '3 - Regular'),
+        (4, '4 - Bom'),
+        (5, '5 - Excelente'),
+    ]
+
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='review_set')
+    user = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
+    five_star = models.PositiveSmallIntegerField(choices=FIVE_STAR_CHOICES)
+    review_date = models.DateTimeField(auto_now_add=True)
 
 class Subscriber(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT, editable=False)

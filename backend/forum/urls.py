@@ -6,7 +6,10 @@ from forum.views import (
     UnsubscribeView,
     ForumDetailView,
     ForumEditView,
-    ForumDeleteView
+    ForumDeleteView,
+    EventRegisterView,
+    EventListView,
+
 )
  
 
@@ -17,5 +20,9 @@ urlpatterns = [
     path('delete/<slug:slug>/', ForumDeleteView.as_view(), name='forum_delete'),
     path('subscribe/<slug:slug>/', SubscribeView.as_view(), name='forum_subscribe'),
     path('unsubscribe/<slug:slug>/', UnsubscribeView.as_view(), name='forum_unsubscribe'),
-    path('detail/<slug:slug>/', ForumDetailView.as_view(), name='forum_detail')
+    path('detail/<slug:slug>/', ForumDetailView.as_view(), name='forum_detail'),
+    path('event/register/',EventRegisterView.as_view(), name='event_register'),
+    path('event/list/', EventListView.as_view(), name='event_list'),
+
+
 ]
