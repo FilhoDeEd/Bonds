@@ -1,8 +1,8 @@
-const BASE_URL = process.env.VUE_APP_BASE_URL || "http://localhost:8000";
-const ACCOUNT_URL = `${BASE_URL}/account`;
-const USER_PROFILE_URL = `${BASE_URL}/user_profile`;
-const FORUM_URL = `${BASE_URL}/forum`;
-const COMMENT_URL = `${BASE_URL}/comment`;
+const API_URL = process.env.VUE_APP_API_URL || "http://localhost:8000";
+const ACCOUNT_URL = `${API_URL}/account`;
+const USER_PROFILE_URL = `${API_URL}/user_profile`;
+const FORUM_URL = `${API_URL}/forum`;
+const COMMENT_URL = `${API_URL}/comment`;
 
 // Endpoints centralizados
 export const ENDPOINTS = {

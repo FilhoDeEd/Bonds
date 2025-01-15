@@ -37,8 +37,6 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    volumes:
-      - ./backend:/app/django_server # Só serve em development, mover para lá depois
     expose:
       - ${DJANGO_PORT}
     networks:
@@ -55,9 +53,10 @@ services:
     image: frontend_image
     container_name: frontend_production
     environment:
-      VUE_APP_BASE_URL: ${API_URL}
+      ENVIRONMENT: production
+      VUE_APP_API_URL: ${API_URL}
     volumes:
-      - static_volume:/app/dist
+      - static_volume:/app/frontend/dist
     profiles:
       - build
 
@@ -67,7 +66,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
       - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
-      - static_volume:/usr/share/nginx/html/static:ro
+      - static_volume:/usr/share/nginx/html/dist:ro
       # - media_volume:/usr/share/nginx/html/media:ro # Será?
     ports:
       - "${NGINX_HTTP_PORT}:80"

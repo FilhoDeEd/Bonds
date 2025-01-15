@@ -11,7 +11,7 @@ RUN pip install -r /app/requirements.txt
 
 COPY backend/ /app/backend/
 
-COPY entrypoint.backend.sh /app/
-RUN chmod +x /app/entrypoint.backend.sh
+COPY entrypoint.backend.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["/app/entrypoint.backend.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
