@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { useForumListStore } from "./forumListStore";
 
 
 export const useUserStore = defineStore({
@@ -139,7 +140,9 @@ export const useUserStore = defineStore({
       localStorage.setItem("user.address.state", "");
       localStorage.setItem("user.address.locality", "");
       localStorage.setItem("user.address.neighborhood", "");
-    
+      
+      const forumListStore = useForumListStore();
+      forumListStore.clearForums();
       axios.defaults.headers.common["Authorization"] = "";
     
       console.log("Logged Out");

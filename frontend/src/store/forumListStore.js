@@ -55,6 +55,7 @@ export const useForumListStore = defineStore("forumListStore", {
                 const response = await axios.get(`${ENDPOINTS.LIST_FORUNS}`, {
                     params
                 });
+                
 
                 const { results, count, next } = response.data;
                 this.forums = this.currentPage === 1 ? results : [...this.forums, ...results];
@@ -66,6 +67,16 @@ export const useForumListStore = defineStore("forumListStore", {
             } finally {
                 this.loading = false;
             }
+        },
+        
+        clearForums() {
+            this.forums = [];
+            this.count = 0;
+            this.currentPage = 1;
+            this.searchQuery = "";
+            this.loading = false;
+            this.error = null;
+            this.next = null;
         }
     }
 });

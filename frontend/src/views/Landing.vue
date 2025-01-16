@@ -67,9 +67,9 @@
         </div>
         <div>
           <ModalCreateEvent
-            v-if="isModalOpen"
-            :isModalOpen="isModalOpen"
-            @close="isModalOpen = false"
+            v-if="isModalEventOpen"
+            :isModalOpen="isModalEventOpen"
+            @close="isModalEventOpen = false"
           />
         </div>
       </main>
@@ -99,6 +99,7 @@ export default {
   data() {
     return {
       isModalOpen: false, // Defina aqui no data
+      isModalEventOpen: false,
     };
   },
   setup() {
@@ -143,8 +144,12 @@ export default {
       this.isModalOpen = false; // Fecha o modal
     },
     openModalEvent() {
-      this.isModalOpen = true; // Abre o modal
+      this.isModalEventOpen = true; // Abre o modal
     },
+    closeModalEvent() {
+      this.isModalEventOpen = false; // Fecha o modal
+    },
+
   },
 };
 </script>
