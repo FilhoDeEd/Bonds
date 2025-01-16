@@ -1,4 +1,4 @@
-from forum.models import Forum, Event
+from forum.models import Forum, Event, Review
 from rest_framework import serializers
 
 
@@ -31,7 +31,8 @@ class ForumListSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'slug',
-            'popularity'
+            'popularity',
+            'type'
         ]
 
 class ForumEditSerializer(serializers.ModelSerializer):
@@ -54,6 +55,8 @@ class EventSerializer(serializers.ModelSerializer):
             'description',
             'date',
             'location',
+            'cancelled',
+            'five_star_mean',
             'creation_date',
             'update_date',
             'creator'
@@ -61,24 +64,10 @@ class EventSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'slug',
+            'five_star_mean',
             'creation_date',
             'update_date',
             'creator'
-        ]
-
-
-class EventListSerializer(serializers.ModelSerializer):
-    event_id = serializers.IntegerField(source='id', read_only=True)
-
-    class Meta:
-        model = Event
-        fields = [
-            'event_id',
-            'title',
-            'description',
-            'location',
-            'slug',
-            'date',
         ]
 
 
@@ -89,5 +78,41 @@ class EventEditSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'location',
+            'cancelled'
             'date',
+        ]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    forum = serializers.CharField(source='forum.title', read_only=True)
+    event = serializers.CharField(source='event.title', read_only=True)
+    user = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = [
+            'id',
+            'event',
+            'user',
+            'five_star',
+            'location',
+            'review_date'
+        ]
+        read_only_fields = [
+            'id',
+            'event',
+            'user',
+            'review_date'
+        ]
+        
+class ReviewEditSerializer(serializers.ModelSerializer):
+    forum = serializers.CharField(source='forum.title', read_only=True)
+    event = serializers.CharField(source='event.title', read_only=True)
+    user = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = [
+            'five_star',
+            'location',
         ]

@@ -28,7 +28,7 @@ Content-Type: application/json
 ######
 
 GET http://localhost:8000/forum/list/?page=1
-Authorization: Token 0b32659e7c17349859dd9e123c9ace264aed9520
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ######
 
@@ -53,24 +53,14 @@ Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ###TESTES DE EVENTO###
 
-POST http://localhost:8000/forum/event/register/
-Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
-Content-Type: application/json
 
-{
-  "title": "teste de evento",
-  "description": "This is an example description for the event.",
-  "date": "2025-01-20"
-}
-
-######
 
 POST http://localhost:8000/forum/event/register/
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 {
-  "title": "teste de evento",
+  "title": "natal mexicano",
   "description": "This is an example description for the event.",
   "date": "2025-01-20",
   "location":"rua da casa do carvalho"
@@ -78,9 +68,8 @@ Content-Type: application/json
 
 ######
 
-GET http://localhost:8000/forum/event/list/?page=1
+GET http://localhost:8000/forum/list/?page=1
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
-
 
 ######
 
@@ -104,7 +93,19 @@ Content-Type: application/json
 
 ######
 
-POST  http://localhost:8000/forum/event/delete/teste-de-evento-1/ 
+POST  http://localhost:8000/forum/delete/teste-de-evento/ HTTP/1.1
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
+######
+
+POST http://localhost:8000/forum/review/register/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+{
+  "title": "natal mexicano",
+  "description": "This is an example description for the event.",
+  "date": "2025-01-20",
+  "location":"rua da casa do carvalho"
+}
