@@ -10,7 +10,7 @@
         type="text"
         id="title"
         v-model="form.title"
-        placeholder="Digite o título do fórum"
+        placeholder="Digite o título do Evento"
         required
       />
       </div>
@@ -31,8 +31,10 @@
         type="date"
         id="eventDate"
         v-model="form.eventDate"
+        @change="validateDate"
         required
       />
+      <small v-if="dataError" class="error-message">{{ dataError }}</small>
       </div>
 
       <div class="form-group">
@@ -71,6 +73,7 @@
       eventDate: '',
       location: '',
     },
+    dataError: null,
     toast: useToast(),
     };
   },
@@ -79,18 +82,28 @@
     this.$emit('close'); // Emite o evento para o componente pai fechar o modal
     },
 
+    validateDate() {
+    const today = new Date();
+    const eventDate = new Date(this.form.eventDate);
+    if (eventDate < today) {
+      this.dataError = 'Data inválida';
+    } else {
+      this.dataError = null;
+    }
+    },
+    
     async handleSubmit() {
     try {
-      const response = await axios.post(ENDPOINTS.REGISTER_FORUM,{
+      const response = await axios.post(ENDPOINTS.REGISTER_EVENT,{
       title : this.form.title,
       description : this.form.description,
       eventDate: this.form.eventDate,
       location: this.form.location,
       });
       if(response.status === 201){
-        this.toast.success('Fórum Criado: ', this.form.title);
+        this.toast.success('Evento Criado: ', this.form.title);
         this.closeModal();
-        this.$router.push("/forum/"+response.data.slug)
+        this.$router.push("/forum/event/"+response.data.slug)
       }
       else{
         this.toast.error("Erro ao tentar criar fórum")
@@ -139,6 +152,13 @@
   h2 {
   text-align: center;
   }
+  .error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
   
   .form-group {
   margin-bottom: 15px;
