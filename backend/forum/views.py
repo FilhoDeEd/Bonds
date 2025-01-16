@@ -5,9 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
-from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer, EventSerializer, EventListSerializer, EventEditSerializer
+from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer, EventSerializer, EventEditSerializer, ReviewSerializer, ReviewEditSerializer
 from account.views import add_errors
-from forum.models import Forum , Subscriber , Event
+from forum.models import Forum , Subscriber , Event , Review
 from django.utils.text import slugify
 
 
@@ -152,32 +152,14 @@ class EventRegisterView(APIView):
             with transaction.atomic():
                 account = request.user.account
                 user_profile = UserProfile.objects.get(account=account, active=True)
-                event = event_serializer.save(owner=user_profile, neighborhood=user_profile.neighborhood)
+                event = event_serializer.save(owner=user_profile, neighborhood=user_profile.neighborhood, type = 'E')
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'detail': 'Event created successfully.', 'slug': event.slug}, status=status.HTTP_201_CREATED)
 
 
-class EventListView(ListAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
 
-    serializer_class = EventListSerializer
-    filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['title', 'location']
-    ordering_fields = ['date', 'creation_date']
-    ordering = ['-date']
-
-    def get_queryset(self):
-        account = self.request.user.account
-
-        try:
-            user_profile = UserProfile.objects.get(account=account, active=True)
-        except UserProfile.DoesNotExist:
-            return Event.objects.none()
-
-        return Event.objects.all()
 
 class EventEditView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -214,24 +196,6 @@ class EventDetailView(APIView):
         serializer = EventSerializer(event)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class EventDeleteView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, slug):
-        event = get_object_or_404(Event, slug=slug)
-        account = request.user.account
-
-        try:
-            user_profile = UserProfile.objects.get(account=account, active=True)
-        except UserProfile.DoesNotExist:
-            return Response({"detail": "Active user profile not found."}, status=status.HTTP_400_BAD_REQUEST)
-
-        if event.owner != user_profile:
-            return Response({"detail": "You do not have permission to delete this event."}, status=status.HTTP_403_FORBIDDEN)
-
-        event.delete()
-        return Response({"detail": "Event deleted successfully."}, status=status.HTTP_200_OK)
     
 
 class SubscribeView(APIView):
@@ -307,3 +271,47 @@ class UnsubscribeView(APIView):
 
         except Exception as e:
             return Response({'detail': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ReviewRegisterView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        errors = {}
+
+        forum_slug = data.get('forum_slug')
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        data['forum'] = forum.id 
+        
+        try:
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Perfil de usuário não encontrado ou inativo."}, status=status.HTTP_400_BAD_REQUEST)
+
+        event_id = data.get('event')
+        event = get_object_or_404(Event, id=event_id)
+
+        # Verifica se o usuário já fez uma review para este evento
+        if Review.objects.filter(event=event, user=user_profile).exists():
+            return Response({"detail": "Você já avaliou este evento."}, status=status.HTTP_400_BAD_REQUEST)
+
+        review_data = {
+            "event": event.id,
+            "user": user_profile.id,
+            "five_star": data.get("five_star")
+        }
+
+        review_serializer = ReviewSerializer(data=review_data)
+        if not review_serializer.is_valid():
+            add_errors(errors=errors, serializer_errors=review_serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        review = review_serializer.save()
+        event.calculate_five_star_mean()  # Atualiza a média de avaliações do evento
+
+        return Response({"detail": "Review registrada com sucesso."}, status=status.HTTP_201_CREATED)
