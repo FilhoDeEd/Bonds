@@ -489,10 +489,16 @@ onBeforeMount( async() => {
     try {
       // Faz a chamada POST para inscrever no fórum
       const response = await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
-      const unsubscribeResponse = await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
+      await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
       isSubscribed.value = false;
     } catch (err) {
-      isSubscribed.value = true;
+      if (response.data.detail === "You are already subscribed to this forum.") {
+        isSubscribed.value = true;
+      }
+      else {
+        console.log(err);
+        toast.error("Algo deu errado!");
+      }
     }
 });
 
