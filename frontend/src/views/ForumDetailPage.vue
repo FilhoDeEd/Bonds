@@ -247,7 +247,7 @@
 
 <script setup>
 /* eslint-disable */
-import { ref, onMounted, watch, onUnmounted } from 'vue';
+import { ref, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -484,6 +484,29 @@ const toggleMenu = (commentId) => {
 onMounted(() => {
   fetchForum();
 });
+
+onBeforeMount( async() => {
+    try {
+      // Faz a chamada POST para inscrever no fórum
+      const response = await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
+
+      if (response.status === 201) {
+        // Se inscreveu com sucesso, faz o unsubscribe
+        const unsubscribeResponse = await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
+        
+        if (unsubscribeResponse.status === 200) {
+          isSubscribed.value = false;
+        } else {
+          console.error('Erro ao desinscrever:', unsubscribeResponse.data);
+        }
+      } else {
+        isSubscribed.value = true;
+      }
+    } catch (err) {
+      console.error('Erro ao gerenciar a assinatura do fórum:', err.response?.data || err.message);
+    }
+});
+
 
 watch(
   () => route.params.slug,

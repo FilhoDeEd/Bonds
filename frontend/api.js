@@ -2,6 +2,7 @@ const API_URL = process.env.VUE_APP_API_URL || "http://localhost:8000";
 const ACCOUNT_URL = `${API_URL}/account`;
 const USER_PROFILE_URL = `${API_URL}/user_profile`;
 const FORUM_URL = `${API_URL}/forum`;
+const EVENT_URL = `${FORUM_URL}/event`;
 const COMMENT_URL = `${API_URL}/comment`;
 
 // Endpoints centralizados
@@ -29,6 +30,11 @@ export const ENDPOINTS = {
   SUBSCRIBE_FORUM: `${FORUM_URL}/subscribe`,
   UNSUBSCRIBE_FORUM: `${FORUM_URL}/unsubscribe`,
 
+  LIST_EVENTS: `${EVENT_URL}/list/`,
+  EVENT_DETAIL: `${EVENT_URL}/detail`,
+  REGISTER_EVENT: `${EVENT_URL}/register/`,
+  EDIT_EVENT: `${EVENT_URL}/edit`,
+
   LIST_COMMENTS : `${COMMENT_URL}/list`,
   CREATE_COMMENT : `${COMMENT_URL}/register/`,
   EDIT_COMMENT : `${COMMENT_URL}/edit`,
@@ -36,4 +42,6 @@ export const ENDPOINTS = {
   LIKE_COMMENT: `${COMMENT_URL}/like/`,
   DISLIKE_COMMENT: `${COMMENT_URL}/dislike/`,
   UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`
+
+
 };
