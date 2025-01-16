@@ -52,8 +52,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **kwargs):
-        limit = int(kwargs.get('limit'))
-        shuffle = bool(kwargs.get('shuffle'))
+        limit = kwargs.get('limit')
+        shuffle = kwargs.get('shuffle')
 
         current_directory = os.path.dirname(os.path.abspath(__file__))
         excel_file = os.path.join(current_directory, 'neighborhoods.xlsx')
