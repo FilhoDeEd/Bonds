@@ -2,7 +2,6 @@
 
 set -e
 
-# Checagem de variáveis essenciais
 if [ -z "$ENVIRONMENT" ]; then
     echo "Error: ENVIRONMENT variable is not set. Exiting..."
     exit 1
