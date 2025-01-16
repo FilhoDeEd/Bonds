@@ -32,15 +32,13 @@ class Command(BaseCommand):
 
         forums_to_create = []
 
+        counter = 1
         for neighborhood in neighborhoods:
-
             for title in forum_titles:
                 base_slug = slugify(title)
                 slug = base_slug
-                counter = 1
 
                 slug = f'{base_slug}-{counter}'
-                counter += 1
 
                 forums_to_create.append(Forum(
                     title=title,
@@ -51,6 +49,8 @@ class Command(BaseCommand):
                     update_date=now(),
                     slug=slug
                 ))
+
+            counter += 1
 
         try:
             with transaction.atomic():
