@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from django.core.management.base import BaseCommand, CommandParser
 from forum.models import Forum
 from user_profile.models import Neighborhood
@@ -39,6 +40,7 @@ class Command(BaseCommand):
                     description=f'Forum about {title}',
                     neighborhood=neighborhood,
                     type=Forum.TypeChoices.DEFAULT,
+                    creation_date=now()
                 ))
 
         try:
