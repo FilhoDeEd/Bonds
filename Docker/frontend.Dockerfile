@@ -4,6 +4,8 @@ WORKDIR /app/frontend
 
 COPY frontend/package*.json .
 
+RUN npm install
+
 COPY frontend/ /app/frontend/
 
 COPY entrypoint.frontend.sh /app/entrypoint.sh
