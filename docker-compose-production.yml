@@ -65,7 +65,7 @@ services:
     container_name: nginx_production
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
-      - ./certs:/etc/nginx/certs:ro # Para SSL (opcional)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - static_volume:/usr/share/nginx/html/dist:ro
       # - media_volume:/usr/share/nginx/html/media:ro # Será?
     ports:

@@ -56,6 +56,7 @@ services:
       VUE_APP_API_URL: http://localhost:${DJANGO_PORT}
     volumes:
       - ./frontend:/app/frontend/
+      - /app/frontend/node_modules/
     ports:
       - "${NODE_PORT}:${NODE_PORT}"
     networks:
