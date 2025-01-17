@@ -10,8 +10,9 @@ from forum.views import (
     EventRegisterView,
     EventDetailView,
     EventEditView,
-    ReviewRegisterView
-
+    ReviewRegisterView,
+    ReviewEditView,
+    ReviewDeleteView
 
 )
  
@@ -40,9 +41,9 @@ urlpatterns = [
     ##register de review
     path('review/register/',ReviewRegisterView.as_view(), name='review_register'),
     ##edit de review
-
+    path('review/edit/',ReviewEditView.as_view(), name='review_edit'),
     ##delete de review
-    
+    path('review/delete/<slug:slug>/',ReviewDeleteView.as_view(), name='review_delete'),
 
 
 ]

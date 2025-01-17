@@ -104,8 +104,28 @@ Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 {
-  "title": "natal mexicano",
-  "description": "This is an example description for the event.",
-  "date": "2025-01-20",
-  "location":"rua da casa do carvalho"
+  "five_star": "4",
+  "forum_slug": "natal-mexicano"
 }
+
+
+######
+
+
+POST http://localhost:8000/forum/review/edit/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+{
+  "five_star": "1",
+  "forum_slug": "natal-mexicano"
+}
+
+
+######
+
+POST http://127.0.0.1:8000/forum/review/delete/natal-mexicano/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+######

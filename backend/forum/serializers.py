@@ -78,41 +78,34 @@ class EventEditSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'location',
-            'cancelled'
+            'cancelled',
             'date',
         ]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    forum = serializers.CharField(source='forum.title', read_only=True)
-    event = serializers.CharField(source='event.title', read_only=True)
-    user = serializers.CharField(source='user.username', read_only=True)
+    event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+    creator = serializers.CharField(source='get_creator_name', read_only=True)
+    forum_slug = serializers.SlugRelatedField(
+        slug_field='slug',
+        read_only=True,
+        source='forum'
+    )
 
     class Meta:
         model = Review
         fields = [
             'id',
             'event',
-            'user',
+            'forum_slug',
+            'creator',
             'five_star',
-            'location',
             'review_date'
         ]
         read_only_fields = [
             'id',
-            'event',
-            'user',
+            'forum_slug',
+            'creator',
             'review_date'
         ]
-        
-class ReviewEditSerializer(serializers.ModelSerializer):
-    forum = serializers.CharField(source='forum.title', read_only=True)
-    event = serializers.CharField(source='event.title', read_only=True)
-    user = serializers.CharField(source='user.username', read_only=True)
 
-    class Meta:
-        model = Review
-        fields = [
-            'five_star',
-            'location',
-        ]
