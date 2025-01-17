@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated
-from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer, EventSerializer, EventEditSerializer, ReviewSerializer, ReviewEditSerializer
+from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSerializer, EventSerializer, EventEditSerializer, ReviewSerializer
 from account.views import add_errors
 from forum.models import Forum , Subscriber , Event , Review
 from django.utils.text import slugify
@@ -272,7 +272,6 @@ class UnsubscribeView(APIView):
         except Exception as e:
             return Response({'detail': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class ReviewRegisterView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -281,37 +280,136 @@ class ReviewRegisterView(APIView):
         data = request.data
         errors = {}
 
+        # Obter o forum_slug do corpo da requisição
         forum_slug = data.get('forum_slug')
-        forum = get_object_or_404(Forum, slug=forum_slug)
-        data['forum'] = forum.id 
-        
+
+        # Obter o fórum e o evento correspondente
+        try:
+            forum = Forum.objects.get(slug=forum_slug)
+            event = forum.event
+        except (Forum.DoesNotExist, Event.DoesNotExist):
+            return Response({'detail': 'Forum or Event not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Obter o perfil do usuário logado
         try:
             account = request.user.account
             user_profile = UserProfile.objects.get(account=account, active=True)
         except UserProfile.DoesNotExist:
-            return Response({"detail": "Perfil de usuário não encontrado ou inativo."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Active user profile not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        event_id = data.get('event')
-        event = get_object_or_404(Event, id=event_id)
+        # Verificar se o review já existe para o usuário
+        if Review.objects.filter(user_profile=user_profile, event=event).exists():
+            return Response({'detail': 'User already subscribed to this forum.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Verifica se o usuário já fez uma review para este evento
-        if Review.objects.filter(event=event, user=user_profile).exists():
-            return Response({"detail": "Você já avaliou este evento."}, status=status.HTTP_400_BAD_REQUEST)
+        data['event'] = event.id  # Substituir pelo ID do evento
+        review_serializer = ReviewSerializer(data=data)
 
-        review_data = {
-            "event": event.id,
-            "user": user_profile.id,
-            "five_star": data.get("five_star")
-        }
-
-        review_serializer = ReviewSerializer(data=review_data)
         if not review_serializer.is_valid():
             add_errors(errors=errors, serializer_errors=review_serializer.errors)
 
         if errors:
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-        review = review_serializer.save()
-        event.calculate_five_star_mean()  # Atualiza a média de avaliações do evento
+        try:
+            with transaction.atomic():
+                # Criar o review
+                review = review_serializer.save(user_profile=user_profile)
 
-        return Response({"detail": "Review registrada com sucesso."}, status=status.HTTP_201_CREATED)
+                # Atualizar a média de estrelas do evento
+                event.calculate_five_star_mean()
+
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'detail': 'Review created successfully.', 'id': review.id}, status=status.HTTP_201_CREATED)
+
+class ReviewEditView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        errors = {}
+
+        # Obter o forum_slug do corpo da requisição
+        forum_slug = data.get('forum_slug')
+
+        # Obter o fórum e o evento correspondente
+        try:
+            forum = Forum.objects.get(slug=forum_slug)
+            event = forum.event
+        except (Forum.DoesNotExist, Event.DoesNotExist):
+            return Response({'detail': 'Forum or Event not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Obter o perfil do usuário logado
+        try:
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({'detail': 'Active user profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verificar se o review existe para o usuário e o evento
+        try:
+            review = Review.objects.get(user_profile=user_profile, event=event)
+        except Review.DoesNotExist:
+            return Response({'detail': 'Review not found for this user in the specified forum.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Atualizar os dados do review
+        review_serializer = ReviewSerializer(review, data=data, partial=True)
+
+        if not review_serializer.is_valid():
+            add_errors(errors=errors, serializer_errors=review_serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                # Salvar as alterações
+                review_serializer.save()
+
+                # Atualizar a média de estrelas do evento
+                event.calculate_five_star_mean()
+
+            return Response({'detail': 'Review updated successfully.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ReviewDeleteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        try:
+            # Obtém o fórum pelo slug
+            forum = Forum.objects.get(slug=slug)
+            event = forum.event
+        except (Forum.DoesNotExist, Event.DoesNotExist):
+            return Response({'detail': 'Forum or Event not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # Obtém o perfil do usuário logado
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({'detail': 'Active user profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Verifica se o review existe para o usuário e o fórum
+        try:
+            review = Review.objects.get(user_profile=user_profile, event=event)
+        except Review.DoesNotExist:
+            return Response({'detail': 'Review not found for this user in the specified forum.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                # Remove o review
+                review.delete()
+
+                # Atualizar a média de estrelas do evento
+                event.calculate_five_star_mean()
+
+            return Response({'detail': 'Review successfully deleted.'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'detail': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

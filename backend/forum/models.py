@@ -113,10 +113,20 @@ class Review(models.Model):
         (5, '5 - Excelente'),
     ]
 
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='review_set')
-    user = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
     five_star = models.PositiveSmallIntegerField(choices=FIVE_STAR_CHOICES)
     review_date = models.DateTimeField(auto_now_add=True)
+    
+    def get_creator_name(self):
+        """
+        Retorna o nome completo do criador do comentário a partir do modelo Account, que está relacionado ao UserProfile.
+        Se o usuário não estiver relacionado, retorna 'Sistema'.
+        """
+        if self.user_profile and self.user_profile.account: 
+            return self.user_profile.account.full_name()  
+        else:
+            return 'Sistema'  
 
 class Subscriber(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT, editable=False)
