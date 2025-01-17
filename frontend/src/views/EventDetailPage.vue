@@ -14,15 +14,26 @@
             <div class="px-6 py-8">
               <div class="container mx-auto flex flex-col items-start">
                 <!-- Título editável -->
-                <input type="text" v-model="forumData.title" :readonly="!editMode"
-                  class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Fórum">
+                <div class="grid grid-cols-2 gap-4 w-full">
+                  <input type="text" v-model="forumData.title" :readonly="!editMode"
+                  class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento">
 
-                <!-- Descrição editável -->
-                <textarea v-model="forumData.description" :readonly="!editMode"
+                  <!-- Descrição editável -->
+                  <textarea v-model="forumData.description" :readonly="!editMode"
                   class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do fórum" rows="3"></textarea>
-              </div>
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento" rows="3"></textarea>
+
+                  <textarea v-model="forumData.date" :readonly="!editMode"
+                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
+
+                  <textarea v-model="forumData.localization" :readonly="!editMode"
+                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                </div>
+                <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+                </div>
             </div>
 
             <!-- Botões alinhados ao bottom -->
@@ -51,7 +62,7 @@
 
       <div class="bg-white p-6 rounded-lg shadow mb-8">
         <div class="container mx-auto">
-          <h2 class="text-2xl font-bold mb-4">Engaje no fórum!</h2>
+          <h2 class="text-2xl font-bold mb-4">Engaje no Evento!</h2>
 
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
@@ -197,6 +208,18 @@
               <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
             </div>
             <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Avaliação </h4>
+              <p class="text-gray-600">{{ forumData.five_star_mean }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Data do Evento</h4>
+              <p class="text-gray-600">{{ forumData.date }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Local do Evento</h4>
+              <p class="text-gray-600">{{ forumData.localization }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
               <h4 class="font-medium">Criado em</h4>
               <p class="text-gray-600">{{ forumData.createdAt }}</p>
             </div>
@@ -224,7 +247,7 @@ import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
 import router from '../router/index.js';
-import { ENDPOINTS } from '../../api';
+import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
@@ -232,35 +255,41 @@ import downvoteIcon from '@/assets/img/downvote.png';
 const toast = useToast();
 const forumData = ref({
   title: '',
+  date:'',
+  localization:'',
   description: '',
   popularity: 0,
   createdAt: '',
   creator: '',
   members: 0,
+  five_star_mean:	0,
 });
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
-
   if (!editMode.value) {
     try {
-      const response = await axios.post(`${ENDPOINTS.EDIT_FORUM}/${slug.value}/`, {
+      const response = await axios.post(`${ENDPOINTS.EDIT_EVENT}/${slug.value}/`, {
         title: forumData.value.title,
         description: forumData.value.description,
+        date: formatDateToISO(forumData.value.date),
+        location: forumData.value.localization,
+
       });
+
 
       if (response.data.slug) {
         // Atualiza o slug na rota diretamente
-        await router.push({ name: 'ForumDetailPage', params: { slug: response.data.slug } });
-        toast.success('Fórum atualizado com sucesso');
-        await fetchForum(); // Recarrega os dados do fórum com o novo slug
+        await router.push({ name: 'EventDetailPage', params: { slug: response.data.slug } });
+        toast.success('Evento atualizado com sucesso');
+        await fetchEvent(); // Recarrega os dados do fórum com o novo slug
       }
     } catch (error) {
       console.error(error);
       if (error.response.data.detail == "You do not have permission to edit this forum.") {
-        toast.error("Você não tem permissão para editar este fórum");
+        toast.error("Você não tem permissão para editar este Evento");
       } else {
-        toast.error(error.response.data.detail || 'Erro ao editar fórum');
+        toast.error(error.response.data.detail || 'Erro ao editar Event');
       }
     }
   }
@@ -275,6 +304,7 @@ const slug = ref(route.params.slug);
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
+  date.setDate(date.getDate() + 1); // Add one day to the date
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
     month: 'long',
@@ -282,9 +312,9 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
-const fetchForum = async () => {
+const fetchEvent = async () => {
   try {
-    const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${slug.value}/`);
+    const response = await axios.get(`${ENDPOINTS.EVENT_DETAIL}/${slug.value}/`);
     forumData.value = {
       title: response.data.title,
       description: response.data.description,
@@ -293,6 +323,9 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
       tempContent: "",
+      date: formatDate(response.data.date),
+      localization: response.data.location,
+      five_star_mean: response.data.five_star_mean,
     };
     await fetchComments();
   } catch (error) {
@@ -453,9 +486,37 @@ const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
 };
 
+
 onMounted(() => {
-  fetchForum();
+  fetchEvent();
 });
+
+function formatDateToISO(dateString) {
+  // Mapeia os meses para seus valores numéricos
+  const months = {
+    janeiro: "01",
+    fevereiro: "02",
+    março: "03",
+    abril: "04",
+    maio: "05",
+    junho: "06",
+    julho: "07",
+    agosto: "08",
+    setembro: "09",
+    outubro: "10",
+    novembro: "11",
+    dezembro: "12",
+  };
+
+  // Divide a string em partes (dia, mês, ano)
+  const [day, monthText, year] = dateString.split(" de ");
+  console.log(day, monthText, year);
+  //const day = (parseInt(day_before) + 1).toString().padStart(2, "0");
+  // Formata para YYYY-MM-DD
+  const month = months[monthText.toLowerCase()];
+  console.log(`${year}-${month}-${day.padStart(2, "0")}`);
+  return `${year}-${month}-${day.padStart(2, "0")}`;
+};
 
 onBeforeMount( async() => {
     try {
@@ -479,7 +540,7 @@ watch(
   () => route.params.slug,
   (newSlug) => {
     slug.value = newSlug;
-    fetchForum();
+    fetchEvent();
   }
 );
 
