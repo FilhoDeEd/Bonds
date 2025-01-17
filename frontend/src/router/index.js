@@ -107,6 +107,7 @@ const routes = [
     name: 'ForumDetailPage',
     props: true,
   },
+
   {
     path: "/about",
     component: AboutPage,

@@ -24,26 +24,40 @@
 
             <div v-for="forum in forumListStore.forums" :key="forum.forum_id"
               class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 w-[70%] mx-auto"
-              style="background-color: rgb(124, 122, 187, 1);">
+              
+              :style="{ backgroundColor: getColor(forum) }">
               <div class="flex h-full">
                 <!-- Imagem à esquerda -->
                 <div class="w-1/4 flex items-center">
                   <img src="https://via.placeholder.com/300x200" alt="Forum image" class="object-cover w-full"
                     style="height: 70%;" />
                 </div>
-
-                <!-- Conteúdo à direita -->
-                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <router-link :to="{ name: 'ForumDetailPage', params: { slug: forum.slug } }"
-                    class="text-white flex flex-col h-full justify-between">
-                    <h2 :value="forum.title" class="text-4xl font-semibold mb-8">
-                      {{ forum.title }}
-                    </h2>
-                    <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
-                      <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
-                      <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
-                    </div>
-                  </router-link>
+                  <!-- Conteúdo à direita -->
+                  <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                    <div v-if="forum.type === 'e'">
+                      <router-link  :to="{ name: 'ForumDetailPage', params: { slug: forum.slug } }"
+                        class="text-white flex flex-col h-full justify-between">
+                        <h2 :value="forum.title" class="text-4xl font-semibold mb-8">
+                          {{ forum.title }}
+                        </h2>
+                        <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                          <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
+                          <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
+                        </div>
+                      </router-link>
+                  </div>
+                  <div v-else>
+                    <router-link  :to="{ name: 'ForumDetailPage', params: { slug: forum.slug } }"
+                      class="text-white flex flex-col h-full justify-between">
+                      <h2 :value="forum.title" class="text-4xl font-semibold mb-8">
+                        {{ forum.title }}
+                      </h2>
+                      <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                        <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
+                        <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
+                      </div>
+                    </router-link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,8 +163,14 @@ export default {
     closeModalEvent() {
       this.isModalEventOpen = false; // Fecha o modal
     },
+    getColor(forum) {
+      // Replace this with your logic to determine the color based on the forum
+      return forum.type === 'e' ? 'rgba(124, 122, 187, 1)' : 'rgb(240, 117, 117)';
+    },
+
 
   },
+
 };
 </script>
 
