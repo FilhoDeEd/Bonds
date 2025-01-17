@@ -223,7 +223,10 @@ class SubscribeView(APIView):
         try:
             with transaction.atomic():
 
-                Subscriber.objects.create(user_profile=user_profile, forum=forum)
+                sub_instance, created = Subscriber.objects.update_or_create(
+                    user_profile=user_profile,
+                    forum=forum,
+                    defaults={'is_sub': True})
 
     
                 forum.subscribers_count += 1
@@ -260,6 +263,12 @@ class UnsubscribeView(APIView):
 
         try:
             with transaction.atomic():
+
+                sub_instance, created = Subscriber.objects.update_or_create(
+                    user_profile=user_profile,
+                    forum=forum,
+                    defaults={'is_sub': False})
+                
                 # Remove a inscrição
                 subscription.delete()
 
