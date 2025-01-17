@@ -34,12 +34,13 @@
                 </div>
                   <!-- Conteúdo à direita -->
                   <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                    <div v-if="forum.type === 'e'">
-                      <router-link  :to="{ name: 'ForumDetailPage', params: { slug: forum.slug } }"
+                    <div v-if="forum.type === 'E'">
+                      <router-link  :to="{ name: 'EventDetailPage', params: { slug: forum.slug } }"
                         class="text-white flex flex-col h-full justify-between">
                         <h2 :value="forum.title" class="text-4xl font-semibold mb-8">
                           {{ forum.title }}
                         </h2>
+                        <h3>Evento</h3>
                         <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
                           <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
                           <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
@@ -52,6 +53,7 @@
                       <h2 :value="forum.title" class="text-4xl font-semibold mb-8">
                         {{ forum.title }}
                       </h2>
+                      <h3>Fórum</h3>
                       <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
                         <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
                         <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
@@ -165,7 +167,7 @@ export default {
     },
     getColor(forum) {
       // Replace this with your logic to determine the color based on the forum
-      return forum.type === 'e' ? 'rgba(124, 122, 187, 1)' : 'rgb(240, 117, 117)';
+      return forum.type === 'U' || forum.type === 'D' ? 'rgba(124, 122, 187, 1)' : 'rgb(240, 117, 117)';
     },
 
 

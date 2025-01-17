@@ -103,7 +103,7 @@
       if(response.status === 201){
         this.toast.success('Evento Criado: ', this.form.title);
         this.closeModal();
-        this.$router.push("/forum/"+response.data.slug)
+        this.$router.push("/forum/event/"+response.data.slug)
       }
       else{
         this.toast.error("Erro ao tentar criar fórum")

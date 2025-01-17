@@ -23,6 +23,7 @@ import Maps from "@/views/admin/Maps.vue";
 
 // views without layouts
 import Index from "@/views/Index.vue";
+import EventDetailPage from '../views/EventDetailPage.vue';
 
 /* eslint-disable */
 
@@ -107,7 +108,12 @@ const routes = [
     name: 'ForumDetailPage',
     props: true,
   },
-
+  {
+    path: "/forum/event/:slug",
+    component: EventDetailPage,
+    name: 'EventDetailPage',
+    props: true,
+  },
   {
     path: "/about",
     component: AboutPage,

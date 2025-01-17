@@ -78,7 +78,7 @@ class EventEditSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'location',
-            'cancelled'
+            'cancelled',
             'date',
         ]
 

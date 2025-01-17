@@ -28,7 +28,7 @@ Content-Type: application/json
 ######
 
 GET http://localhost:8000/forum/list/?page=1
-Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Authorization: Token 8a33f3bb71a6045b3397eb9d97becc6a12be0ad7
 
 ######
 
