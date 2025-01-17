@@ -10,12 +10,12 @@ Content-Type: application/json
 
 ######
 
-POST  http://localhost:8000/forum/edit/teste-1/ 
+POST  http://localhost:8000/forum/edit/norte-4/ 
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
-  "title": "ano novo 1",
+  "title": "ano novo 200",
   "description": "This is an example description for the forum."
 }
 
