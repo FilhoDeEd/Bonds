@@ -51,7 +51,7 @@ class Comment(models.Model):
             return 'Sistema'  
 
 
-class CommentLike(models.Model):
+class Like(models.Model):
     comment = models.ForeignKey(Comment, related_name="likes", on_delete=models.CASCADE)
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -62,3 +62,20 @@ class CommentLike(models.Model):
 
     def __str__(self):
         return f"Like by {self.user_profile} on Comment {self.comment.id}"
+    
+class Report(Comment):
+    class TagChoices(models.TextChoices):
+        SAUDE = 'S', 'Saúde'
+        LIXO = 'L', 'Lixo'
+        INFRAESTRUTURA = 'I', 'Infraestrutura'
+        SEGURANCA = 'SG', 'Segurança'
+        EDUCACAO = 'E', 'Educação'
+        TRANSPORTE = 'T', 'Transporte'
+        ILUMINACAO = 'IL', 'Iluminação'
+        REDE_GUARDIAO = 'RG', 'Rede de proteção (guardião)'
+        OUTROS = 'O', 'Outros'
+
+    tag = models.CharField(max_length=5, choices=TagChoices.choices, default=TagChoices.OUTROS)
+    title = models.CharField(max_length=255)
+    location = models.TextField(max_length=1023)
+    solved = models.BooleanField(default=False)

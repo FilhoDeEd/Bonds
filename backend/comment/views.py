@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from forum.models import Forum
 
-from comment.models import Comment, CommentLike
+from comment.models import Comment, Like
 from comment.serializers import CommentSerializer
 from user_profile.models import UserProfile
 
@@ -120,7 +120,7 @@ class CommentListView(ListAPIView):
         return Comment.objects.filter(forum=forum)
     
 
-class CommentLikeView(APIView):
+class LikeView(APIView):
     """
     Adiciona um like a um comentário.
     """
@@ -132,7 +132,7 @@ class CommentLikeView(APIView):
         user_profile = self.get_user_profile(request)
 
         # Adiciona ou atualiza o like
-        like_instance, created = CommentLike.objects.update_or_create(
+        like_instance, created = Like.objects.update_or_create(
             user_profile=user_profile,
             comment=comment,
             defaults={'is_like': True}  # Like
@@ -148,7 +148,7 @@ class CommentLikeView(APIView):
         return get_object_or_404(UserProfile, account=account, active=True)
 
 
-class CommentDislikeView(APIView):
+class DislikeView(APIView):
     """
     Adiciona um dislike a um comentário.
     """
@@ -160,7 +160,7 @@ class CommentDislikeView(APIView):
         user_profile = self.get_user_profile(request)
 
         # Adiciona ou atualiza o dislike
-        like_instance, created = CommentLike.objects.update_or_create(
+        like_instance, created = Like.objects.update_or_create(
             user_profile=user_profile,
             comment=comment,
             defaults={'is_like': False}  # Dislike
@@ -176,7 +176,7 @@ class CommentDislikeView(APIView):
         return get_object_or_404(UserProfile, account=account, active=True)
 
 
-class CommentLikeDeleteView(APIView):
+class LikeDeleteView(APIView):
     """
     Remove um like ou dislike de um comentário.
     """
@@ -188,7 +188,7 @@ class CommentLikeDeleteView(APIView):
         user_profile = self.get_user_profile(request)
 
         # Remove o like/dislike
-        deleted, _ = CommentLike.objects.filter(user_profile=user_profile, comment=comment).delete()
+        deleted, _ = Like.objects.filter(user_profile=user_profile, comment=comment).delete()
 
         if deleted:
             return Response({
