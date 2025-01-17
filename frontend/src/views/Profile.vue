@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <div class="bg-blueGray-200 -mt-24">
+    <div class="bg-blueGray-200 -mt-24 ">
       <section class="relative block h-600-px">
         <div class="absolute top-0 w-full h-full bg-center bg-cover" style="
             background-image: url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80');
@@ -20,7 +20,7 @@
         <div class="container mx-auto px-4 -pt-8 " id="infoProfile">
           
           <form @submit.prevent="openModalConfirmEdit">
-            <div class="relative flex flex-col  min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
+            <div class="relative flex flex-col h-850-px  min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
               <!-- Container da Imagem de Perfil -->
               <div class="relative pt-16 pb-8">
                 <div class="flex flex-wrap justify-center">

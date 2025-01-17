@@ -5,8 +5,7 @@
       <div class="bg-white h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
-          <div class="absolute top-0 left-0 right-0 h-85" 
-               style="background-color: rgba(124, 122, 187, 1);">
+          <div class="absolute top-0 left-0 right-0 h-85" style="background-color: rgba(124, 122, 187, 1);">
           </div>
 
           <!-- Conteúdo do banner -->
@@ -15,44 +14,32 @@
             <div class="px-6 py-8">
               <div class="container mx-auto flex flex-col items-start">
                 <!-- Título editável -->
-                <input 
-                  type="text" 
-                  v-model="forumData.title" 
-                  :readonly="!editMode"
+                <input type="text" v-model="forumData.title" :readonly="!editMode"
                   class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full"
-                  :class="{'hover:bg-gray-700/30': editMode}"
-                  placeholder="Título do Fórum"
-                >
-                
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Fórum">
+
                 <!-- Descrição editável -->
-                <textarea 
-                  v-model="forumData.description" 
-                  :readonly="!editMode"
+                <textarea v-model="forumData.description" :readonly="!editMode"
                   class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{'hover:bg-gray-700/30': editMode}"
-                  placeholder="Descrição do fórum"
-                  rows="3"
-                ></textarea>
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do fórum" rows="3"></textarea>
               </div>
             </div>
 
             <!-- Botões alinhados ao bottom -->
             <div class="px-6 pb-4 flex space-x-4 relative z-10">
-              <button type="button" 
-              @click="toggleSubscribe"
-              class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
-              style="background-color: rgb(252, 3, 94);">
-              {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
+              <button type="button" @click="toggleSubscribe"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                style="background-color: rgb(252, 3, 94);">
+                {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
               </button>
-              
-              <button type="button" 
-                @click="toggleEdition"
+
+              <button type="button" @click="toggleEdition"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
 
-              <button type="button" 
+              <button type="button"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
@@ -71,8 +58,7 @@
             <div class="flex items-start space-x-4">
               <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
-                <textarea
-                  v-model="newCommentContent"
+                <textarea v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
                   placeholder="No que você está pensando?" rows="3"></textarea>
 
@@ -90,9 +76,8 @@
                     </button>
                   </div>
 
-                  <button 
-                  @click="createComment"
-                  class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
+                  <button @click="createComment"
+                    class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     Publicar
                   </button>
                 </div>
@@ -107,77 +92,71 @@
         <!-- Posts Section -->
         <div class="w-3/4">
           <div class="space-y-4">
-            <article v-for="comment in comments" :key="comment.createdAt" class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200" style="background-color: rgba(124, 122, 187, 1);">
+            <article v-for="comment in comments" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
+              style="background-color: rgba(124, 122, 187, 1);">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
                 <div class="flex flex-col items-center text-2xl font-bold w-12">
-                  <button 
-                    @click="likeComment(comment)"
-                    class="vote"
-                    :class="{
-                      'on-up': comment.has_liked === 1,
-                      'hover:text-gray-300': comment.has_liked !== 1
-                    }"
-                  >
+                  <button @click="likeComment(comment)" class="vote" :class="{
+                    'on-up': comment.has_liked === 1,
+                    'hover:text-gray-300': comment.has_liked !== 1
+                  }">
                     <svg width="36" height="36" viewBox="0 0 36 36">
-                      <path d="M2 26h32L18 10 2 26z" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            fill="none"
-                            class="svg-path"></path>
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
                     </svg>
                   </button>
                   <span class="my-1 text-white">{{ comment.trust_rate }}</span>
-                  <button 
-                    @click="dislikeComment(comment)"
-                    class="vote"
-                    :class="{
-                      'on-down': comment.has_liked === -1,
-                      'hover:text-gray-300': comment.has_liked !== -1
-                    }"
-                  >
+                  <button @click="dislikeComment(comment)" class="vote" :class="{
+                    'on-down': comment.has_liked === -1,
+                    'hover:text-gray-300': comment.has_liked !== -1
+                  }">
                     <svg width="36" height="36" viewBox="0 0 36 36">
-                      <path d="M2 10h32L18 26 2 10z" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            fill="none"
-                            class="svg-path"></path>
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
                     </svg>
+                  </button>
+
+                  <!-- Botão para criar enquete -->
+                  <button @click="showPollCreator = true" class="p-2 hover:bg-gray-100 rounded-full"
+                    title="Criar Enquete">
+                    <span>📊</span>
                   </button>
                 </div>
 
                 <!-- Imagem do autor do comentário -->
                 <div class="w-1/4 h-70-px flex flex-col pt-12 ">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full" style="height: 70%;">
-                  
-                  
+                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
+                    style="height: 70%;">
+
+
                 </div>
-                
+
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-white flex flex-col h-full justify-between">
                     <!-- Menu dropdown -->
                     <div class="relative self-end mb-2">
-                      <button @click="toggleMenu(comment.id)" 
-                              class="text-white text-xl hover:text-gray-300">
+                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
                         ⋯
                       </button>
-                      
+
                       <!-- Dropdown menu -->
-                      <div v-if="menuStates[comment.id]" 
-                           class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                           <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }" 
+                      <div v-if="menuStates[comment.id]"
+                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                            Editar
-                          </button>
-                           <button @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }" 
-                             
-                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Editar
+                        </button>
+                        <button
+                          @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
                         </button>
-                        <button @click="menuStates[comment.id] = false" 
-                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                        <button @click="menuStates[comment.id] = false"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Reportar
                         </button>
 
@@ -186,30 +165,23 @@
 
                     <!-- Título ou nome do autor -->
                     <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
-                    
+
                     <div class="text-lg flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
-                      <p 
-                        v-if="!comment.isEditing" 
-                        class="mb-auto leading-relaxed cursor-pointer"
-                        @dblclick="() => { comment.isEditing = true; }" 
-                        title="Clique duas vezes para editar"
-                      >
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
                         {{ comment.content }}
                       </p>
 
                       <!-- Edição do comentário -->
-                      <textarea 
-                        v-else 
-                        v-model="comment.tempContent" 
-                        @blur="cancelEdit(comment)" 
-                        @keyup.enter="saveEdit(comment)" 
+                      <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEdit(comment)"
                         class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
                       </textarea>
                     </div>
-                      <!-- Detalhes do comentário -->
-                      <p class="mt-8">{{ comment.createdAt }}</p>
-                    </div>
+                    <!-- Detalhes do comentário -->
+                    <p class="mt-8">{{ comment.createdAt }}</p>
+                  </div>
                 </div>
               </div>
             </article>
@@ -404,8 +376,8 @@ const dislikeComment = async (comment) => {
   }
 };
 
-const editComment = async(comment)=>{
-  try{
+const editComment = async (comment) => {
+  try {
     const response = await axios.post(`${ENDPOINTS.EDIT_COMMENT}/${comment.id}/`, {
       content: comment.content,
     });
@@ -413,31 +385,31 @@ const editComment = async(comment)=>{
     // Atualiza o conteúdo do comentário com a resposta do servidor
     toast.success('Comentário editado com sucesso');
   }
-  catch(err){
+  catch (err) {
     console.log(err);
     toast.error("Algo deu errado!");
   }
 };
 
-const cancelEdit = async(comment) =>{
-  try{
+const cancelEdit = async (comment) => {
+  try {
     comment.isEditing = false;
     comment.tempContent = comment.content;
   }
-  catch(err){
+  catch (err) {
     console.log(err)
   }
 };
 
-const saveEdit = async(comment) =>{
-  try{
-    if (comment.tempContent !== comment.content && comment.tempContent){
+const saveEdit = async (comment) => {
+  try {
+    if (comment.tempContent !== comment.content && comment.tempContent) {
       comment.content = comment.tempContent;
       editComment(comment);
     }
     comment.isEditing = false;
   }
-  catch(err){
+  catch (err) {
     console.log(err)
   }
 };
@@ -523,7 +495,7 @@ onUnmounted(() => {
   height: 85%;
 }
 
-.bg-pattern{
+.bg-pattern {
   background-color: #363474;
 }
 
@@ -531,11 +503,13 @@ onUnmounted(() => {
   height: 400px;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   outline: none;
 }
 
-input::placeholder, textarea::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -553,14 +527,16 @@ button:hover {
   cursor: pointer;
   color: #687074;
   transition: all 0.2s ease;
-} 
+}
 
 .vote.on-up {
-  color: #22c55e; /* verde */
+  color: #22c55e;
+  /* verde */
 }
 
 .vote.on-down {
-  color: #ef4444; /* vermelho */
+  color: #ef4444;
+  /* vermelho */
 }
 
 .vote.on-up .svg-path,

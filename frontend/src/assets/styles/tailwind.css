@@ -1626,6 +1626,10 @@ select {
   margin-top: 4rem;
 }
 
+.mt-reg {
+  margin-top: 3.75rem;
+}
+
 .mt-2 {
   margin-top: 0.5rem;
 }
@@ -1842,6 +1846,11 @@ select {
 .h-600-px {
   height: 600px;
 }
+
+.h-850-px {
+  height: 850px;
+}
+
 
 .h-70-px {
   height: 300px;
@@ -3718,7 +3727,7 @@ select {
 
 
 .pb-16 {
-  padding-bottom: 4rem;
+  padding-bottom: 20rem;
 }
 
 .pb-2 {
