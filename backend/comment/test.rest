@@ -1,6 +1,6 @@
 
 POST http://localhost:8000/comment/register/
-Authorization: Token 44185d2d7c01e91fae7d2a8a03b1e72cdd183b25
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 {
@@ -32,8 +32,8 @@ Content-Type: application/json
 
 
 ### Teste: Adicionar um Like
-POST http://127.0.0.1:8000/comment/like/18/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+POST http://127.0.0.1:8000/comment/like/26/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 {
@@ -41,8 +41,8 @@ Content-Type: application/json
 }
 
 ### Teste: Adicionar um Dislike
-POST http://127.0.0.1:8000/comment/dislike/{comment_id}/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+POST http://127.0.0.1:8000/comment/dislike/26/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 {
@@ -50,5 +50,5 @@ Content-Type: application/json
 }
 
 ### Teste: Remover Like/Dislike
-DELETE http://127.0.0.1:8000/comment/unlike/{comment_id}/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+DELETE http://127.0.0.1:8000/comment/unlike/26/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52

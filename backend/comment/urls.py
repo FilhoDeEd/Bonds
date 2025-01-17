@@ -4,9 +4,9 @@ from comment.views import (
     CommentEditView,
     CommentDeleteView,
     CommentListView,
-    CommentLikeView,
-    CommentDislikeView,
-    CommentLikeDeleteView
+    LikeView,
+    DislikeView,
+    LikeDeleteView
 )
 
 urlpatterns = [
@@ -14,7 +14,7 @@ urlpatterns = [
     path('edit/<int:comment_id>/',CommentEditView.as_view(), name='comment_edit'),
     path('delete/<int:comment_id>/', CommentDeleteView.as_view(), name='comment-delete'),
     path('list/<slug:slug>/', CommentListView.as_view(), name='comment_list'),
-    path('like/<int:comment_id>/', CommentLikeView.as_view(), name='comment-like'),
-    path('dislike/<int:comment_id>/', CommentDislikeView.as_view(), name='comment-dislike'),
-    path('unlike/<int:comment_id>/', CommentLikeDeleteView.as_view(), name='comment-unlike'),
+    path('like/<int:comment_id>/', LikeView.as_view(), name='comment-like'),
+    path('dislike/<int:comment_id>/', DislikeView.as_view(), name='comment-dislike'),
+    path('unlike/<int:comment_id>/', LikeDeleteView.as_view(), name='comment-unlike'),
 ]
