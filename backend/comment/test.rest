@@ -5,7 +5,7 @@ Content-Type: application/json
 
 {
     "content": "Este é um comentário de exemplo.",
-    "forum_slug": "centro-noticias-e-atualizacoes-locais"
+    "forum_slug": "centro-seguranca-e-emergencias"
 }
 
 ######
@@ -26,13 +26,13 @@ Content-Type: application/json
 
 ####### 
 
-GET http://localhost:8000/comment/list/centro-noticias-e-atualizacoes-locais/
+GET http://localhost:8000/comment/list/centro-seguranca-e-emergencias/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 
 ### Teste: Adicionar um Like
-POST http://127.0.0.1:8000/comment/like/26/
+POST http://127.0.0.1:8000/comment/like/25/
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
@@ -52,3 +52,45 @@ Content-Type: application/json
 ### Teste: Remover Like/Dislike
 DELETE http://127.0.0.1:8000/comment/unlike/26/
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+
+########
+
+
+
+
+POST http://localhost:8000/comment/report/register/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+{
+    "content": "Este é um report de exemplo.",
+    "title":"perigo",
+    "location":"rua das flores",
+    "tag": "SG",
+    "solved": "False",
+    "forum_slug": "centro-seguranca-e-emergencias"
+}
+
+
+#######
+
+POST http://localhost:8000/comment/report/edit/24/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+{
+    "content": "Este é um report de exemplo.",
+    "title":"cuidado",
+    "location":"rua das flores",
+    "tag": "SA",
+    "solved": "False",
+    "forum_slug": "centro-seguranca-e-emergencias"
+}
+
+######
+
+POST http://localhost:8000/comment/delete/24/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+Content-Type: application/json
+
+####### 
