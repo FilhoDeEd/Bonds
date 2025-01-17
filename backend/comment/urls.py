@@ -6,7 +6,10 @@ from comment.views import (
     CommentListView,
     LikeView,
     DislikeView,
-    LikeDeleteView
+    LikeDeleteView,
+    ReportRegisterView,
+    ReportEditView,
+    ReportDeleteView
 )
 
 urlpatterns = [
@@ -17,4 +20,7 @@ urlpatterns = [
     path('like/<int:comment_id>/', LikeView.as_view(), name='comment-like'),
     path('dislike/<int:comment_id>/', DislikeView.as_view(), name='comment-dislike'),
     path('unlike/<int:comment_id>/', LikeDeleteView.as_view(), name='comment-unlike'),
+    path('report/register/',ReportRegisterView.as_view(), name='report_register'),
+    path('report/edit/<int:report_id>/',ReportEditView.as_view(), name='comment_edit'),
+    path('report/delete/<int:report_id>/',ReportDeleteView.as_view(), name='comment_edit'),
 ]
