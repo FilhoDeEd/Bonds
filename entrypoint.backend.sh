@@ -15,7 +15,7 @@ fi
 echo "Starting Django setup..."
 
 python manage.py wait_for_db
-python manage.py makemigrations
+python manage.py makemigrations --noinput
 python manage.py migrate
 
 if [ "$ENVIRONMENT" = "development" ]; then
