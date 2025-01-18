@@ -68,7 +68,9 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
+                    <button 
+                    v-show="showReportCreator"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
@@ -237,7 +239,17 @@ const forumData = ref({
   createdAt: '',
   creator: '',
   members: 0,
+  type:'',
 });
+
+const showReportCreator = ref(false);
+const showPollCreator = ref(false);
+
+const activeReportCreator = () => {
+  if (forumData.value.type === "D") {
+    showReportCreator.value = !showReportCreator.value;
+  }
+};
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
@@ -455,6 +467,7 @@ const toggleMenu = (commentId) => {
 
 onMounted(() => {
   fetchForum();
+  activeReportCreator();
 });
 
 onBeforeMount( async() => {
@@ -463,6 +476,7 @@ onBeforeMount( async() => {
       await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
       await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
       isSubscribed.value = false;
+
     } catch (err) {
       if (err.response && err.response.data.detail === "You are already subscribed to this forum.") {
         isSubscribed.value = true;

@@ -79,9 +79,6 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
-                      <span>📢</span>
-                    </button>
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
