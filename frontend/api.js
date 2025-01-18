@@ -34,6 +34,7 @@ export const ENDPOINTS = {
   EVENT_DETAIL: `${EVENT_URL}/detail`,
   REGISTER_EVENT: `${EVENT_URL}/register/`,
   EDIT_EVENT: `${EVENT_URL}/edit`,
+  REVIEW_EVENT: `${FORUM_URL}/review/register/`,
 
   LIST_COMMENTS : `${COMMENT_URL}/list`,
   CREATE_COMMENT : `${COMMENT_URL}/register/`,
