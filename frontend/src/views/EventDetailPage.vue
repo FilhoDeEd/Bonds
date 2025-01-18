@@ -85,7 +85,7 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
-                  <button v-if="checkDate(forumData.date)" @click="callReview"
+                  <button v-if="true" @click="callReview"
                     class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
                     <span>⭐</span>
                   </button>
@@ -240,19 +240,20 @@
           </div>
         </aside>
       </div>
-  <ModalReview
-    v-if="isModalOpen"
-    :isModalOpen="isModalOpen"
-    @submitRating="handleRating"
-    @close="isModalOpen = false"
- />
+      <ModalReview
+        v-if="isModalOpen"
+        :isModalOpen="isModalOpen"
+        @submitRating="handleRating"
+        @close="isModalOpen = false"
+        @showToast="handleShowToast"
+      />
     </div>
   </MainLayout>
 </template>
 
 <script setup>
 /* eslint-disable */
-import { ref, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -262,6 +263,39 @@ import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
+
+const checkDate = ()=>{
+  if (forumData.value.date < new Date()){
+      return true
+    }
+    return false;
+  }
+
+const isModalOpen = ref(false);
+const stars = ref(0);
+
+const callReview = () => {
+  isModalOpen.value = true;
+};
+
+const handleRating = async (rating) => {
+  stars.value = rating;
+  try {
+    const response = await axios.post(ENDPOINTS.REVIEW_EVENT, {
+      five_star: stars.value,
+      forum_slug: slug.value,
+    });
+    if (response.data.success) {
+      toast.success("Evento avaliado com sucesso!");
+      isModalOpen.value = false;
+    }
+    if (response.detail == "User already subscribed to this forum.") {
+      toast.error("Você já avaliou este evento.");
+    }
+  } catch (error) {
+    toast.error("Você já avaliou este evento.");
+  }
+};
 
 const toast = useToast();
 const forumData = ref({
@@ -279,37 +313,34 @@ const forumData = ref({
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
-    if(forumData.value.date < new Date()){
-      toast.error('Não é possível editar um evento que já ocorreu');
-      editMode.value = !editMode.value;
-    } else{
-      try {
-        const response = await axios.post(`${ENDPOINTS.EDIT_EVENT}/${slug.value}/`, {
-          title: forumData.value.title,
-          description: forumData.value.description,
-          date: formatDateToISO(forumData.value.date),
-          location: forumData.value.localization,
-  
-        });
-  
-  
-        if (response.data.slug) {
-          // Atualiza o slug na rota diretamente
-          await router.push({ name: 'EventDetailPage', params: { slug: response.data.slug } });
-          toast.success('Evento atualizado com sucesso');
-          await fetchEvent(); // Recarrega os dados do fórum com o novo slug
-        }
-      } catch (error) {
-        console.error(error);
-        if (error.response.data.detail == "You do not have permission to edit this forum.") {
-          toast.error("Você não tem permissão para editar este Evento");
-        } else {
-          toast.error(error.response.data.detail || 'Erro ao editar Event');
-        }
+    if(new Date(formatDateToISO(forumData.value.date)) <= new Date()){
+      toast.error('Não é possível editar a data de um evento que já ocorreu, ou mover para o passado');
+      editMode.value = false;
+      return;
+    }
+    try {
+      const response = await axios.post(`${ENDPOINTS.EDIT_EVENT}/${slug.value}/`, {
+        title: forumData.value.title,
+        description: forumData.value.description,
+        date: formatDateToISO(forumData.value.date),
+        location: forumData.value.localization,
+
+      });
+      if (response.data.slug) {
+        // Atualiza o slug na rota diretamente
+        await router.push({ name: 'EventDetailPage', params: { slug: response.data.slug } });
+        toast.success('Evento atualizado com sucesso');
+        await fetchEvent(); // Recarrega os dados do fórum com o novo slug
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response.data.detail == "You do not have permission to edit this forum.") {
+        toast.error("Você não tem permissão para editar este Evento");
+      } else {
+        toast.error(error.response.data.detail || 'Erro ao editar Event');
       }
     }
-      
-    }
+  }
 };
 
 const comments = ref([]);
@@ -537,24 +568,6 @@ function formatDateToISO(dateString) {
   return `${year}-${month}-${day.padStart(2, "0")}`;
 };
 
-onBeforeMount( async() => {
-    try {
-      // Faz a chamada POST para inscrever no fórum
-      await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
-      await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
-      isSubscribed.value = false;
-    } catch (err) {
-      if (err.response && err.response.data.detail === "You are already subscribed to this forum.") {
-        isSubscribed.value = true;
-      }
-      else {
-        console.log(err);
-        toast.error("Algo deu errado!");
-      }
-    }
-});
-
-
 watch(
   () => route.params.slug,
   (newSlug) => {
@@ -567,34 +580,7 @@ onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
 
-const checkDate = ()=>{
-  if (forumData.value.date < new Date()){
-      return true
-    }
-    return false;
-  }
 
-const isModalOpen = ref(false);
-const stars = ref(0); // Define the stars variable
-const callReview = async () => {
-  isModalOpen.value = true;
-  handleRating(stars.value); // Ensure handleRating is defined or remove this line if unnecessary
-  try {
-    const response = await axios.post(`${ENDPOINTS.REVIEW_EVENT}`,
-      {
-        five_star: stars.value,
-        slug: slug.value,
-      }
-    );
-    if (response.data.reviewed){
-      toast.success('Evento avaliado com sucesso');
-      forumData.value.reviewed = true;
-    }
-  } catch (error) {
-    console.error(error);
-    toast.error('Erro ao avaliar evento');
-  }
-};
   
 
 </script>
