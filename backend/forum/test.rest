@@ -10,12 +10,12 @@ Content-Type: application/json
 
 ######
 
-POST  http://localhost:8000/forum/edit/teste-1/ 
+POST  http://localhost:8000/forum/edit/norte-4/ 
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
 {
-  "title": "ano novo 1",
+  "title": "ano novo 200",
   "description": "This is an example description for the forum."
 }
 
@@ -28,7 +28,7 @@ Content-Type: application/json
 ######
 
 GET http://localhost:8000/forum/list/?page=1
-Authorization: Token 8a33f3bb71a6045b3397eb9d97becc6a12be0ad7
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ######
 
@@ -37,12 +37,12 @@ Authorization: Token c55d674ffd9e375f61d3be0a32c5d7f6403404a1
 
 ######
 
-POST http://localhost:8000/forum/subscribe/norte/
-Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+POST http://localhost:8000/forum/subscribe/natal-mexicano-5/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ### Testar Cancelamento de Inscrição no Fórum
-POST http://127.0.0.1:8000/forum/unsubscribe/ot/
-Authorization: Token 44185d2d7c01e91fae7d2a8a03b1e72cdd183b25
+POST http://127.0.0.1:8000/forum/unsubscribe/natal-mexicano-5/
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
 ######

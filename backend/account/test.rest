@@ -1,4 +1,4 @@
-POST http://localhost:8080/account/register/ HTTP/1.1
+POST http://localhost:8000/account/register/ HTTP/1.1
 Content-Type: application/json
 
 {
@@ -14,7 +14,7 @@ Content-Type: application/json
 
 ######
 
-POST http://localhost:8080/account/login/ HTTP/1.1
+POST http://localhost:8000/account/login/ HTTP/1.1
 Content-Type: application/json
 
 {

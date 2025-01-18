@@ -132,6 +132,7 @@ class Subscriber(models.Model):
     user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT, editable=False)
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE, editable=False)
     subscription_date = models.DateField(editable=False)
+    is_sub = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.id:
