@@ -85,6 +85,10 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
+                  <button v-if="checkDate(forumData.date)" @click="callReview"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
+                    <span>⭐</span>
+                  </button>
                   </div>
 
                   <button @click="createComment"
@@ -238,6 +242,12 @@
       </div>
     </div>
   </MainLayout>
+  <ModalReview
+    v-if="isModalOpen"
+    :isModalOpen="isModalOpen"
+    @submitRating="handleRating"
+    @close="isModalOpen = false"
+ />
 </template>
 
 <script setup>
@@ -249,8 +259,10 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
+import { ModalReview } from '../components/Modals/ModalReview.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
+import { is } from 'core-js/core/object';
 
 const toast = useToast();
 const forumData = ref({
@@ -370,6 +382,8 @@ const createComment = async () => {
     toast.error('Erro ao criar comentário');
   }
 };
+
+
 
 const likeComment = async (comment) => {
   try {
@@ -547,6 +561,37 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
+
+const checkDate = ()=>{
+  forumData.value.date = formatDateToISO(forumData.value.date);
+  if (forumData.value.date < new Date().toISOString().split('T')[0]){
+      return True
+    }
+    return false;
+  }
+
+const isModalOpen = ref(false);
+const stars = ref(0); // Define the stars variable
+const callReview = async () => {
+  isModalOpen.value = true;
+  handleRating(stars.value); // Ensure handleRating is defined or remove this line if unnecessary
+  try {
+    const response = await axios.post(`${ENDPOINTS.REVIEW_EVENT}`,
+      {
+        five_star: stars.value,
+        slug: slug.value,
+      }
+    );
+    if (response.data.reviewed){
+      toast.success('Evento avaliado com sucesso');
+      forumData.value.reviewed = true;
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao avaliar evento');
+  }
+};
+  
 
 </script>
 
