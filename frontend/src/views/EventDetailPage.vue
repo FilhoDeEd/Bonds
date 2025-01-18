@@ -240,14 +240,14 @@
           </div>
         </aside>
       </div>
-    </div>
-  </MainLayout>
   <ModalReview
     v-if="isModalOpen"
     :isModalOpen="isModalOpen"
     @submitRating="handleRating"
     @close="isModalOpen = false"
  />
+    </div>
+  </MainLayout>
 </template>
 
 <script setup>
@@ -259,10 +259,9 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
-import { ModalReview } from '../components/Modals/ModalReview.vue';
+import ModalReview from '../components/Modals/ModalReview.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
-import { is } from 'core-js/core/object';
 
 const toast = useToast();
 const forumData = ref({
@@ -280,31 +279,37 @@ const forumData = ref({
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
-    try {
-      const response = await axios.post(`${ENDPOINTS.EDIT_EVENT}/${slug.value}/`, {
-        title: forumData.value.title,
-        description: forumData.value.description,
-        date: formatDateToISO(forumData.value.date),
-        location: forumData.value.localization,
-
-      });
-
-
-      if (response.data.slug) {
-        // Atualiza o slug na rota diretamente
-        await router.push({ name: 'EventDetailPage', params: { slug: response.data.slug } });
-        toast.success('Evento atualizado com sucesso');
-        await fetchEvent(); // Recarrega os dados do fórum com o novo slug
-      }
-    } catch (error) {
-      console.error(error);
-      if (error.response.data.detail == "You do not have permission to edit this forum.") {
-        toast.error("Você não tem permissão para editar este Evento");
-      } else {
-        toast.error(error.response.data.detail || 'Erro ao editar Event');
+    if(forumData.value.date < new Date()){
+      toast.error('Não é possível editar um evento que já ocorreu');
+      editMode.value = !editMode.value;
+    } else{
+      try {
+        const response = await axios.post(`${ENDPOINTS.EDIT_EVENT}/${slug.value}/`, {
+          title: forumData.value.title,
+          description: forumData.value.description,
+          date: formatDateToISO(forumData.value.date),
+          location: forumData.value.localization,
+  
+        });
+  
+  
+        if (response.data.slug) {
+          // Atualiza o slug na rota diretamente
+          await router.push({ name: 'EventDetailPage', params: { slug: response.data.slug } });
+          toast.success('Evento atualizado com sucesso');
+          await fetchEvent(); // Recarrega os dados do fórum com o novo slug
+        }
+      } catch (error) {
+        console.error(error);
+        if (error.response.data.detail == "You do not have permission to edit this forum.") {
+          toast.error("Você não tem permissão para editar este Evento");
+        } else {
+          toast.error(error.response.data.detail || 'Erro ao editar Event');
+        }
       }
     }
-  }
+      
+    }
 };
 
 const comments = ref([]);
@@ -563,9 +568,8 @@ onUnmounted(() => {
 });
 
 const checkDate = ()=>{
-  forumData.value.date = formatDateToISO(forumData.value.date);
-  if (forumData.value.date < new Date().toISOString().split('T')[0]){
-      return True
+  if (forumData.value.date < new Date()){
+      return true
     }
     return false;
   }
