@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from comment.models import Comment, Like
+from comment.models import Comment, Like, Report
 from forum.models import Forum
 from user_profile.models import UserProfile
 
@@ -26,7 +26,8 @@ class CommentSerializer(serializers.ModelSerializer):
             'forum',
             'forum_slug',
             'creator',
-            'has_liked'
+            'has_liked',
+            'type'
         ]
         read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked']
 
@@ -74,7 +75,7 @@ class ReportSerializer(serializers.ModelSerializer):
     has_liked = serializers.SerializerMethodField()
 
     class Meta:
-        model = Comment
+        model = Report
         fields = [
             'id',
             'content',
@@ -88,7 +89,8 @@ class ReportSerializer(serializers.ModelSerializer):
             'forum',
             'forum_slug',
             'creator',
-            'has_liked'
+            'has_liked',
+            'type'
         ]
         read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked']
 

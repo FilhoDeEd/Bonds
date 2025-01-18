@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from forum.models import Forum
 
-from comment.models import Comment, Like
-from comment.serializers import CommentSerializer
+from comment.models import Comment, Like, Report
+from comment.serializers import CommentSerializer, ReportSerializer
 from user_profile.models import UserProfile
 
 
@@ -203,3 +203,99 @@ class LikeDeleteView(APIView):
     def get_user_profile(self, request):
         account = request.user.account
         return get_object_or_404(UserProfile, account=account, active=True)
+    
+class ReportRegisterView(APIView):
+    """
+    Registra um novo report.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        errors = {}
+
+         # Obter o slug do fórum e buscar o objeto correspondente
+        forum_slug = data.get('forum_slug')
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        data['forum'] = forum.id  # Substituir pelo ID do fórum
+
+
+        serializer = ReportSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                account = request.user.account
+                user_profile = get_object_or_404(UserProfile, account=account, active=True)
+                report = serializer.save(user_profile=user_profile, type = 'R')
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'detail': 'Report created successfully.', 'id': report.id}, status=status.HTTP_201_CREATED)
+
+class ReportEditView(APIView):
+    """
+    Edita um report existente.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, report_id):
+        """
+        Atualiza os dados de um report pelo ID.
+        """
+        try:
+            # Obtém o report pelo ID
+            report = get_object_or_404(Report, pk=report_id)
+
+            account = request.user.account
+            try:
+                user_profile = UserProfile.objects.get(account=account, active=True)
+            except UserProfile.DoesNotExist:
+                return Response({"detail": "Invalid or inactive user."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Verifica se o usuário é o dono do report
+            if report.user_profile != user_profile:
+                return Response({"detail": "You do not have permission to edit this report."}, status=status.HTTP_403_FORBIDDEN)
+
+
+            # Valida e atualiza o report
+            serializer = ReportSerializer(report, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"success": "Report updated successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(
+                {"detail": f"Ocorreu um erro inesperado. {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class ReportDeleteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, report_id):
+        # Obtém o comentário pelo ID
+        report = get_object_or_404(Report, id=report_id)
+
+        account = request.user.account
+        try:
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Active user profile not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verifica se o usuário logado é o dono do comentário
+        if report.user_profile != user_profile:
+            return Response({"detail": "You do not have permission to delete this report."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Deleta o comentário
+        report.delete()
+
+        return Response({"detail": "Report deleted successfully."}, status=status.HTTP_200_OK)
+   

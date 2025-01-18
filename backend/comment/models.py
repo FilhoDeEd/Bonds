@@ -4,10 +4,12 @@ from django.utils import timezone
 from forum.models import Forum
 
 class Comment(models.Model):
-    """
-    Modelo para representar um comentário em um fórum.
-    """
+    class TypeChoices(models.TextChoices):
+        COMMENT = 'C', 'comment'
+        REPORT = 'R', 'report'
 
+
+    type = models.CharField(max_length=10, choices=TypeChoices.choices, default=TypeChoices.COMMENT)
     content = models.CharField(max_length=500)
     post_date = models.DateTimeField(auto_now_add=True) 
     # image = models.ForeignKey('ImageModel', on_delete=models.SET_NULL, null=True, blank=True)  
@@ -65,14 +67,13 @@ class Like(models.Model):
     
 class Report(Comment):
     class TagChoices(models.TextChoices):
-        SAUDE = 'S', 'Saúde'
+        SAUDE = 'SA', 'Saúde'
         LIXO = 'L', 'Lixo'
         INFRAESTRUTURA = 'I', 'Infraestrutura'
         SEGURANCA = 'SG', 'Segurança'
         EDUCACAO = 'E', 'Educação'
         TRANSPORTE = 'T', 'Transporte'
         ILUMINACAO = 'IL', 'Iluminação'
-        REDE_GUARDIAO = 'RG', 'Rede de proteção (guardião)'
         OUTROS = 'O', 'Outros'
 
     tag = models.CharField(max_length=5, choices=TagChoices.choices, default=TagChoices.OUTROS)
