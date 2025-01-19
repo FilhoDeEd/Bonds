@@ -77,8 +77,9 @@ class ForumEditSerializer(serializers.ModelSerializer):
         ]
 
 class EventSerializer(serializers.ModelSerializer):
-    creator = serializers.CharField(source='get_creator_name', read_only=True)
-    is_sub = serializers.SerializerMethodField()
+    is_sub = serializers.SerializerMethodField(method_name='get_is_sub')
+    did_review = serializers.SerializerMethodField(method_name='get_did_review')
+
 
     class Meta:
         model = Event
@@ -94,7 +95,8 @@ class EventSerializer(serializers.ModelSerializer):
             'creation_date',
             'update_date',
             'creator',
-            'is_sub'
+            'is_sub',
+            'did_review'
         ]
         read_only_fields = [
             'id',
@@ -105,6 +107,8 @@ class EventSerializer(serializers.ModelSerializer):
             'creator',
             'is_sub'
         ]
+
+    creator = serializers.CharField(source='get_creator_name', read_only=True)
 
     def get_is_sub(self, obj):
         user = self.context['request'].user
@@ -119,6 +123,27 @@ class EventSerializer(serializers.ModelSerializer):
             return 1 if sub.is_sub else -1
         except (UserProfile.DoesNotExist, Subscriber.DoesNotExist):
             return 0
+        
+    def get_did_review(self, obj):
+        user = self.context['request'].user
+
+        if not user.is_authenticated:
+            return 0
+
+        try:
+            account = user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+            
+            # Tente buscar a review, e retorne o status dela se encontrada
+            try:
+                rev = Review.objects.get(event=obj, user_profile=user_profile)
+                return 1 
+            except Review.DoesNotExist:
+                return 0  
+
+        except UserProfile.DoesNotExist:
+            return -1  
+    
 
 
 class EventEditSerializer(serializers.ModelSerializer):

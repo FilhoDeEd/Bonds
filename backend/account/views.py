@@ -1,5 +1,7 @@
-from typing import Dict
+import os
 from account.serializers import AccountSerializer, UserSerializer, UpdateAccountBaseSerializer
+from PIL import Image
+from typing import Dict
 
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
@@ -16,6 +18,9 @@ from rest_framework.views import APIView
 
 from user_profile.serializers import UserProfileSerializer, NeighborhoodSerializer
 from user_profile.models import Neighborhood, UserProfile
+
+
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
 def add_errors(errors: Dict, serializer_errors: Dict):
@@ -112,7 +117,7 @@ class DetailAccountView(APIView):
             neighborhood = user_profile.neighborhood
 
             user_serializer = UserSerializer(user)
-            account_serializer = AccountSerializer(account)
+            account_serializer = AccountSerializer(account, context={'request': request})
             user_profile_serializer = UserProfileSerializer(user_profile)
             neighborhood_serializer = NeighborhoodSerializer(neighborhood)
         except Exception as e:
@@ -201,6 +206,44 @@ class UpdateAccountPasswordView(APIView):
             return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response({'detail': 'Account password updated successfully.'}, status=status.HTTP_200_OK)
+
+
+class UpdateAccountProfileImage(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if 'image' not in request.FILES:
+            return Response({'error': 'No image sent.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        image = request.FILES['image']
+
+        if image.size > MAX_FILE_SIZE:
+            return Response({'error': 'File size exceeds 5MB.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            img = Image.open(image)
+            if img.format not in ['JPEG', 'PNG']:
+                return Response({'error': 'Unsupported file format. Please upload JPEG or PNG.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                account = request.user.account
+
+                if account.profile_image:
+                    old_image_path = account.profile_image.path
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+
+                account.profile_image = image
+                account.save()
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        image_url = request.build_absolute_uri(account.profile_image.url)
+        return Response({'message': 'Profile image updated successfully.', 'image_url': image_url}, status=status.HTTP_200_OK)
 
 
 class AnonymizeAccountView(APIView):
