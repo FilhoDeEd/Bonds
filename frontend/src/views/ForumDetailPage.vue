@@ -70,6 +70,7 @@
                     </button>
                     <button 
                     v-show="showReportCreator"
+                    @click = "openModal"
                     class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
@@ -214,9 +215,17 @@
             </div>
           </div>
         </aside>
+        
       </div>
     </div>
+    <ModalReport 
+      v-if="isModalOpen"
+      :isModalOpen="isModalOpen"
+      @close="closeModal"
+      :slug="slug"
+     />
   </MainLayout>
+
 </template>
 
 <script setup>
@@ -228,8 +237,7 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../api';
 import MainLayout from '../layouts/mainLayout.vue';
-import upvoteIcon from '@/assets/img/upvote.png';
-import downvoteIcon from '@/assets/img/downvote.png';
+import ModalReport from '../components/Modals/ModalReport.vue';
 
 const toast = useToast();
 const forumData = ref({
@@ -253,6 +261,14 @@ const activeReportCreator = () => {
     else{
       showReportCreator.value = false;
     }
+};
+const isModalOpen = ref(false); // Referência reativa
+const openModal = () => {
+  isModalOpen.value = true; // Atualiza a propriedade `.value` do ref
+};
+
+const closeModal = () => {
+  isModalOpen.value = false; // Fecha o modal corretamente
 };
 
 const toggleEdition = async () => {

@@ -32,7 +32,7 @@
                   class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
                   :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
                 </div>
-                <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+                <p class="text-white text-lg">Avaliação: {{ forumData.five_star_mean }} estrelas</p>
                 </div>
             </div>
 
@@ -82,7 +82,7 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
-                  <button v-show="checkDate" @click="callReview"
+                  <button v-show="isReview" @click="callReview"
                     class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
                     <span>⭐</span>
                   </button>
@@ -210,7 +210,7 @@
             </div>
             <div class="p-3 bg-gray-50 rounded">
               <h4 class="font-medium">Avaliação </h4>
-              <p class="text-gray-600">{{ forumData.five_star_mean }}</p>
+              <p class="text-gray-600">Avaliação: {{ forumData.five_star_mean }}</p>
             </div>
             <div class="p-3 bg-gray-50 rounded">
               <h4 class="font-medium">Data do Evento</h4>
@@ -261,13 +261,6 @@ import ModalReview from '../components/Modals/ModalReview.vue';
 import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
 
-const checkDate = ()=>{
-  if (forumData.value.date <= new Date()){
-      return true
-    }
-    return false;
-  }
-
 const isModalOpen = ref(false);
 const stars = ref(0);
 
@@ -293,7 +286,15 @@ const handleRating = async (rating) => {
     toast.error("Você já avaliou este evento.");
   }
 };
-
+const isReview = ref(false);
+const checkDate = () =>{
+  if (forumData.value.date){
+    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()){
+      isReview.value = true
+    }    
+  }
+  console.log(isReview.value)
+}
 const toast = useToast();
 const forumData = ref({
   title: '',
@@ -375,6 +376,8 @@ const fetchEvent = async () => {
     };
     await fetchComments();
     subscribed();
+    checkDate();
+
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
@@ -569,11 +572,9 @@ function formatDateToISO(dateString) {
 
   // Divide a string em partes (dia, mês, ano)
   const [day, monthText, year] = dateString.split(" de ");
-  console.log(day, monthText, year);
   //const day = (parseInt(day_before) + 1).toString().padStart(2, "0");
   // Formata para YYYY-MM-DD
   const month = months[monthText.toLowerCase()];
-  console.log(`${year}-${month}-${day.padStart(2, "0")}`);
   return `${year}-${month}-${day.padStart(2, "0")}`;
 };
 

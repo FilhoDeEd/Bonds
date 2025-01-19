@@ -1,84 +1,92 @@
 <template>
-    <div v-if="isModalOpen" class="modal-overlay">
-      <div class="modal">
+  <div v-if="isModalOpen" class="modal-overlay">
+    <div class="modal">
       <button class="close-btn" @click="closeModal">×</button>
-      <h2>Criar Report</h2>
-      <form @submit.prevent="handleSubmit">
+      <h2 class="modal-title">Criar Report</h2>
+      <form @submit.prevent="handleSubmit" class="modal-form">
+        <!-- Título -->
         <div class="form-group">
-        <label for="title">Título</label>
-        <input
-          type="text"
-          id="title"
-          v-model="form.title"
-          placeholder="Digite o título do Reporte"
-          required
-        />
-        </div>
-        
-        <div class="form-group">
-        <label for="description">Descrição</label>
-        <textarea
-          id="description"
-          v-model="form.description"
-          placeholder="Digite a descrição do fórum"
-          required
-        ></textarea>
-        </div>
-  
-        <div class="form-group">
-        <label for="eventDate">Data do Ocorrido</label>
-        <input
-          type="date"
-          id="eventDate"
-          v-model="form.eventDate"
-          @change="validateDate"
-          required
-        />
-        <small v-if="dataError" class="error-message">{{ dataError }}</small>
-        </div>
-  
-        <div class="form-group">
-        <label for="location">Localização</label>
-        <input
-          type="text"
-          id="location"
-          v-model="form.location"
-          placeholder="Digite a localização do evento"
-          required
-        />
+          <label for="title">Título</label>
+          <input
+            type="text"
+            id="title"
+            v-model="form.title"
+            placeholder="Digite o título do Reporte"
+            required
+          />
         </div>
 
+        <!-- Descrição -->
         <div class="form-group">
-        <label for="Solved">Resolvido?</label>
-        <div>
-            <input type="radio" id="solvedYes" value="true" v-model="form.solved" />
-            <label for="solvedYes">Sim</label>
-            <input type="radio" id="solvedNo" value="false" v-model="form.solved" />
-            <label for="solvedNo">Não</label>
-        </div>
+          <label for="description">Descrição</label>
+          <textarea
+            id="description"
+            v-model="form.description"
+            placeholder="Digite a descrição do ocorrido"
+          ></textarea>
         </div>
 
-        <div class="form-group">
-        <label for="tags">Tags</label>
+        <!-- Data e Localização -->
+        <div class="form-group row">
+          <div class="column">
+            <label for="eventDate">Data do ocorrido</label>
+            <input type="date" id="eventDate" v-model="form.eventDate" />
+            <small v-if="dataError" class="error-message">{{ dataError }}</small>
+          </div>
+          <div class="column">
+            <label for="location">Localização</label>
+            <input
+              type="text"
+              id="location"
+              v-model="form.location"
+              placeholder="Digite a localização do ocorrido"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Tags e Resolvido -->
+        <div class="form-group row">
+          <div class="column">
+            <label for="tags">Tags</label>
             <select id="tags" v-model="form.tags" required>
-                <option disabled value="">Selecione uma tag</option>
-                <option v-for="tag in tags" :key="tag.id" :value="tag.name">{{ tag.name }}</option>
+              <option disabled value="">Selecione uma tag</option>
+              <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+                {{ tag.name }}
+              </option>
             </select>
+          </div>
+          <div class="column">
+            <label>Foi resolvido?</label>
+            <div class="radio-group">
+              <label for="solvedYes">
+                <input type="radio" id="solvedYes" value="true" v-model="form.solved" />
+                Sim
+              </label>
+              <label for="solvedNo">
+                <input type="radio" id="solvedNo" value="false" v-model="form.solved" />
+                Não
+              </label>
+            </div>
+          </div>
         </div>
-  
+
+        <!-- Ações -->
         <div class="form-actions">
-        <button type="submit" class="confirm-btn">Confirmar</button>
-        <button type="button" class="cancel-btn" @click="closeModal">Cancelar</button>
+          <button type="submit" class="confirm-btn">Confirmar</button>
+          <button type="button" class="cancel-btn" @click="closeModal">Cancelar</button>
         </div>
       </form>
-      </div>
     </div>
-    </template>
+  </div>
+</template>
+
     
-    <script>
+    <script>/*eslint-disable*/
     import axios from 'axios';
     import { ENDPOINTS } from '../../../api';
     import { useToast } from 'vue-toastification';
+    import { onMounted } from 'vue';
     export default {
     props: {
       isModalOpen: Boolean, // Controle do modal (passado do componente pai)
@@ -97,12 +105,15 @@
       },
       dataError: null,
       toast: useToast(),
-      tags = [
-        { id: 1, name: 'Assalto' },
-        { id: 2, name: 'Acidente' },
-        { id: 3, name: 'Incêndio' },
-        { id: 4, name: 'Desastre Natural' },
-        { id: 5, name: 'Outro' },
+      tags: [
+        { id: 'SA', name: 'Saúde' },
+        { id: 'L', name: 'Lixo' },
+        { id: 'I', name: 'Infraestrutura' },
+        { id: 'SG', name: 'Segurança' },
+        { id: 'E', name: 'Educação' },
+        { id: 'T', name: 'Transporte' },
+        { id: 'IL', name: 'Iluminação' },
+        { id: 'O', name: 'Outros' }
       ],
       };
     },
@@ -111,29 +122,26 @@
       this.$emit('close'); // Emite o evento para o componente pai fechar o modal
       },
   
-      validateDate() {
-      const today = new Date();
-      const eventDate = new Date(this.form.eventDate);
-      },
       
       async handleSubmit() {
       try {
         const response = await axios.post(ENDPOINTS.REGISTER_REPORT,{
         title : this.form.title,
         content : this.form.description,
-        date: new Date(this.form.eventDate),
+        //date: new Date(this.form.eventDate),
         location: this.form.location,
         tags: this.form.tags,
-        solved: this.form.solved,
-        slug: this.form.slug,
+        solved: this.form.solved === 'true',
+        forum_slug: this.form.slug,
         });
+
         if(response.status === 201){
-          this.toast.success('Evento Criado: ', this.form.title);
+          this.toast.success('Reporte Criado');
           this.closeModal();
-          this.$router.push("/forum/event/"+response.data.slug)
+          this.$router.push("/forum/"+this.slug)
         }
         else{
-          this.toast.error("Erro ao tentar criar fórum")
+          this.toast.error("Erro ao tentar criar reporte: " + response.error)
           console.log(response.error)
         }
   
@@ -143,89 +151,162 @@
       },
     },
     };
+    onMounted(() => {
+        console.log('Modal carregado:', slug);
+    });
     </script>
     
     <style scoped>
+    /* Overlay */
     .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
     }
     
+    /* Modal */
     .modal {
-    background: white;
-    padding: 20px;
-    width: 400px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
     }
     
+    /* Title */
+    .modal-title {
+      margin: 0 0 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
+    }
+    
+    /* Close Button */
     .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #555;
     }
     
-    h2 {
-    text-align: center;
+    .close-btn:hover {
+      color: #000;
     }
-    .error-message {
-    color: #f44336;
-    font-size: 12px;
-    margin-top: 5px;
-    display: block;
-  }
-  
     
+    /* Form Group */
     .form-group {
-    margin-bottom: 15px;
+      margin-bottom: 15px;
     }
     
     label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
     }
     
     input,
-    textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
     }
     
+    textarea {
+      resize: none;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+    
+    /* Two Columns in a Row */
+    .row {
+      display: flex;
+      gap: 20px;
+      justify-content: space-between;
+    }
+    
+    .column {
+      flex: 1;
+    }
+    
+    /* Radio Group */
+    .radio-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    /* Error Message */
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+    }
+    
+    /* Form Actions */
     .form-actions {
-    display: flex;
-    justify-content: space-between;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
     }
     
     .confirm-btn,
     .cancel-btn {
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
     }
     
     .confirm-btn {
-    background-color: #4caf50;
-    color: white;
+      background: #007bff;
+      color: #fff;
+    }
+    
+    .confirm-btn:hover {
+      background: #0056b3;
     }
     
     .cancel-btn {
-    background-color: #f44336;
-    color: white;
+      background: #ddd;
+      color: #333;
+    }
+    
+    .cancel-btn:hover {
+      background: #bbb;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
     </style>
+    
