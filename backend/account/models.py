@@ -26,6 +26,7 @@ class Account(models.Model):
     biography = models.CharField(max_length=4095, null=True, blank=True)
     agree_policy = models.BooleanField()
     profile_image = models.ImageField(upload_to=directory_path, null=True, blank=True)
+    profile_image_low = models.ImageField(upload_to=directory_path, null=True, blank=True)
 
     email = models.EmailField(unique=True)
     email_notifications = models.BooleanField(default=True) # Pode vir direto no cadastro

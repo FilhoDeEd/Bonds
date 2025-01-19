@@ -160,6 +160,10 @@ class ForumBannerEditView(APIView):
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
 
+                    old_image_low_path = forum.banner_image_low.path
+                    if os.path.exists(old_image_low_path):
+                        os.remove(old_image_low_path)
+
                 forum.banner_image = image
                 forum.banner_image_low = low_res_image
                 forum.save()
