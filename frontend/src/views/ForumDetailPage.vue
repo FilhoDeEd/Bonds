@@ -134,11 +134,20 @@
           </div>
         </div>
       </div>
-
+      <div>
+        <button></button>
+      </div>
+      <button @click="commentOrReport" class="px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-600">
+        <span v-if="comment_list">Veja os Reports 📢</span>
+        <span v-else>Veja os Comentários 💬</span>
+      </button>
       <!-- Content Section with Posts and Sidebar -->
       <div class="flex gap-8 space-x-4 ">
-        <!-- Posts Section -->
-        <div class="w-3/4">
+        <!-- Comments Section -->
+        <div 
+        class="w-3/4"
+        v-if="comment_list"
+        >
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
               class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
@@ -230,6 +239,172 @@
           </div>
         </div>
 
+        <!-- Reports Section -->
+        <div class="w-3/4 " v-else>
+          <div class="space-y-4 ">
+            <article v-for="comment in reports" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-red-400">
+              <div class="flex h-full">
+
+                <!-- Área de votação -->
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button @click="likeComment(comment)" class="vote" :class="{
+                    'on-up': comment.has_liked === 1,
+                    'hover:text-gray-300': comment.has_liked !== 1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
+                  <button @click="dislikeComment(comment)" class="vote" :class="{
+                    'on-down': comment.has_liked === -1,
+                    'hover:text-gray-300': comment.has_liked !== -1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Imagem do autor do comentário -->
+                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
+                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
+                    style="height: 70%;">
+
+
+                </div>
+
+                <!-- Conteúdo do comentário -->
+                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                  <div class="text-white flex flex-col h-full justify-between">
+                    <!-- Menu dropdown -->
+                    <div class="relative self-end mb-2">
+                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                        ⋯
+                      </button>
+
+                      <!-- Dropdown menu -->
+                      <div v-if="menuStates[comment.id]"
+                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Editar
+                        </button>
+                        <button
+                          @click="() => { menuStates[comment.id] = false; deleteComment(comment)}"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Deletar
+                        </button>
+                        <button @click="menuStates[comment.id] = false"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Reportar
+                        </button>
+
+                      </div>
+                    </div>
+
+                    <!-- Título ou nome do autor -->
+                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <h3 v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.title }}
+                    </h3>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.title" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.content }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.content" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.location }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.location" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte realizado em: {{ comment.date }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.date" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte resolvido? {{comment.solved ? "Sim" : "Não"}}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.solved" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </select>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Tag: {{ comment.tag }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.tag" @blur="cancelEdit(comment)"
+                      @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                        <option disabled :value="comment.tag"></option>
+                        <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+                        {{ tag.name }}
+                      </option>
+                    </select>
+    
+                    </div>
+                    <!-- Detalhes do comentário -->
+                    <p class="mt-8">{{ comment.createdAt }}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+
+
         <!-- Sidebar -->
         <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
 
@@ -283,7 +458,7 @@
 
 <script setup>
 /* eslint-disable */
-import { ref, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -307,7 +482,27 @@ const forumData = ref({
   type:'',
   isSubscribed: false,
 });
+const tags = [
+        { id: 'SA', name: 'Saúde' },
+        { id: 'L', name: 'Lixo' },
+        { id: 'I', name: 'Infraestrutura' },
+        { id: 'SG', name: 'Segurança' },
+        { id: 'E', name: 'Educação' },
+        { id: 'T', name: 'Transporte' },
+        { id: 'IL', name: 'Iluminação' },
+        { id: 'O', name: 'Outros' }
+      ];
 
+
+const comment_list = ref(true);
+const commentOrReport = async() =>{
+  comment_list.value = !comment_list.value;
+  if (comment_list.value){
+    await fetchComments();
+  } else {
+    await fetchReports();
+  }
+}
 const showReportCreator = ref(false);
 const showPollCreator = ref(false);
 
@@ -324,8 +519,9 @@ const openModal = () => {
   isModalOpen.value = true; // Atualiza a propriedade `.value` do ref
 };
 
-const closeModal = () => {
+const closeModal = async () => {
   isModalOpen.value = false; // Fecha o modal corretamente
+  await router.push({ name: 'ForumDetailPage', params: { slug: slug.value } });
 };
 
 const userStore = useUserStore();
@@ -358,6 +554,7 @@ const toggleEdition = async () => {
 };
 
 const comments = ref([]);
+const reports = ref([]);
 const newCommentContent = ref('');
 const editMode = ref(false);
 const route = useRoute();
@@ -422,6 +619,29 @@ const fetchComments = async () => {
     toast.error('Erro ao carregar comentários');
   }
 };
+const fetchReports = async () => {
+  try {
+    const reportsResponse = await axios.get(`${ENDPOINTS.REPORT_LIST}/${slug.value}/`);
+    reports.value = reportsResponse.data.results.map((reports) => ({
+      content: reports.content,
+      id: reports.id,
+      createdAt: formatDate(reports.post_date),
+      date: formatDate(reports.date),
+      creator: reports.creator,
+      trust_rate: reports.trust_rate,
+      has_liked: reports.has_liked,
+      title: reports.title,
+      tag: reports.tag,
+      solved: reports.solved,
+      location: reports.location,
+    }));
+    //toast.success('Comentários carregados com sucesso');
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao carregar reports');
+  }
+};
+
 
 const createComment = async () => {
   try {
@@ -493,6 +713,26 @@ const editComment = async (comment) => {
     toast.error("Algo deu errado!");
   }
 };
+const editReport = async (report) => {
+  try {
+    const response = await axios.post(`${ENDPOINTS.REPORT_EDIT}/${report.id}/`, {
+      content: report.content,
+      title: report.title,
+      location: report.location,
+      tag: report.tag,
+      solved: report.solved,
+      forum_slug: slug
+    });
+
+    // Atualiza o conteúdo do comentário com a resposta do servidor
+    toast.success('Reporte editado com sucesso');
+    await fetchReports();
+  }
+  catch (err) {
+    console.log(err);
+    toast.error("Algo deu errado!");
+  }
+};
 
 const cancelEdit = async (comment) => {
   try {
@@ -516,12 +756,26 @@ const saveEdit = async (comment) => {
     console.log(err)
   }
 };
+const saveEditReport = async (comment) => {
+  try {
+    if (comment.tempContent !== comment.content && comment.tempContent) {
+      comment.content = comment.tempContent;
+    }
+    editReport(comment);
+    comment.isEditing = false;
+  }
+  catch (err) {
+    console.log(err)
+  }
+};
+
 
 const deleteComment = async (comment) => {
   try {
     await axios.post(`${ENDPOINTS.DELETE_COMMENT}/${comment.id}/`);
     toast.success('Comentário deletado com sucesso');
     await fetchComments(); // Recarrega os comentários
+    await fetchReports();
   } catch (error) {
     console.error("Erro ao deletar o comentário:", error);
     toast.error('Erro ao deletar comentário');

@@ -332,7 +332,13 @@ const isReview = ref(false);
 const checkDate = () =>{
   if (forumData.value.date){
     if (new Date(formatDateToISO(forumData.value.date)) <= new Date()){
-      isReview.value = true
+      if (forumData.value.did_review === 1){
+        isReview.value = true;
+      }
+      else{
+        isReview.value = false;
+      }
+      
     }    
   }
   console.log(isReview.value)
@@ -348,6 +354,7 @@ const forumData = ref({
   creator: '',
   members: 0,
   five_star_mean: 0,
+  did_review:0,
 });
 
 const toggleEdition = async () => {
@@ -415,6 +422,7 @@ const fetchEvent = async () => {
       localization: response.data.location,
       five_star_mean: response.data.five_star_mean,
       isSubscribed: response.data.is_sub,
+      did_review: response.data.did_review,
     };
     await fetchComments();
     subscribed();

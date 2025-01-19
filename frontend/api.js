@@ -50,6 +50,6 @@ export const ENDPOINTS = {
   REGISTER_REPORT: `${REPORT_URL}/register/`,
   REPORT_EDIT: `${REPORT_URL}/edit`,
   REPORT_DELETE: `${REPORT_URL}/delete`,
-
+  REPORT_LIST: `${REPORT_URL}/list`,
 
 };
