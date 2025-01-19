@@ -521,7 +521,7 @@ const openModal = () => {
 
 const closeModal = async () => {
   isModalOpen.value = false; // Fecha o modal corretamente
-  await router.push({ name: 'ForumDetailPage', params: { slug: slug } });
+  await router.push({ name: 'ForumDetailPage', params: { slug: slug.value } });
 };
 
 const userStore = useUserStore();
