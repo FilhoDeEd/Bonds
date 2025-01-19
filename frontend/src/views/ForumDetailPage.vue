@@ -120,11 +120,20 @@
           </div>
         </div>
       </div>
-
+      <div>
+        <button></button>
+      </div>
+      <button @click="commentOrReport" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+        <span v-if="comment_list">💬</span>
+        <span v-else>📢</span>
+      </button>
       <!-- Content Section with Posts and Sidebar -->
       <div class="flex gap-8 space-x-4 ">
-        <!-- Posts Section -->
-        <div class="w-3/4">
+        <!-- Comments Section -->
+        <div 
+        class="w-3/4"
+        v-show="comment_list"
+        >
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
               class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
@@ -215,6 +224,100 @@
           </div>
         </div>
 
+        <!-- Reports Section -->
+        <div class="w-3/4" v-show="!comment_list">
+          <div class="space-y-4">
+            <article v-for="comment in comments" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
+              <div class="flex h-full">
+
+                <!-- Área de votação -->
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button @click="likeComment(comment)" class="vote" :class="{
+                    'on-up': comment.has_liked === 1,
+                    'hover:text-gray-300': comment.has_liked !== 1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
+                  <button @click="dislikeComment(comment)" class="vote" :class="{
+                    'on-down': comment.has_liked === -1,
+                    'hover:text-gray-300': comment.has_liked !== -1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Imagem do autor do comentário -->
+                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
+                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
+                    style="height: 70%;">
+
+
+                </div>
+
+                <!-- Conteúdo do comentário -->
+                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                  <div class="text-white flex flex-col h-full justify-between">
+                    <!-- Menu dropdown -->
+                    <div class="relative self-end mb-2">
+                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                        ⋯
+                      </button>
+
+                      <!-- Dropdown menu -->
+                      <div v-if="menuStates[comment.id]"
+                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Editar
+                        </button>
+                        <button
+                          @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Deletar
+                        </button>
+                        <button @click="menuStates[comment.id] = false"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Reportar
+                        </button>
+
+                      </div>
+                    </div>
+
+                    <!-- Título ou nome do autor -->
+                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.content }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEdit(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <!-- Detalhes do comentário -->
+                    <p class="mt-8">{{ comment.createdAt }}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+
+
         <!-- Sidebar -->
         <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
           <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
@@ -254,7 +357,7 @@
 
 <script setup>
 /* eslint-disable */
-import { ref, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -275,6 +378,10 @@ const forumData = ref({
   isSubscribed: false,
 });
 
+const comment_list = ref(true);
+const commentOrReport = () =>{
+  comment_list.value = !comment_list.value;
+}
 const showReportCreator = ref(false);
 const showPollCreator = ref(false);
 
