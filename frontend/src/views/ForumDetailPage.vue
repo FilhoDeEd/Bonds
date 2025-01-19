@@ -240,15 +240,19 @@ const forumData = ref({
   creator: '',
   members: 0,
   type:'',
+  isSubscribed: false,
 });
 
 const showReportCreator = ref(false);
 const showPollCreator = ref(false);
 
 const activeReportCreator = () => {
-  if (forumData.value.type === "D") {
-    showReportCreator.value = !showReportCreator.value;
-  }
+  if (forumData.value.creator === "Sistema") {
+      showReportCreator.value = true;
+    }
+    else{
+      showReportCreator.value = false;
+    }
 };
 
 const toggleEdition = async () => {
@@ -305,12 +309,24 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
       tempContent: "",
+      isSubscribed: response.data.is_sub,
     };
     await fetchComments();
+    subscribed();
+    activeReportCreator();
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
+  }
+};
+
+const subscribed = () => {
+  if (forumData.value.isSubscribed == 1) {
+    isSubscribed.value = true;
+  }
+  else {
+    isSubscribed.value = false;
   }
 };
 
@@ -482,6 +498,7 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
+
 
 </script>
 

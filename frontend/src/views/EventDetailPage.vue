@@ -82,7 +82,7 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
-                  <button v-if="true" @click="callReview"
+                  <button v-show="checkDate" @click="callReview"
                     class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
                     <span>⭐</span>
                   </button>
@@ -262,7 +262,7 @@ import upvoteIcon from '@/assets/img/upvote.png';
 import downvoteIcon from '@/assets/img/downvote.png';
 
 const checkDate = ()=>{
-  if (forumData.value.date < new Date()){
+  if (forumData.value.date <= new Date()){
       return true
     }
     return false;
@@ -371,14 +371,25 @@ const fetchEvent = async () => {
       date: formatDate(response.data.date),
       localization: response.data.location,
       five_star_mean: response.data.five_star_mean,
+      isSubscribed: response.data.is_sub,
     };
     await fetchComments();
+    subscribed();
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
   }
 };
+const subscribed = () => {
+  if (forumData.value.isSubscribed == 1) {
+    isSubscribed.value = true;
+  }
+  else {
+    isSubscribed.value = false;
+  }
+};
+
 
 const fetchComments = async () => {
   try {
@@ -397,6 +408,7 @@ const fetchComments = async () => {
     toast.error('Erro ao carregar comentários');
   }
 };
+
 
 const createComment = async () => {
   try {
