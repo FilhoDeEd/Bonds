@@ -293,6 +293,7 @@
 
                     <!-- Título ou nome do autor -->
                     <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
+                    <h3> {{ comment.title }}</h3>
 
                     <div class="text-lg flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
