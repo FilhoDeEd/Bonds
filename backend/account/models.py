@@ -7,7 +7,7 @@ import random
 
 
 def directory_path(instance, filename):
-    return f'profile_images/{instance.id}/{filename}'
+    return f'images/profiles/{instance.id}/{filename}'
 
 
 class Account(models.Model):

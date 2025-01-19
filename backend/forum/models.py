@@ -6,7 +6,7 @@ from django.db.models import Avg
 
 
 def directory_path(instance, filename):
-    return f'banner_images/{instance.id}/{filename}'
+    return f'images/banners/{instance.id}/{filename}'
 
 
 class Forum(models.Model):
