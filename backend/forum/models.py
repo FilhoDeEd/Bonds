@@ -113,6 +113,7 @@ class Review(models.Model):
         (5, '5 - Excelente'),
     ]
 
+    did_review = models.BooleanField(default=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
     five_star = models.PositiveSmallIntegerField(choices=FIVE_STAR_CHOICES)
