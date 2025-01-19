@@ -5,7 +5,7 @@
       <div class="bg-white h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
-          <div class="absolute top-0 left-0 right-0 h-85" style="background-color: rgba(124, 122, 187, 1);">
+          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
 
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
@@ -42,19 +42,19 @@
             <!-- Botões alinhados ao bottom -->
             <div class=" flex space-x-4 relative z-10">
               <button type="button" @click="toggleSubscribe"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
               </button>
 
               <button type="button" @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
 
               <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
               </button>
@@ -65,7 +65,7 @@
 
       <div class="bg-white p-6 rounded-lg shadow mb-8">
         <div class="container mx-auto">
-          <h2 class="text-2xl font-bold mb-4">Engaje no Evento!</h2>
+          <h2 class="text-2xl font-bold mb-4">Engaje no fórum!</h2>
 
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
@@ -85,18 +85,45 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
+
+                    <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                      id="pollButton">
                       <span>📊</span>
                     </button>
-                    <button v-if="true" @click="callReview" class="p-2 hover:bg-gray-100 rounded-full"
-                      title="Avaliar Evento">
-                      <span>⭐</span>
-                    </button>
+
+                    <div v-if="showPoll" class="mt-4 space-y-2">
+                      <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
+                        <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
+                          :placeholder="`Opção ${index + 1}`">
+                        <button v-if="index >= 2" @click="removePollOption(index)"
+                          class="text-red-500 hover:text-red-600">
+                          ❌
+                        </button>
+                      </div>
+
+                      <div class="flex space-x-2 mt-3">
+                        <button v-if="pollOptions.length < 4" @click="addPollOption"
+                          class="text-blue-500 hover:text-blue-600 text-sm">
+                          + Adicionar opção
+                        </button>
+
+                        <div class="flex space-x-2 ml-auto">
+                          <button @click="cancelPoll"
+                            class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
+                            Cancelar
+                          </button>
+                          <button @click="createPoll"
+                            class="px-4 py-1 bg-blueGray-600 text-white rounded-lg hover:bg-blue-600">
+                            Criar Enquete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <button @click="createComment"
-                    class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
-                    Publicar
+                  <button v-show="showPostButton" @click="createComment"
+                    class="px-4 py-2 bg-blue-500 text-black rounded-lg hover:bg-blue-600">
+                    ✔️
                   </button>
                 </div>
               </div>
@@ -530,6 +557,47 @@ const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
 };
 
+
+// Enquete  
+const showPostButton = ref(true)
+const showPoll = ref(false)
+const pollOptions = ref([
+  { text: '', votes: 0 },
+  { text: '', votes: 0 }
+])
+
+// Add these methods
+const togglePoll = () => {
+  showPoll.value = !showPoll.value
+  showPostButton.value = !showPoll.value
+}
+
+const addPollOption = () => {
+  if (pollOptions.value.length < 4) {
+    pollOptions.value.push({ text: '', votes: 0 })
+  }
+}
+
+const removePollOption = (index) => {
+  if (index >= 2) { // Only allow removing extra options
+    pollOptions.value.splice(index, 1)
+  }
+}
+
+const cancelPoll = () => {
+  showPoll.value = false
+  showPostButton.value = true
+  pollOptions.value = [
+    { text: '', votes: 0 },
+    { text: '', votes: 0 }
+  ]
+}
+const createPoll = () => {
+  // Add your poll creation logic here
+  console.log('Poll created:', pollOptions.value)
+  showPostButton.value = true
+  cancelPoll()
+}
 
 onMounted(() => {
   fetchEvent();
