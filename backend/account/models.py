@@ -68,7 +68,7 @@ class Account(models.Model):
     cellphone = models.CharField(max_length=255, null=True, blank=True)
     biography = models.CharField(max_length=4095, null=True, blank=True)
     agree_policy = models.BooleanField()
-    perfil_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     email = models.EmailField(unique=True)
     email_notifications = models.BooleanField(default=True) # Pode vir direto no cadastro

@@ -15,6 +15,7 @@ export const ENDPOINTS = {
   EDIT_NEIGHBORHOOD: `${ACCOUNT_URL}/update-neighborhood/`,
   EDIT_EMAIL: `${ACCOUNT_URL}/update-email/`,
   EDIT_PASSWORD: `${ACCOUNT_URL}/update-password/`,
+  EDIT_PROFILE_IMAGE: `${ACCOUNT_URL}/update-profile-image/`,
 
   DELETE_ACCOUNT: `${ACCOUNT_URL}/anonymize/`,
 
