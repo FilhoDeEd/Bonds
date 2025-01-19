@@ -68,7 +68,10 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
+                    <button 
+                    v-show="showReportCreator"
+                    @click = "openModal"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
 
@@ -237,9 +240,17 @@
             </div>
           </div>
         </aside>
+        
       </div>
     </div>
+    <ModalReport 
+      v-if="isModalOpen"
+      :isModalOpen="isModalOpen"
+      @close="closeModal"
+      :slug="slug"
+     />
   </MainLayout>
+
 </template>
 
 <script setup>
@@ -251,6 +262,7 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../api';
 import MainLayout from '../layouts/mainLayout.vue';
+import ModalReport from '../components/Modals/ModalReport.vue';
 import { computed } from "vue";
 import { useUserStore } from "../store/user.js";
 
@@ -264,7 +276,29 @@ const forumData = ref({
   createdAt: '',
   creator: '',
   members: 0,
+  type:'',
+  isSubscribed: false,
 });
+
+const showReportCreator = ref(false);
+const showPollCreator = ref(false);
+
+const activeReportCreator = () => {
+  if (forumData.value.creator === "Sistema") {
+      showReportCreator.value = true;
+    }
+    else{
+      showReportCreator.value = false;
+    }
+};
+const isModalOpen = ref(false); // Referência reativa
+const openModal = () => {
+  isModalOpen.value = true; // Atualiza a propriedade `.value` do ref
+};
+
+const closeModal = () => {
+  isModalOpen.value = false; // Fecha o modal corretamente
+};
 
 const userStore = useUserStore();
 
@@ -322,12 +356,24 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
       tempContent: "",
+      isSubscribed: response.data.is_sub,
     };
     await fetchComments();
+    subscribed();
+    activeReportCreator();
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
+  }
+};
+
+const subscribed = () => {
+  if (forumData.value.isSubscribed == 1) {
+    isSubscribed.value = true;
+  }
+  else {
+    isSubscribed.value = false;
   }
 };
 
@@ -525,23 +571,7 @@ const createPoll = () => {
 
 onMounted(() => {
   fetchForum();
-});
-
-onBeforeMount(async () => {
-  try {
-    // Faz a chamada POST para inscrever no fórum
-    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
-    await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
-    isSubscribed.value = false;
-  } catch (err) {
-    if (err.response && err.response.data.detail === "You are already subscribed to this forum.") {
-      isSubscribed.value = true;
-    }
-    else {
-      console.log(err);
-      toast.error("Algo deu errado!");
-    }
-  }
+  activeReportCreator();
 });
 
 
@@ -557,9 +587,7 @@ onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
 
-const profileImage = computed(() => {
-  return userStore.user.account.profile_image || profile;
-});
+
 </script>
 
 

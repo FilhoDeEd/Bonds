@@ -31,11 +31,11 @@
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
                       :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
 
-                    <textarea v-model="forumData.localization" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
-                  </div>
-                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+                  <textarea v-model="forumData.localization" :readonly="!editMode"
+                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                </div>
+                <p class="text-white text-lg">Avaliação: {{ forumData.five_star_mean }} estrelas</p>
                 </div>
               </div>
             </div>
@@ -82,9 +82,11 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
-                      <span>📢</span>
-                    </button>
+
+                  <button v-show="isReview" @click="callReview"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
+                    <span>⭐</span>
+                  </button>
 
                     <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
                       id="pollButton">
@@ -227,34 +229,37 @@
         </div>
 
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
-
-          <div class="bg-banner p-4 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
-
-            <div class="space-y-3">
-              <div class="text-sm">
-                <p class="text-white">
-                  <span class="font-medium">Criado por:</span> {{ forumData.creator }}
-                </p>
-              </div>
-
-              <div class="text-sm">
-                <p class="text-white">
-                  <span class="font-medium">Criado em:</span> {{ forumData.createdAt }}
-                </p>
-              </div>
-
-              <div class="text-sm">
-                <p class="text-white ">
-                  <span class="font-medium">Subscribers:</span> {{ forumData.members }}
-                </p>
-              </div>
-
-              <div class="text-sm">
-                <p class="text-white">
-                  <span class="font-medium">Popularidade:</span> {{ forumData.popularity }}
-                </p>
+        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
+          <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
+          <div class="space-y-4">
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Participantes</h4>
+              <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Avaliação </h4>
+              <p class="text-gray-600">Avaliação: {{ forumData.five_star_mean }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Data do Evento</h4>
+              <p class="text-gray-600">{{ forumData.date }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Local do Evento</h4>
+              <p class="text-gray-600">{{ forumData.localization }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Criado em</h4>
+              <p class="text-gray-600">{{ forumData.createdAt }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Criado por</h4>
+              <p class="text-gray-600">{{ forumData.creator }}</p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded">
+              <h4 class="font-medium">Popularidade</h4>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ forumData.popularity }}</span>
               </div>
             </div>
           </div>
@@ -277,13 +282,6 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
-
-const checkDate = () => {
-  if (forumData.value.date < new Date()) {
-    return true
-  }
-  return false;
-}
 
 const isModalOpen = ref(false);
 const stars = ref(0);
@@ -310,7 +308,15 @@ const handleRating = async (rating) => {
     toast.error("Você já avaliou este evento.");
   }
 };
-
+const isReview = ref(false);
+const checkDate = () =>{
+  if (forumData.value.date){
+    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()){
+      isReview.value = true
+    }    
+  }
+  console.log(isReview.value)
+}
 const toast = useToast();
 const forumData = ref({
   title: '',
@@ -388,14 +394,27 @@ const fetchEvent = async () => {
       date: formatDate(response.data.date),
       localization: response.data.location,
       five_star_mean: response.data.five_star_mean,
+      isSubscribed: response.data.is_sub,
     };
     await fetchComments();
+    subscribed();
+    checkDate();
+
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
   }
 };
+const subscribed = () => {
+  if (forumData.value.isSubscribed == 1) {
+    isSubscribed.value = true;
+  }
+  else {
+    isSubscribed.value = false;
+  }
+};
+
 
 const fetchComments = async () => {
   try {
@@ -414,6 +433,7 @@ const fetchComments = async () => {
     toast.error('Erro ao carregar comentários');
   }
 };
+
 
 const createComment = async () => {
   try {
@@ -615,11 +635,9 @@ function formatDateToISO(dateString) {
 
   // Divide a string em partes (dia, mês, ano)
   const [day, monthText, year] = dateString.split(" de ");
-  console.log(day, monthText, year);
   //const day = (parseInt(day_before) + 1).toString().padStart(2, "0");
   // Formata para YYYY-MM-DD
   const month = months[monthText.toLowerCase()];
-  console.log(`${year}-${month}-${day.padStart(2, "0")}`);
   return `${year}-${month}-${day.padStart(2, "0")}`;
 };
 

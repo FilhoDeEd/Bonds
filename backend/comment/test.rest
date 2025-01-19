@@ -30,6 +30,13 @@ GET http://localhost:8000/comment/list/centro-seguranca-e-emergencias/
 Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
 Content-Type: application/json
 
+####### 
+
+
+GET http://localhost:8000/comment/report/list/centro-seguranca-e-emergencias/
+Authorization: Token 9d5f607f8c7b39b348c783c96e983888daaa9597
+Content-Type: application/json
+
 
 ### Teste: Adicionar um Like
 POST http://127.0.0.1:8000/comment/like/42/

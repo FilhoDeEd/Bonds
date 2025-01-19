@@ -119,6 +119,22 @@ class CommentListView(ListAPIView):
         # Retorna os comentários relacionados ao fórum encontrado
         return Comment.objects.filter(forum=forum)
     
+class ReportListView(ListAPIView):
+    """
+    Lista os comentários de um fórum específico, filtrando pelo slug do fórum.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReportSerializer
+
+    def get_queryset(self):
+        # Obtém o slug do fórum da URL
+        forum_slug = self.kwargs.get('slug')
+        # Busca o fórum correspondente ou retorna 404
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        # Retorna os comentários relacionados ao fórum encontrado
+        return Report.objects.filter(forum=forum)
+    
 
 class LikeView(APIView):
     """
