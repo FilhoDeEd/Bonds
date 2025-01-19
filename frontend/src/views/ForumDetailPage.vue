@@ -123,16 +123,16 @@
       <div>
         <button></button>
       </div>
-      <button @click="commentOrReport" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-        <span v-if="comment_list">💬</span>
-        <span v-else>📢</span>
+      <button @click="commentOrReport" class="px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-600">
+        <span v-if="comment_list">Veja os Reports 📢</span>
+        <span v-else>Veja os Comentários 💬</span>
       </button>
       <!-- Content Section with Posts and Sidebar -->
       <div class="flex gap-8 space-x-4 ">
         <!-- Comments Section -->
         <div 
         class="w-3/4"
-        v-show="comment_list"
+        v-if="comment_list"
         >
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
@@ -225,10 +225,10 @@
         </div>
 
         <!-- Reports Section -->
-        <div class="w-3/4" v-show="!comment_list">
-          <div class="space-y-4">
-            <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
+        <div class="w-3/4 " v-else>
+          <div class="space-y-4 ">
+            <article v-for="comment in reports" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-red-400">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -379,8 +379,13 @@ const forumData = ref({
 });
 
 const comment_list = ref(true);
-const commentOrReport = () =>{
+const commentOrReport = async() =>{
   comment_list.value = !comment_list.value;
+  if (comment_list.value){
+    await fetchComments();
+  } else {
+    await fetchReports();
+  }
 }
 const showReportCreator = ref(false);
 const showPollCreator = ref(false);
@@ -430,6 +435,7 @@ const toggleEdition = async () => {
 };
 
 const comments = ref([]);
+const reports = ref([]);
 const newCommentContent = ref('');
 const editMode = ref(false);
 const route = useRoute();
@@ -494,6 +500,29 @@ const fetchComments = async () => {
     toast.error('Erro ao carregar comentários');
   }
 };
+const fetchReports = async () => {
+  try {
+    const reportsResponse = await axios.get(`${ENDPOINTS.REPORT_LIST}/${slug.value}/`);
+    reports.value = reportsResponse.data.results.map((reports) => ({
+      content: reports.content,
+      id: reports.id,
+      createdAt: formatDate(reports.post_date),
+      date: formatDate(reports.date),
+      creator: reports.creator,
+      trust_rate: reports.trust_rate,
+      has_liked: reports.has_liked,
+      title: reports.title,
+      tag: reports.tag,
+      solved: reports.solved,
+      location: reports.location,
+    }));
+    //toast.success('Comentários carregados com sucesso');
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao carregar reports');
+  }
+};
+
 
 const createComment = async () => {
   try {

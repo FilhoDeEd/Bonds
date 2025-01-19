@@ -18,6 +18,7 @@ from user_profile.models import UserProfile
 
 
 
+
 class CommentRegisterView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -117,7 +118,7 @@ class CommentListView(ListAPIView):
         # Busca o fórum correspondente ou retorna 404
         forum = get_object_or_404(Forum, slug=forum_slug)
         # Retorna os comentários relacionados ao fórum encontrado
-        return Comment.objects.filter(forum=forum)
+        return Comment.objects.filter(forum=forum, type= Comment.TypeChoices.COMMENT)
     
 class ReportListView(ListAPIView):
     """
