@@ -4,7 +4,10 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import transaction
 import random
-import string
+
+
+def user_directory_path(instance, filename):
+    return f'images/{instance.id}/{filename}'
 
 
 class Account(models.Model):
@@ -65,6 +68,7 @@ class Account(models.Model):
     cellphone = models.CharField(max_length=255, null=True, blank=True)
     biography = models.CharField(max_length=4095, null=True, blank=True)
     agree_policy = models.BooleanField()
+    profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     email = models.EmailField(unique=True)
     email_notifications = models.BooleanField(default=True) # Pode vir direto no cadastro

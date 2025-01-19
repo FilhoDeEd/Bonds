@@ -56,7 +56,7 @@
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
             <div class="flex items-start space-x-4">
-              <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
+              <img :src="profileImage" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
                 <textarea v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
@@ -162,14 +162,6 @@
                   </button>
                 </div>
 
-                <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
-                    style="height: 70%;">
-
-
-                </div>
-
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-white flex flex-col h-full justify-between">
@@ -200,7 +192,16 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
+                    <div class="flex items-center mb-8">
+                      <!-- Imagem do autor -->
+                      <img 
+                        :src="profileImage" 
+                        alt="Imagem do autor" 
+                        class="w-8 h-8 rounded-full object-cover mr-4"
+                      >
+                      <!-- Nome do criador -->
+                      <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
+                    </div>
 
                     <div class="text-lg flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
@@ -366,6 +367,10 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReport from '../components/Modals/ModalReport.vue';
+import { computed } from "vue";
+import { useUserStore } from "../store/user.js";
+
+import profile from "@/assets/img/profilePic.jpg";
 
 const toast = useToast();
 const forumData = ref({
@@ -407,6 +412,8 @@ const openModal = () => {
 const closeModal = () => {
   isModalOpen.value = false; // Fecha o modal corretamente
 };
+
+const userStore = useUserStore();
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;

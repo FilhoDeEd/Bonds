@@ -21,10 +21,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     account_id = serializers.IntegerField(source='id', read_only=True)
+    profile_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Account
-        fields = ['account_id', 'name', 'surname', 'gender', 'birthday', 'email', 'cellphone', 'agree_policy', 'biography']
+        fields = ['account_id', 'name', 'surname', 'gender', 'birthday', 'email', 'cellphone', 'agree_policy', 'biography', 'profile_image']
+
+    def get_profile_image(self, obj):
+        request = self.context.get('request')
+        if obj.profile_image:
+            return request.build_absolute_uri(obj.profile_image.url) if request else obj.profile_image.url
+        return None
 
     def validate_agree_policy(self, value):
         if not value:

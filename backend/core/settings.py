@@ -69,6 +69,17 @@ else:
     raise Exception(f"Invalid environment named '{ENVIRONMENT}'.")
 
 
+if ENVIRONMENT == Envs.PRODUCTION:
+    STATIC_URL = 'https://api.{DOMAIN}/static/'
+    MEDIA_URL = 'https://api.{DOMAIN}/media/'
+    STATIC_ROOT = '/static/'
+    MEDIA_ROOT = '/media/'
+elif ENVIRONMENT == Envs.DEVELOPMENT:
+    STATIC_URL = 'static/'
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -176,6 +187,3 @@ USE_TZ = True
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-STATIC_URL = 'static/'
