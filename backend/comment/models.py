@@ -81,3 +81,50 @@ class Report(Comment):
     location = models.TextField(max_length=1023)
     solved = models.BooleanField(default=False)
     date = models.DateField(default=timezone.now, editable=True)
+
+class Pool(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.CharField(max_length=500)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    post_date = models.DateTimeField(auto_now_add=True)
+    deadline = models.DateField(null=True, editable=True)
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE) 
+
+    class Meta:
+        ordering = ['-post_date']
+
+    def save(self, *args, **kwargs):
+        if not self.id:  # Apenas na criação
+            self.post_date = timezone.now()
+        super().save(*args, **kwargs)
+
+    def trust_rate(self):
+        likes = self.likes.filter(is_like=True).count()
+        dislikes = self.likes.filter(is_like=False).count()
+        return likes - dislikes
+
+    def create_with_options(self, options):
+        """
+        Cria uma Pool e adiciona as opções associadas.
+        :param options: Lista de strings representando as opções.
+        """
+        self.save()  # Salva a Pool
+        for option_text in options:
+            Option.objects.create(pool=self, option_text=option_text)
+
+    def __str__(self):
+        return self.title
+
+class Option(models.Model):
+    """
+    Representa uma opção de resposta em uma enquete.
+    """
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE, related_name="answers")  
+    option_text = models.CharField(max_length=255)  
+    votes = models.PositiveIntegerField(default=0) 
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.option_text} ({self.votes} votos)"

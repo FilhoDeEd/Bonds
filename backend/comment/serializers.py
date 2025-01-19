@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from comment.models import Comment, Like, Report
+from comment.models import Comment, Like, Report, Pool, Option
 from forum.models import Forum
 from user_profile.models import UserProfile
 
@@ -75,7 +75,7 @@ class ReportSerializer(serializers.ModelSerializer):
     has_liked = serializers.SerializerMethodField()
 
     class Meta:
-        model = Report
+        model = Pool
         fields = [
             'id',
             'content',
@@ -111,3 +111,64 @@ class ReportSerializer(serializers.ModelSerializer):
             return 1 if comment_like.is_like else -1
         except (UserProfile.DoesNotExist, Like.DoesNotExist):
             return 0
+
+class OptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Option
+        fields = ['option_text']
+
+class PoolSerializer(serializers.ModelSerializer):
+    
+    creator = serializers.CharField(source='get_creator_name', read_only=True)
+    post_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    trust_rate = serializers.SerializerMethodField()
+    forum_slug = serializers.SlugRelatedField(
+        slug_field='slug',
+        read_only=True,
+        source='forum'
+    )
+    has_liked = serializers.SerializerMethodField()
+    options = OptionSerializer(many=True, write_only=True)
+
+    class Meta:
+        model = Report
+        fields = [
+            'id',
+            'title',
+            'content',
+            'deadline',
+            'post_date',
+            'trust_rate',
+            'forum',
+            'forum_slug',
+            'creator',
+            'has_liked',
+            'type'
+        ]
+        read_only_fields = [
+            'id',
+            'post_date',
+            'trust_rate',
+            'creator',
+            'forum_slug',
+            'has_liked'
+        ]
+
+
+    def get_trust_rate(self, obj):
+        return obj.trust_rate()
+
+    def get_has_liked(self, obj):
+        user = self.context['request'].user
+        
+        if not user.is_authenticated:
+            return 0
+
+        try:
+            account = user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+            comment_like = Like.objects.get(comment=obj, user_profile=user_profile)
+            return 1 if comment_like.is_like else -1
+        except (UserProfile.DoesNotExist, Like.DoesNotExist):
+            return 0
+        
