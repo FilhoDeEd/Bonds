@@ -1,3 +1,6 @@
+from io import BytesIO
+import os
+from PIL import Image
 from django.shortcuts import get_object_or_404, render
 from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
@@ -9,12 +12,15 @@ from forum.serializers import ForumSerializer, ForumListSerializer, ForumEditSer
 from account.views import add_errors
 from forum.models import Forum , Subscriber , Event , Review
 from django.utils.text import slugify
-
+from django.core.files.base import ContentFile
 
 from rest_framework import status
 from rest_framework.response import Response
 
 from user_profile.models import UserProfile
+
+
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
 class ForumRegisterView(APIView):
@@ -82,7 +88,6 @@ class ForumEditView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, slug):
-        # Obtém o fórum pelo slug
         forum = get_object_or_404(Forum, slug=slug)
 
         account = self.request.user.account
@@ -106,6 +111,63 @@ class ForumEditView(APIView):
             return Response({"success": "success", "slug": forum.slug}, status=status.HTTP_200_OK)
         else:
             return Response({"errors": forum_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForumBannerEditView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        forum = get_object_or_404(Forum, slug=slug)
+
+        account = self.request.user.account
+
+        try:
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({"detail": "Invalid or inactive user."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if forum.owner != user_profile:
+            return Response({"detail": "You do not have permission to edit this forum."}, status=status.HTTP_403_FORBIDDEN)
+
+        if 'image' not in request.FILES:
+            return Response({'error': 'No image sent.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        image = request.FILES['image']
+
+        if image.size > MAX_FILE_SIZE:
+            return Response({'error': 'File size exceeds 5MB.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            img = Image.open(image)
+            if img.format not in ['JPEG', 'PNG']:
+                return Response({'error': 'Unsupported file format. Please upload JPEG or PNG.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        img_low_res = img.copy()
+        img_low_res.thumbnail((800, 800))  # Definindo um tamanho máximo para a miniatura, por exemplo, 800x800
+        low_res_io = BytesIO()
+        img_low_res.save(low_res_io, format='JPEG')
+        low_res_io.seek(0)
+
+        low_res_image = ContentFile(low_res_io.read(), name=f'low_res_{image.name}')
+
+        try:
+            with transaction.atomic():
+                if forum.banner_image:
+                    old_image_path = forum.banner_image.path
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+
+                forum.banner_image = image
+                forum.banner_image_low = low_res_image
+                forum.save()
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        image_url = request.build_absolute_uri(forum.banner_image.url)
+        return Response({'message': 'Forum banner updated successfully.', 'image_url': image_url}, status=status.HTTP_200_OK)
 
 
 class ForumDeleteView(APIView):
