@@ -1,3 +1,4 @@
+import os
 from account.serializers import AccountSerializer, UserSerializer, UpdateAccountBaseSerializer
 from PIL import Image
 from typing import Dict
@@ -116,7 +117,7 @@ class DetailAccountView(APIView):
             neighborhood = user_profile.neighborhood
 
             user_serializer = UserSerializer(user)
-            account_serializer = AccountSerializer(account)
+            account_serializer = AccountSerializer(account, context={'request': request})
             user_profile_serializer = UserProfileSerializer(user_profile)
             neighborhood_serializer = NeighborhoodSerializer(neighborhood)
         except Exception as e:
@@ -230,6 +231,12 @@ class UpdateAccountProfileImage(APIView):
         try:
             with transaction.atomic():
                 account = request.user.account
+
+                if account.profile_image:
+                    old_image_path = account.profile_image.path
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+
                 account.profile_image = image
                 account.save()
         except Exception as e:

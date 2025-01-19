@@ -35,7 +35,7 @@
                       >
                       <img 
                         alt="Foto de Perfil" 
-                        :src="profileImage || profile" 
+                        :src="profileImageUrl"
                         :value="userStore.user.username"
                         style="width: 200px; height: 200px; min-width: 200px; min-height: 200px; max-width: 200px; max-height: 200px;"
                         class="shadow-xl rounded-full object-cover border-4 border-white transition-transform duration-300"
@@ -249,7 +249,6 @@ export default {
   data() {
 
     return {
-      profileImage: null,
       errors: {},
       editMode: false,
       profile,
@@ -284,49 +283,11 @@ export default {
       status: userStore.user.account.status || "",
     });
 
-    const handleImageUpload = async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      // Verificar se o arquivo é uma imagem
-      if (!file.type.startsWith('image/')) {
-        toast.error('Por favor, selecione apenas arquivos de imagem.');
-        return;
-      }
-
-      // Verificar o tamanho do arquivo (limite de 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB em bytes
-      if (file.size > maxSize) {
-        toast.error('A imagem deve ter menos de 5MB.');
-        return;
-      }
-
-      try {
-        const formData = new FormData();
-        formData.append('profile_image', file);
-
-        const response = await axios.post(`${ENDPOINTS.UPLOAD_PROFILE_IMAGE}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        if (response.data.success) {
-          profileImage.value = URL.createObjectURL(file);
-          toast.success('Foto de perfil atualizada com sucesso!');
-        }
-      } catch (error) {
-        console.error('Erro ao fazer upload da imagem:', error);
-        toast.error('Erro ao atualizar a foto de perfil. Tente novamente.');
-      }
-    };
-
     return {
       userStore,
       form,
       toast,
-      fileInput,
-      handleImageUpload,
+      fileInput
     };
   },
 
@@ -513,7 +474,51 @@ export default {
         }
       }
     },
+    
+    async handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        this.toast.error('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        this.toast.error('A imagem deve ter menos de 5MB.');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await axios.post(`${ENDPOINTS.EDIT_PROFILE_IMAGE}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (response.status === 200) {
+          // Atualiza diretamente o store
+          this.userStore.user.account.profile_image = response.data.image_url;
+
+          this.toast.success('Foto de perfil atualizada com sucesso!');
+        }
+      } catch (error) {
+        console.error('Erro ao fazer upload da imagem:', error);
+        this.toast.error('Erro ao atualizar a foto de perfil. Tente novamente.');
+      }
+    },
+    
   },
+  
+  computed: {
+    profileImageUrl() {
+      return this.userStore.user.account.profile_image || this.profile;
+    }
+  }
 };
 </script>
 

@@ -22,7 +22,8 @@ export const useUserStore = defineStore({
         cellphone: null,
         agree_policy: null,
         biography: null,
-        status: null
+        status: null,
+        profile_image: null
       },
 
       user_profle: {
@@ -57,6 +58,7 @@ export const useUserStore = defineStore({
           this.user.account.agree_policy = localStorage.getItem("user.account.agree_policy");
           this.user.account.biography = localStorage.getItem("user.account.biography");
           this.user.account.status = localStorage.getItem("user.account.status");
+          this.user.account.profile_image = localStorage.getItem("user.account.profile_image");
       
           this.user.user_profle.id = localStorage.getItem("user.user_profle.id");
           this.user.user_profle.trust_rate = localStorage.getItem("user.user_profle.trust_rate");
@@ -100,7 +102,8 @@ export const useUserStore = defineStore({
         cellphone: null,
         agree_policy: null,
         biography: null,
-        status: null
+        status: null,
+        profile_image: null
       };
 
       this.user.user_profle = {
@@ -130,6 +133,7 @@ export const useUserStore = defineStore({
       localStorage.setItem("user.account.agree_policy", "");
       localStorage.setItem("user.account.biography", "");
       localStorage.setItem("user.account.status", "");
+      localStorage.setItem("user.account.profile_image", "");
     
       localStorage.setItem("user.user_profle.id", "");
       localStorage.setItem("user.user_profle.trust_rate", "");
@@ -165,6 +169,7 @@ export const useUserStore = defineStore({
           agree_policy: data.agree_policy || this.user.account.agree_policy,
           biography: data.biography || this.user.account.biography,
           status: data.status || this.user.account.status,
+          profile_image: data.profile_image || this.user.account.profile_image
       };
   
       this.user.user_profle = {
@@ -196,6 +201,7 @@ export const useUserStore = defineStore({
       localStorage.setItem("user.account.agree_policy", this.user.account.agree_policy || "");
       localStorage.setItem("user.account.biography", this.user.account.biography || "");
       localStorage.setItem("user.account.status", this.user.account.status || "");
+      localStorage.setItem("user.account.profile_image", this.user.account.profile_image || "");
   
       localStorage.setItem("user.user_profle.id", this.user.user_profle.id || "");
       localStorage.setItem("user.user_profle.trust_rate", this.user.user_profle.trust_rate || "");
