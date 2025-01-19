@@ -3442,7 +3442,7 @@ select {
   background-color: #7c7abb;
 }
 
-.bg-comment{
+.bg-basic{
   background-color: #d9d9d9;
 }
 
@@ -5492,4 +5492,20 @@ textarea[readonly] {
   background-color: transparent; /* Remove o fundo de destaque */
   cursor: default; /* Altera o cursor para um que não sugere edição */
   outline: none; /* Remove o contorno de foco */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+
+.inconsolata-regular {
+  font-family: "Inconsolata", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.josefin-sans-bold-italic {
+  font-family: "Josefin Sans", sans-serif;
+  font-weight: 700;
+  font-style: italic;
 }
