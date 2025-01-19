@@ -70,7 +70,7 @@
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
             <div class="flex items-start space-x-4">
-              <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
+              <img :src="profileImage" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
                 <textarea v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
@@ -82,7 +82,10 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
                       <span>📷</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
+                    <button 
+                    v-show="showReportCreator"
+                    @click = "openModal"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
 
@@ -164,14 +167,6 @@
                   </button>
                 </div>
 
-                <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
-                    style="height: 70%;">
-
-
-                </div>
-
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-black flex flex-col h-full justify-between">
@@ -202,7 +197,16 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-lg text-black font-semibold mb-8">{{ comment.creator }}</h2>
+                    <div class="flex items-center mb-8">
+                      <!-- Imagem do autor -->
+                      <img 
+                        :src="profileImage" 
+                        alt="Imagem do autor" 
+                        class="w-8 h-8 rounded-full object-cover mr-4"
+                      >
+                      <!-- Nome do criador -->
+                      <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
+                    </div>
 
                     <div class="text-lg text-black flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
@@ -264,9 +268,17 @@
           </div>
 
         </aside>
+        
       </div>
     </div>
+    <ModalReport 
+      v-if="isModalOpen"
+      :isModalOpen="isModalOpen"
+      @close="closeModal"
+      :slug="slug"
+     />
   </MainLayout>
+
 </template>
 
 <script setup>
@@ -278,6 +290,11 @@ import axios from 'axios';
 import router from '../router/index.js';
 import { ENDPOINTS } from '../../api';
 import MainLayout from '../layouts/mainLayout.vue';
+import ModalReport from '../components/Modals/ModalReport.vue';
+import { computed } from "vue";
+import { useUserStore } from "../store/user.js";
+
+import profile from "@/assets/img/profilePic.jpg";
 
 const toast = useToast();
 const forumData = ref({
@@ -287,7 +304,31 @@ const forumData = ref({
   createdAt: '',
   creator: '',
   members: 0,
+  type:'',
+  isSubscribed: false,
 });
+
+const showReportCreator = ref(false);
+const showPollCreator = ref(false);
+
+const activeReportCreator = () => {
+  if (forumData.value.creator === "Sistema") {
+      showReportCreator.value = true;
+    }
+    else{
+      showReportCreator.value = false;
+    }
+};
+const isModalOpen = ref(false); // Referência reativa
+const openModal = () => {
+  isModalOpen.value = true; // Atualiza a propriedade `.value` do ref
+};
+
+const closeModal = () => {
+  isModalOpen.value = false; // Fecha o modal corretamente
+};
+
+const userStore = useUserStore();
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
@@ -343,12 +384,24 @@ const fetchForum = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
       tempContent: "",
+      isSubscribed: response.data.is_sub,
     };
     await fetchComments();
+    subscribed();
+    activeReportCreator();
   } catch (error) {
     console.error(error);
     toast.error('Erro ao buscar dados do fórum');
     router.push('/home');
+  }
+};
+
+const subscribed = () => {
+  if (forumData.value.isSubscribed == 1) {
+    isSubscribed.value = true;
+  }
+  else {
+    isSubscribed.value = false;
   }
 };
 
@@ -546,23 +599,7 @@ const createPoll = () => {
 
 onMounted(() => {
   fetchForum();
-});
-
-onBeforeMount(async () => {
-  try {
-    // Faz a chamada POST para inscrever no fórum
-    await axios.post(`${ENDPOINTS.SUBSCRIBE_FORUM}/${slug.value}/`);
-    await axios.post(`${ENDPOINTS.UNSUBSCRIBE_FORUM}/${slug.value}/`);
-    isSubscribed.value = false;
-  } catch (err) {
-    if (err.response && err.response.data.detail === "You are already subscribed to this forum.") {
-      isSubscribed.value = true;
-    }
-    else {
-      console.log(err);
-      toast.error("Algo deu errado!");
-    }
-  }
+  activeReportCreator();
 });
 
 
@@ -577,6 +614,7 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
+
 
 </script>
 

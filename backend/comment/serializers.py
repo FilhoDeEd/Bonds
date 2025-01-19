@@ -82,6 +82,7 @@ class ReportSerializer(serializers.ModelSerializer):
             'title',
             'tag',
             'location',
+            'date',
             'solved',
             'post_date',
             'trust_rate',

@@ -4,6 +4,7 @@ const USER_PROFILE_URL = `${API_URL}/user_profile`;
 const FORUM_URL = `${API_URL}/forum`;
 const EVENT_URL = `${FORUM_URL}/event`;
 const COMMENT_URL = `${API_URL}/comment`;
+const REPORT_URL = `${COMMENT_URL}/report`;
 
 // Endpoints centralizados
 export const ENDPOINTS = {
@@ -15,6 +16,7 @@ export const ENDPOINTS = {
   EDIT_NEIGHBORHOOD: `${ACCOUNT_URL}/update-neighborhood/`,
   EDIT_EMAIL: `${ACCOUNT_URL}/update-email/`,
   EDIT_PASSWORD: `${ACCOUNT_URL}/update-password/`,
+  EDIT_PROFILE_IMAGE: `${ACCOUNT_URL}/update-profile-image/`,
 
   DELETE_ACCOUNT: `${ACCOUNT_URL}/anonymize/`,
 
@@ -42,7 +44,11 @@ export const ENDPOINTS = {
   DELETE_COMMENT : `${COMMENT_URL}/delete`,
   LIKE_COMMENT: `${COMMENT_URL}/like/`,
   DISLIKE_COMMENT: `${COMMENT_URL}/dislike/`,
-  UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`
+  UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`,
+
+  REGISTER_REPORT: `${REPORT_URL}/register/`,
+  REPORT_EDIT: `${REPORT_URL}/edit`,
+  REPORT_DELETE: `${REPORT_URL}/delete`,
 
 
 };

@@ -37,7 +37,7 @@
                         class="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition overflow-hidden">
                         <img 
                         alt="Foto de Perfil" 
-                        :src="profileImage || team2" 
+                        :src="profileImage" 
                         class="w-full h-full object-cover">
                     </button>
                 </div>
@@ -70,8 +70,10 @@ import { ref } from "vue";
 import MenuItem from "../components/Sidebar/MenuItem.vue";
 import { useForumListStore } from "../store/forumListStore.js";
 import router from "../router/index.js";
+import { computed } from "vue";
+import { useUserStore } from "../store/user.js";
 
-import team2 from "@/assets/img/team-2-800x800.jpg";
+import profile from "@/assets/img/profilePic.jpg";
 
 const activeItem = ref("home");
 const searchQuery = ref("");
@@ -83,6 +85,7 @@ const menuItems = [
   { id: "about", icon: "info", title: "Sobre", path: "/about" }
 ];
 
+const userStore = useUserStore();
 const forumListStore = useForumListStore();
 
 const handleSearch = async () => {
@@ -90,6 +93,10 @@ const handleSearch = async () => {
   await forumListStore.fetchForums();
   router.push("/home");
 };
+
+const profileImage = computed(() => {
+  return userStore.user.account.profile_image || profile;
+});
 </script>
 
 <style>

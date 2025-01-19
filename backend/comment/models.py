@@ -80,3 +80,4 @@ class Report(Comment):
     title = models.CharField(max_length=255)
     location = models.TextField(max_length=1023)
     solved = models.BooleanField(default=False)
+    date = models.DateField(default=timezone.now, editable=True)

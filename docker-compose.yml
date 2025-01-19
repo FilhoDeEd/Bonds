@@ -42,6 +42,7 @@ services:
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL}
     volumes:
       - ./backend:/app/backend
+      - media_volume:/app/media
     ports:
       - "${DJANGO_PORT}:${DJANGO_PORT}"
     networks:
@@ -72,6 +73,9 @@ services:
 volumes:
   db_data:
     name: development_db_data
+    driver: local
+  media_volume:
+    name: development_media_volume
     driver: local
 
 networks:

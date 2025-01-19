@@ -7,8 +7,10 @@ from account.views import (
     AnonymizeAccountView,
     UpdateNeighborhoodView,
     UpdateAccountEmailView,
-    UpdateAccountPasswordView
+    UpdateAccountPasswordView,
+    UpdateAccountProfileImage
 )
+
 
 urlpatterns = [
     path('detail/', DetailAccountView.as_view(), name='account_detail'),
@@ -18,5 +20,6 @@ urlpatterns = [
     path('update-neighborhood/', UpdateNeighborhoodView.as_view(), name='update_neighborhood'),
     path('update-email/', UpdateAccountEmailView.as_view(), name='update_email'),
     path('update-password/', UpdateAccountPasswordView.as_view(), name='update_password'),
-    path('anonymize/', AnonymizeAccountView.as_view(), name='account_anonymize'),
+    path('update-profile-image/', UpdateAccountProfileImage.as_view(), name='update_profile_image'),
+    path('anonymize/', AnonymizeAccountView.as_view(), name='account_anonymize')
 ]
