@@ -75,7 +75,7 @@ class ReportSerializer(serializers.ModelSerializer):
     has_liked = serializers.SerializerMethodField()
 
     class Meta:
-        model = Pool
+        model = Report
         fields = [
             'id',
             'content',
