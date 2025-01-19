@@ -6,6 +6,7 @@ from forum.models import Subscriber
 class ForumSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='get_creator_name', read_only=True)
     is_sub = serializers.SerializerMethodField()
+    banner_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Forum
@@ -19,9 +20,16 @@ class ForumSerializer(serializers.ModelSerializer):
             'creation_date',
             'update_date',
             'creator',
-            'is_sub'
+            'is_sub',
+            'banner_image'
         ]
-        read_only_fields = ['id', 'slug', 'creation_date', 'update_date', 'subscribers_count', 'popularity', 'creator', 'is_sub']
+        read_only_fields = ['id', 'slug', 'creation_date', 'update_date', 'subscribers_count', 'popularity', 'creator', 'is_sub', 'banner_image']
+
+    def get_banner_image(self, obj):
+        request = self.context.get('request')
+        if obj.banner_image:
+            return request.build_absolute_uri(obj.banner_image.url) if request else obj.banner_image.url
+        return None
 
     def get_is_sub(self, obj):
         user = self.context['request'].user
@@ -40,6 +48,7 @@ class ForumSerializer(serializers.ModelSerializer):
 
 class ForumListSerializer(serializers.ModelSerializer):
     forum_id = serializers.IntegerField(source='id', read_only=True)
+    banner_image_low = serializers.SerializerMethodField()
 
     is_sub = serializers.SerializerMethodField()
     class Meta:
@@ -51,8 +60,15 @@ class ForumListSerializer(serializers.ModelSerializer):
             'slug',
             'popularity',
             'type',
-            'is_sub'
+            'is_sub',
+            'banner_image_low'
         ]
+
+    def get_banner_image_low(self, obj):
+        request = self.context.get('request')
+        if obj.banner_image_low:
+            return request.build_absolute_uri(obj.banner_image_low.url) if request else obj.banner_image_low.url
+        return None
 
     def get_is_sub(self, obj):
         user = self.context['request'].user

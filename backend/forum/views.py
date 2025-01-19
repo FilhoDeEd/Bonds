@@ -146,7 +146,7 @@ class ForumBannerEditView(APIView):
             return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
 
         img_low_res = img.copy()
-        img_low_res.thumbnail((800, 800))  # Definindo um tamanho máximo para a miniatura, por exemplo, 800x800
+        img_low_res.thumbnail((800, 800))
         low_res_io = BytesIO()
         img_low_res.save(low_res_io, format='JPEG')
         low_res_io.seek(0)

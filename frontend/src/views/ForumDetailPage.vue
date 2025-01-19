@@ -206,13 +206,14 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <div class="flex items-center mb-8">
-                      <!-- Imagem do autor -->
+                    <div class="flex items-center mb-8 ml-auto">
+                      <!-- Imagem do autor (à direita) -->
                       <img 
-                        :src="profileImage" 
-                        alt="Imagem do autor" 
-                        class="w-8 h-8 rounded-full object-cover mr-4"
+                      :src="authorImage" 
+                      alt="Imagem do autor" 
+                      class="w-10 h-10 rounded-full object-cover mr-3"
                       >
+
                       <!-- Nome do criador -->
                       <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
                     </div>
@@ -269,14 +270,6 @@
                   </button>
                 </div>
 
-                <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
-                    style="height: 70%;">
-
-
-                </div>
-
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-white flex flex-col h-full justify-between">
@@ -306,8 +299,6 @@
                       </div>
                     </div>
 
-                    <!-- Título ou nome do autor -->
-                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
                     <div class="text-lg flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
                       <h3 v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
@@ -869,7 +860,13 @@ onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
 
+const profileImage = computed(() => {
+  return userStore.user.account.profile_image || profile;
+});
 
+const authorImage = computed(() => {
+  return profile;
+});
 </script>
 
 
