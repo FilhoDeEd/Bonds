@@ -2,40 +2,58 @@
   <MainLayout>
     <div class="w-8/12 h-full py-8 pr-20 pl-20 bg-gray-50">
       <!-- Banner Section -->
-      <div class="bg-white h-400-px p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
           <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
-
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
               <div class="px-6 py-8">
                 <div class="container mx-auto flex flex-col items-start">
-                  <!-- Título editável -->
+                  <!-- Banner do evento -->
                   <div class="flex justify-center w-full">
                     <img src="@/assets/img/1200x400.png" alt="Event banner"
                       class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
                   </div>
+                  
+                  <!-- Grid 2x2 para informações do evento -->
                   <div class="grid grid-cols-2 gap-4 w-full">
-                    <input type="text" v-model="forumData.title" :readonly="!editMode"
-                      class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento" id="EventTitle">
+                    <!-- Título - Primeira coluna, primeira linha -->
+                    <textarea v-model="forumData.title" :readonly="!editMode"
+                      class="text-white text-base font-bold mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Título do Evento" 
+                      id="EventTitle">
+                    </textarea>
 
-                    <!-- Descrição editável -->
+                    <!-- Localização - Segunda coluna, primeira linha -->
+                    <textarea v-model="forumData.localization" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Localização" 
+                      rows="2">
+                    </textarea>
+
+                    <!-- Descrição - Primeira coluna, segunda linha -->
                     <textarea v-model="forumData.description" :readonly="!editMode"
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento"
-                      rows="3"></textarea>
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Descrição do Evento"
+                      rows="3">
+                    </textarea>
 
+                    <!-- Data - Segunda coluna, segunda linha -->
                     <textarea v-model="forumData.date" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
 
-                  <textarea v-model="forumData.localization" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
-                </div>
-                <p class="text-white text-lg">Avaliação: {{ forumData.five_star_mean }} estrelas</p>
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Data do Evento" 
+                      rows="3">
+                    </textarea>
+                  </div>
+                  
+                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+
                 </div>
               </div>
             </div>
@@ -63,7 +81,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic p-6 rounded-lg shadow mb-8">
         <div class="container mx-auto">
           <h2 class="text-2xl font-bold mb-4">Engaje no fórum!</h2>
 
@@ -140,7 +158,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -176,10 +194,10 @@
 
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <div class="text-white flex flex-col h-full justify-between">
+                  <div class="text-black flex flex-col h-full justify-between">
                     <!-- Menu dropdown -->
                     <div class="relative self-end mb-2">
-                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                      <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
                         ⋯
                       </button>
 
@@ -204,11 +222,11 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-lg font-semibold mb-8">{{ comment.creator }}</h2>
+                    <h2 class="text-lg text-black font-semibold mb-8">{{ comment.creator }}</h2>
 
-                    <div class="text-lg flex flex-col justify-between flex-grow">
+                    <div class="text-lg text-black flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
-                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
                         @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
                         {{ comment.content }}
                       </p>
@@ -216,11 +234,11 @@
                       <!-- Edição do comentário -->
                       <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
                         @keyup.enter="saveEdit(comment)"
-                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                        class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
                       </textarea>
                     </div>
                     <!-- Detalhes do comentário -->
-                    <p class="mt-8">{{ comment.createdAt }}</p>
+                    <p class="mt-8 text-black ">{{ comment.createdAt }}</p>
                   </div>
                 </div>
               </div>
@@ -229,37 +247,39 @@
         </div>
 
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
-          <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
-          <div class="space-y-4">
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Participantes</h4>
-              <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Avaliação </h4>
-              <p class="text-gray-600">Avaliação: {{ forumData.five_star_mean }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Data do Evento</h4>
-              <p class="text-gray-600">{{ forumData.date }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Local do Evento</h4>
-              <p class="text-gray-600">{{ forumData.localization }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado em</h4>
-              <p class="text-gray-600">{{ forumData.createdAt }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado por</h4>
-              <p class="text-gray-600">{{ forumData.creator }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Popularidade</h4>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ forumData.popularity }}</span>
+
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
+
+          <div class="bg-banner p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
+
+            <div class="space-y-3 ">
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Criado por: </span> 
+                  <span class="inconsolata-regular">{{ forumData.creator }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white ">
+                  <span class="josefin-sans-bold-italic">Criado em: </span> 
+                  <span class="inconsolata-regular"> {{ forumData.createdAt }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Subscribers: </span> 
+                  <span class="inconsolata-regular"> {{ forumData.members }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Popularidade: </span> 
+                  <span class="inconsolata-regular"> {{ forumData.popularity }}</span>
+                </p>
               </div>
             </div>
           </div>
@@ -656,6 +676,7 @@ onUnmounted(() => {
 
 
 <style scoped>
+
 .h-85 {
   height: 85%;
 }
