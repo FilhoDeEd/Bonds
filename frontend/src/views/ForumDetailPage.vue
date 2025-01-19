@@ -2,45 +2,59 @@
   <MainLayout>
     <div class="w-8/12 h-full py-8 pr-20 pl-20 bg-gray-50">
       <!-- Banner Section -->
-      <div class="bg-white h-400-px p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
-          <div class="absolute top-0 left-0 right-0 h-85" style="background-color: rgba(124, 122, 187, 1);">
-          </div>
+          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
+            <div class="relative h-full flex flex-col justify-between">
+              <!-- Área de título e descrição -->
+              <div class="px-6 py-8">
+                <div class="container mx-auto flex flex-col items-start">
+                  <!-- Banner do evento -->
+                  <div class="flex justify-center w-full">
+                    <img src="@/assets/img/1200x400.png" alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
+                  </div>
+                  
+                  <!-- Grid 2x2 para informações do evento -->
+                  <div class="grid grid-cols-2 gap-4 w-full">
+                    <!-- Título - Primeira coluna, primeira linha -->
+                    <textarea v-model="forumData.title" :readonly="!editMode"
+                      class="text-white text-base font-bold mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Título do Fórum" 
+                      id="EventTitle">
+                    </textarea>
 
-          <!-- Conteúdo do banner -->
-          <div class="relative h-full flex flex-col justify-between">
-            <!-- Área de título e descrição -->
-            <div class="px-6 py-8">
-              <div class="container mx-auto flex flex-col items-start">
-                <!-- Título editável -->
-                <input type="text" v-model="forumData.title" :readonly="!editMode"
-                  class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Fórum">
-
-                <!-- Descrição editável -->
-                <textarea v-model="forumData.description" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do fórum" rows="3"></textarea>
+                    <!-- Descrição - Primeira coluna, segunda linha -->
+                    <textarea v-model="forumData.description" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" 
+                      placeholder="Descrição do Evento"
+                      rows="3">
+                    </textarea>
+                  </div>
+                  
+                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+                </div>
               </div>
             </div>
-
             <!-- Botões alinhados ao bottom -->
-            <div class="px-6 pb-4 flex space-x-4 relative z-10">
+            <div class=" flex space-x-4 relative z-10">
               <button type="button" @click="toggleSubscribe"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
               </button>
 
               <button type="button" @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
 
               <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
               </button>
@@ -49,7 +63,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic p-6 rounded-lg shadow mb-8">
         <div class="container mx-auto">
           <h2 class="text-2xl font-bold mb-4">Engaje no fórum!</h2>
 
@@ -111,7 +125,7 @@
                   </div>
 
                   <button v-show="showPostButton" @click="createComment"
-                    class="px-4 py-2 bg-blue-500 text-black rounded-lg hover:bg-blue-600">
+                    class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
                   </button>
                 </div>
@@ -127,7 +141,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -155,10 +169,10 @@
 
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <div class="text-white flex flex-col h-full justify-between">
+                  <div class="text-black flex flex-col h-full justify-between">
                     <!-- Menu dropdown -->
                     <div class="relative self-end mb-2">
-                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                      <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
                         ⋯
                       </button>
 
@@ -194,9 +208,9 @@
                       <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
                     </div>
 
-                    <div class="text-lg flex flex-col justify-between flex-grow">
+                    <div class="text-lg text-black flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
-                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
                         @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
                         {{ comment.content }}
                       </p>
@@ -204,11 +218,11 @@
                       <!-- Edição do comentário -->
                       <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
                         @keyup.enter="saveEdit(comment)"
-                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                        class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
                       </textarea>
                     </div>
                     <!-- Detalhes do comentário -->
-                    <p class="mt-8">{{ comment.createdAt }}</p>
+                    <p class="mt-8 text-black ">{{ comment.createdAt }}</p>
                   </div>
                 </div>
               </div>
@@ -217,28 +231,42 @@
         </div>
 
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
-          <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
-          <div class="space-y-4">
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Participantes</h4>
-              <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado em</h4>
-              <p class="text-gray-600">{{ forumData.createdAt }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado por</h4>
-              <p class="text-gray-600">{{ forumData.creator }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Popularidade</h4>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ forumData.popularity }}</span>
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
+
+          <div class="bg-banner p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
+
+            <div class="space-y-3 ">
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Participantes: </span>
+                  <span class="inconsolata-regular">{{ forumData.members }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white ">
+                  <span class="josefin-sans-bold-italic">Criado em: </span>
+                  <span class="inconsolata-regular"> {{ forumData.createdAt }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Criado por: </span>
+                  <span class="inconsolata-regular"> {{ forumData.creator  }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Popularidade: </span>
+                  <span class="inconsolata-regular"> {{ forumData.popularity }}</span>
+                </p>
               </div>
             </div>
           </div>
+
         </aside>
         
       </div>
