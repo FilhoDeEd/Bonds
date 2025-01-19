@@ -28,7 +28,7 @@
                     <div class="relative">
                       <img 
                         alt="Foto de Perfil" 
-                        :src="profileImage || team2" 
+                        :src="profileImage || profile" 
                         :value="userStore.user.username"
                         style="width: 200px; height: 200px; min-width: 200px; min-height: 200px; max-width: 200px; max-height: 200px;"
                         class="shadow-xl rounded-full object-cover border-4 border-white transition-transform duration-300"
@@ -234,7 +234,7 @@ import { useUserStore } from "../store/user.js";
 import axios from "axios";
 import router from "../router/index.js";
 import { ENDPOINTS } from "../../api.js";
-import team2 from "@/assets/img/team-2-800x800.jpg";
+import profile from "@/assets/img/profilePic.jpg";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -253,7 +253,7 @@ export default {
       profileImage: null,
       errors: {},
       editMode: false,
-      team2,
+      profile,
       isModalNeighChangeOpen: false,
       isModalChangePasswordOpen: false,
       isModalChangeEmailOpen: false,

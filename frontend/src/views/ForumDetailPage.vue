@@ -124,8 +124,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-              style="background-color: rgba(124, 122, 187, 1);">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
               <div class="flex h-full">
 
                 <!-- Área de votação -->

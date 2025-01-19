@@ -138,8 +138,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-              style="background-color: rgba(124, 122, 187, 1);">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -162,12 +161,6 @@
                       <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
                       </path>
                     </svg>
-                  </button>
-
-                  <!-- Botão para criar enquete -->
-                  <button @click="showPollCreator = true" class="p-2 hover:bg-gray-100 rounded-full"
-                    title="Criar Enquete">
-                    <span>📊</span>
                   </button>
                 </div>
 
@@ -234,32 +227,32 @@
         </div>
 
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
 
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-4">Mais informações</h3>
+          <div class="bg-banner p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
 
             <div class="space-y-3">
               <div class="text-sm">
-                <p class="text-gray-600">
+                <p class="text-white">
                   <span class="font-medium">Criado por:</span> {{ forumData.creator }}
                 </p>
               </div>
 
               <div class="text-sm">
-                <p class="text-gray-600">
+                <p class="text-white">
                   <span class="font-medium">Criado em:</span> {{ forumData.createdAt }}
                 </p>
               </div>
 
               <div class="text-sm">
-                <p class="text-gray-600">
+                <p class="text-white ">
                   <span class="font-medium">Subscribers:</span> {{ forumData.members }}
                 </p>
               </div>
 
               <div class="text-sm">
-                <p class="text-gray-600">
+                <p class="text-white">
                   <span class="font-medium">Popularidade:</span> {{ forumData.popularity }}
                 </p>
               </div>
@@ -641,10 +634,6 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
-
-
-
-
 </script>
 
 

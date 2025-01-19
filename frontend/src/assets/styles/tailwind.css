@@ -3438,6 +3438,14 @@ select {
   background-color: transparent;
 }
 
+.bg-banner {
+  background-color: #7c7abb;
+}
+
+.bg-comment{
+  background-color: #d9d9d9;
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
