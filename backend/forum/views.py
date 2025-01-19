@@ -73,7 +73,7 @@ class ForumDetailView(APIView):
 
     def get(self, request, slug):
         forum = get_object_or_404(Forum, slug=slug)
-        serializer = ForumSerializer(forum)
+        serializer = ForumSerializer(forum, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -193,7 +193,7 @@ class EventDetailView(APIView):
 
     def get(self, request, slug):
         event = get_object_or_404(Event, slug=slug)
-        serializer = EventSerializer(event)
+        serializer = ForumSerializer(event, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     

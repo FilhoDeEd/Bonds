@@ -5,7 +5,7 @@ from forum.models import Subscriber
 
 class ForumSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='get_creator_name', read_only=True)
-
+    is_sub = serializers.SerializerMethodField()
 
     class Meta:
         model = Forum
@@ -18,9 +18,24 @@ class ForumSerializer(serializers.ModelSerializer):
             'popularity',
             'creation_date',
             'update_date',
-            'creator'
+            'creator',
+            'is_sub'
         ]
-        read_only_fields = ['id', 'slug', 'creation_date', 'update_date', 'subscribers_count', 'popularity', 'creator']
+        read_only_fields = ['id', 'slug', 'creation_date', 'update_date', 'subscribers_count', 'popularity', 'creator', 'is_sub']
+
+    def get_is_sub(self, obj):
+        user = self.context['request'].user
+        
+        if not user.is_authenticated:
+            return 0
+
+        try:
+            account = user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+            sub = Subscriber.objects.get(forum=obj, user_profile=user_profile)
+            return 1 if sub.is_sub else -1
+        except (UserProfile.DoesNotExist, Subscriber.DoesNotExist):
+            return 0
 
 
 class ForumListSerializer(serializers.ModelSerializer):
@@ -63,6 +78,7 @@ class ForumEditSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='get_creator_name', read_only=True)
+    is_sub = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -77,7 +93,8 @@ class EventSerializer(serializers.ModelSerializer):
             'five_star_mean',
             'creation_date',
             'update_date',
-            'creator'
+            'creator',
+            'is_sub'
         ]
         read_only_fields = [
             'id',
@@ -85,8 +102,23 @@ class EventSerializer(serializers.ModelSerializer):
             'five_star_mean',
             'creation_date',
             'update_date',
-            'creator'
+            'creator',
+            'is_sub'
         ]
+
+    def get_is_sub(self, obj):
+        user = self.context['request'].user
+        
+        if not user.is_authenticated:
+            return 0
+
+        try:
+            account = user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+            sub = Subscriber.objects.get(forum=obj, user_profile=user_profile)
+            return 1 if sub.is_sub else -1
+        except (UserProfile.DoesNotExist, Subscriber.DoesNotExist):
+            return 0
 
 
 class EventEditSerializer(serializers.ModelSerializer):
