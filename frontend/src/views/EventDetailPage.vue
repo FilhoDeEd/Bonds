@@ -6,38 +6,41 @@
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
           <div class="absolute top-0 left-0 right-0 h-85" style="background-color: rgba(124, 122, 187, 1);">
-          </div>
 
-          <!-- Conteúdo do banner -->
-          <div class="relative h-full flex flex-col justify-between">
-            <!-- Área de título e descrição -->
-            <div class="px-6 py-8">
-              <div class="container mx-auto flex flex-col items-start">
-                <!-- Título editável -->
-                <div class="grid grid-cols-2 gap-4 w-full">
-                  <input type="text" v-model="forumData.title" :readonly="!editMode"
-                  class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento">
+            <div class="relative h-full flex flex-col justify-between">
+              <!-- Área de título e descrição -->
+              <div class="px-6 py-8">
+                <div class="container mx-auto flex flex-col items-start">
+                  <!-- Título editável -->
+                  <div class="flex justify-center w-full">
+                    <img src="@/assets/img/1200x400.png" alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 w-full">
+                    <input type="text" v-model="forumData.title" :readonly="!editMode"
+                      class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento" id="EventTitle">
 
-                  <!-- Descrição editável -->
-                  <textarea v-model="forumData.description" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento" rows="3"></textarea>
+                    <!-- Descrição editável -->
+                    <textarea v-model="forumData.description" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento"
+                      rows="3"></textarea>
 
-                  <textarea v-model="forumData.date" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
+                    <textarea v-model="forumData.date" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
 
-                  <textarea v-model="forumData.localization" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                    <textarea v-model="forumData.localization" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                  </div>
+                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
                 </div>
-                <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
-                </div>
+              </div>
             </div>
-
             <!-- Botões alinhados ao bottom -->
-            <div class="px-6 pb-4 flex space-x-4 relative z-10">
+            <div class=" flex space-x-4 relative z-10">
               <button type="button" @click="toggleSubscribe"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
@@ -85,10 +88,10 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
                       <span>📊</span>
                     </button>
-                  <button v-if="true" @click="callReview"
-                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
-                    <span>⭐</span>
-                  </button>
+                    <button v-if="true" @click="callReview" class="p-2 hover:bg-gray-100 rounded-full"
+                      title="Avaliar Evento">
+                      <span>⭐</span>
+                    </button>
                   </div>
 
                   <button @click="createComment"
@@ -205,48 +208,41 @@
 
         <!-- Sidebar -->
         <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
-          <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
-          <div class="space-y-4">
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Participantes</h4>
-              <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Avaliação </h4>
-              <p class="text-gray-600">{{ forumData.five_star_mean }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Data do Evento</h4>
-              <p class="text-gray-600">{{ forumData.date }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Local do Evento</h4>
-              <p class="text-gray-600">{{ forumData.localization }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado em</h4>
-              <p class="text-gray-600">{{ forumData.createdAt }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado por</h4>
-              <p class="text-gray-600">{{ forumData.creator }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Popularidade</h4>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ forumData.popularity }}</span>
+
+          <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4">Mais informações</h3>
+
+            <div class="space-y-3">
+              <div class="text-sm">
+                <p class="text-gray-600">
+                  <span class="font-medium">Criado por:</span> {{ forumData.creator }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-gray-600">
+                  <span class="font-medium">Criado em:</span> {{ forumData.createdAt }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-gray-600">
+                  <span class="font-medium">Subscribers:</span> {{ forumData.members }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-gray-600">
+                  <span class="font-medium">Popularidade:</span> {{ forumData.popularity }}
+                </p>
               </div>
             </div>
           </div>
+
         </aside>
       </div>
-      <ModalReview
-        v-if="isModalOpen"
-        :isModalOpen="isModalOpen"
-        @submitRating="handleRating"
-        @close="isModalOpen = false"
-        @showToast="handleShowToast"
-      />
+      <ModalReview v-if="isModalOpen" :isModalOpen="isModalOpen" @submitRating="handleRating"
+        @close="isModalOpen = false" @showToast="handleShowToast" />
     </div>
   </MainLayout>
 </template>
@@ -261,15 +257,13 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
-import upvoteIcon from '@/assets/img/upvote.png';
-import downvoteIcon from '@/assets/img/downvote.png';
 
-const checkDate = ()=>{
-  if (forumData.value.date < new Date()){
-      return true
-    }
-    return false;
+const checkDate = () => {
+  if (forumData.value.date < new Date()) {
+    return true
   }
+  return false;
+}
 
 const isModalOpen = ref(false);
 const stars = ref(0);
@@ -300,20 +294,20 @@ const handleRating = async (rating) => {
 const toast = useToast();
 const forumData = ref({
   title: '',
-  date:'',
-  localization:'',
+  date: '',
+  localization: '',
   description: '',
   popularity: 0,
   createdAt: '',
   creator: '',
   members: 0,
-  five_star_mean:	0,
+  five_star_mean: 0,
 });
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
-    if(new Date(formatDateToISO(forumData.value.date)) <= new Date()){
+    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()) {
       toast.error('Não é possível editar a data de um evento que já ocorreu, ou mover para o passado');
       editMode.value = false;
       return;
@@ -581,7 +575,7 @@ onUnmounted(() => {
 });
 
 
-  
+
 
 </script>
 
