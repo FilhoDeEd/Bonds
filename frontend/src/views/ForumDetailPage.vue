@@ -74,14 +74,45 @@
                     class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
+
+                    <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                      id="pollButton">
                       <span>📊</span>
                     </button>
+
+                    <div v-if="showPoll" class="mt-4 space-y-2">
+                      <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
+                        <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
+                          :placeholder="`Opção ${index + 1}`">
+                        <button v-if="index >= 2" @click="removePollOption(index)"
+                          class="text-red-500 hover:text-red-600">
+                          ❌
+                        </button>
+                      </div>
+
+                      <div class="flex space-x-2 mt-3">
+                        <button v-if="pollOptions.length < 4" @click="addPollOption"
+                          class="text-blue-500 hover:text-blue-600 text-sm">
+                          + Adicionar opção
+                        </button>
+
+                        <div class="flex space-x-2 ml-auto">
+                          <button @click="cancelPoll"
+                            class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
+                            Cancelar
+                          </button>
+                          <button @click="createPoll"
+                            class="px-4 py-1 bg-blueGray-600 text-white rounded-lg hover:bg-blue-600">
+                            Criar Enquete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <button @click="createComment"
-                    class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
-                    Publicar
+                  <button v-show="showPostButton" @click="createComment"
+                    class="px-4 py-2 bg-blue-500 text-black rounded-lg hover:bg-blue-600">
+                    ✔️
                   </button>
                 </div>
               </div>
@@ -96,8 +127,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-              style="background-color: rgba(124, 122, 187, 1);">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -120,12 +150,6 @@
                       <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
                       </path>
                     </svg>
-                  </button>
-
-                  <!-- Botão para criar enquete -->
-                  <button @click="showPollCreator = true" class="p-2 hover:bg-gray-100 rounded-full"
-                    title="Criar Enquete">
-                    <span>📊</span>
                   </button>
                 </div>
 
@@ -496,6 +520,47 @@ const menuStates = ref({});
 const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
 };
+
+// Enquete  
+const showPostButton = ref(true)
+const showPoll = ref(false)
+const pollOptions = ref([
+  { text: '', votes: 0 },
+  { text: '', votes: 0 }
+])
+
+// Add these methods
+const togglePoll = () => {
+  showPoll.value = !showPoll.value
+  showPostButton.value = !showPoll.value
+}
+
+const addPollOption = () => {
+  if (pollOptions.value.length < 4) {
+    pollOptions.value.push({ text: '', votes: 0 })
+  }
+}
+
+const removePollOption = (index) => {
+  if (index >= 2) { // Only allow removing extra options
+    pollOptions.value.splice(index, 1)
+  }
+}
+
+const cancelPoll = () => {
+  showPoll.value = false
+  showPostButton.value = true
+  pollOptions.value = [
+    { text: '', votes: 0 },
+    { text: '', votes: 0 }
+  ]
+}
+const createPoll = () => {
+  // Add your poll creation logic here
+  console.log('Poll created:', pollOptions.value)
+  showPostButton.value = true
+  cancelPoll()
+}
 
 onMounted(() => {
   fetchForum();
