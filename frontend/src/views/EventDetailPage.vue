@@ -122,7 +122,7 @@
                   </div>
 
                   <button v-show="showPostButton" @click="createComment"
-                    class="px-4 py-2 bg-blue-500 text-black rounded-lg hover:bg-blue-600">
+                    class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
                   </button>
                 </div>
