@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ######
 
-GET http://localhost:8000/forum/detail/meu-forum/
+GET http://localhost:8000/forum/detail/ano-novo-200/
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 
@@ -73,7 +73,7 @@ Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ######
 
-GET  http://localhost:8000/forum/event/detail/teste-de-evento/ 
+GET  http://localhost:8000/forum/event/detail/natal-mexicano-4/ 
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 Content-Type: application/json
 
