@@ -5,53 +5,56 @@
       <div class="bg-white h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
-          <div class="absolute top-0 left-0 right-0 h-85" style="background-color: rgba(124, 122, 187, 1);">
-          </div>
+          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
 
-          <!-- Conteúdo do banner -->
-          <div class="relative h-full flex flex-col justify-between">
-            <!-- Área de título e descrição -->
-            <div class="px-6 py-8">
-              <div class="container mx-auto flex flex-col items-start">
-                <!-- Título editável -->
-                <div class="grid grid-cols-2 gap-4 w-full">
-                  <input type="text" v-model="forumData.title" :readonly="!editMode"
-                  class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento">
+            <div class="relative h-full flex flex-col justify-between">
+              <!-- Área de título e descrição -->
+              <div class="px-6 py-8">
+                <div class="container mx-auto flex flex-col items-start">
+                  <!-- Título editável -->
+                  <div class="flex justify-center w-full">
+                    <img src="@/assets/img/1200x400.png" alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
+                  </div>
+                  <div class="grid grid-cols-2 gap-4 w-full">
+                    <input type="text" v-model="forumData.title" :readonly="!editMode"
+                      class="text-white text-3xl font-bold mb-4 bg-transparent border-none w-full col-span-2"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Título do Evento" id="EventTitle">
 
-                  <!-- Descrição editável -->
-                  <textarea v-model="forumData.description" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento" rows="3"></textarea>
+                    <!-- Descrição editável -->
+                    <textarea v-model="forumData.description" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento"
+                      rows="3"></textarea>
 
-                  <textarea v-model="forumData.date" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
+                    <textarea v-model="forumData.date" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="3"></textarea>
 
-                  <textarea v-model="forumData.localization" :readonly="!editMode"
-                  class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                  :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                    <textarea v-model="forumData.localization" :readonly="!editMode"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none pb-6"
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="3"></textarea>
+                  </div>
+                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
                 </div>
-                <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
-                </div>
+              </div>
             </div>
-
             <!-- Botões alinhados ao bottom -->
-            <div class="px-6 pb-4 flex space-x-4 relative z-10">
+            <div class=" flex space-x-4 relative z-10">
               <button type="button" @click="toggleSubscribe"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
               </button>
 
               <button type="button" @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
 
               <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
               </button>
@@ -62,7 +65,7 @@
 
       <div class="bg-white p-6 rounded-lg shadow mb-8">
         <div class="container mx-auto">
-          <h2 class="text-2xl font-bold mb-4">Engaje no Evento!</h2>
+          <h2 class="text-2xl font-bold mb-4">Engaje no fórum!</h2>
 
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
@@ -82,18 +85,45 @@
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
                       <span>📢</span>
                     </button>
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Enquete">
+
+                    <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                      id="pollButton">
                       <span>📊</span>
                     </button>
-                  <button v-if="true" @click="callReview"
-                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
-                    <span>⭐</span>
-                  </button>
+
+                    <div v-if="showPoll" class="mt-4 space-y-2">
+                      <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
+                        <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
+                          :placeholder="`Opção ${index + 1}`">
+                        <button v-if="index >= 2" @click="removePollOption(index)"
+                          class="text-red-500 hover:text-red-600">
+                          ❌
+                        </button>
+                      </div>
+
+                      <div class="flex space-x-2 mt-3">
+                        <button v-if="pollOptions.length < 4" @click="addPollOption"
+                          class="text-blue-500 hover:text-blue-600 text-sm">
+                          + Adicionar opção
+                        </button>
+
+                        <div class="flex space-x-2 ml-auto">
+                          <button @click="cancelPoll"
+                            class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
+                            Cancelar
+                          </button>
+                          <button @click="createPoll"
+                            class="px-4 py-1 bg-blueGray-600 text-white rounded-lg hover:bg-blue-600">
+                            Criar Enquete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <button @click="createComment"
+                  <button v-show="showPostButton" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
-                    Publicar
+                    ✔️
                   </button>
                 </div>
               </div>
@@ -108,8 +138,7 @@
         <div class="w-3/4">
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
-              style="background-color: rgba(124, 122, 187, 1);">
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-comment">
               <div class="flex h-full">
 
                 <!-- Área de votação -->
@@ -132,12 +161,6 @@
                       <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
                       </path>
                     </svg>
-                  </button>
-
-                  <!-- Botão para criar enquete -->
-                  <button @click="showPollCreator = true" class="p-2 hover:bg-gray-100 rounded-full"
-                    title="Criar Enquete">
-                    <span>📊</span>
                   </button>
                 </div>
 
@@ -204,49 +227,42 @@
         </div>
 
         <!-- Sidebar -->
-        <aside class="w-1/4 bg-white p-4 rounded-lg shadow-lg h-fit">
-          <h3 class="text-lg font-semibold mb-4">Informações Adicionais</h3>
-          <div class="space-y-4">
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Participantes</h4>
-              <p class="text-gray-600">{{ forumData.members }} membros ativos</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Avaliação </h4>
-              <p class="text-gray-600">{{ forumData.five_star_mean }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Data do Evento</h4>
-              <p class="text-gray-600">{{ forumData.date }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Local do Evento</h4>
-              <p class="text-gray-600">{{ forumData.localization }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado em</h4>
-              <p class="text-gray-600">{{ forumData.createdAt }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Criado por</h4>
-              <p class="text-gray-600">{{ forumData.creator }}</p>
-            </div>
-            <div class="p-3 bg-gray-50 rounded">
-              <h4 class="font-medium">Popularidade</h4>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{{ forumData.popularity }}</span>
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
+
+          <div class="bg-banner p-4 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
+
+            <div class="space-y-3">
+              <div class="text-sm">
+                <p class="text-white">
+                  <span class="font-medium">Criado por:</span> {{ forumData.creator }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-white">
+                  <span class="font-medium">Criado em:</span> {{ forumData.createdAt }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-white ">
+                  <span class="font-medium">Subscribers:</span> {{ forumData.members }}
+                </p>
+              </div>
+
+              <div class="text-sm">
+                <p class="text-white">
+                  <span class="font-medium">Popularidade:</span> {{ forumData.popularity }}
+                </p>
               </div>
             </div>
           </div>
+
         </aside>
       </div>
-      <ModalReview
-        v-if="isModalOpen"
-        :isModalOpen="isModalOpen"
-        @submitRating="handleRating"
-        @close="isModalOpen = false"
-        @showToast="handleShowToast"
-      />
+      <ModalReview v-if="isModalOpen" :isModalOpen="isModalOpen" @submitRating="handleRating"
+        @close="isModalOpen = false" @showToast="handleShowToast" />
     </div>
   </MainLayout>
 </template>
@@ -261,15 +277,13 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
-import upvoteIcon from '@/assets/img/upvote.png';
-import downvoteIcon from '@/assets/img/downvote.png';
 
-const checkDate = ()=>{
-  if (forumData.value.date < new Date()){
-      return true
-    }
-    return false;
+const checkDate = () => {
+  if (forumData.value.date < new Date()) {
+    return true
   }
+  return false;
+}
 
 const isModalOpen = ref(false);
 const stars = ref(0);
@@ -300,20 +314,20 @@ const handleRating = async (rating) => {
 const toast = useToast();
 const forumData = ref({
   title: '',
-  date:'',
-  localization:'',
+  date: '',
+  localization: '',
   description: '',
   popularity: 0,
   createdAt: '',
   creator: '',
   members: 0,
-  five_star_mean:	0,
+  five_star_mean: 0,
 });
 
 const toggleEdition = async () => {
   editMode.value = !editMode.value;
   if (!editMode.value) {
-    if(new Date(formatDateToISO(forumData.value.date)) <= new Date()){
+    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()) {
       toast.error('Não é possível editar a data de um evento que já ocorreu, ou mover para o passado');
       editMode.value = false;
       return;
@@ -537,6 +551,47 @@ const toggleMenu = (commentId) => {
 };
 
 
+// Enquete  
+const showPostButton = ref(true)
+const showPoll = ref(false)
+const pollOptions = ref([
+  { text: '', votes: 0 },
+  { text: '', votes: 0 }
+])
+
+// Add these methods
+const togglePoll = () => {
+  showPoll.value = !showPoll.value
+  showPostButton.value = !showPoll.value
+}
+
+const addPollOption = () => {
+  if (pollOptions.value.length < 4) {
+    pollOptions.value.push({ text: '', votes: 0 })
+  }
+}
+
+const removePollOption = (index) => {
+  if (index >= 2) { // Only allow removing extra options
+    pollOptions.value.splice(index, 1)
+  }
+}
+
+const cancelPoll = () => {
+  showPoll.value = false
+  showPostButton.value = true
+  pollOptions.value = [
+    { text: '', votes: 0 },
+    { text: '', votes: 0 }
+  ]
+}
+const createPoll = () => {
+  // Add your poll creation logic here
+  console.log('Poll created:', pollOptions.value)
+  showPostButton.value = true
+  cancelPoll()
+}
+
 onMounted(() => {
   fetchEvent();
 });
@@ -579,10 +634,6 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
-
-
-  
-
 </script>
 
 
