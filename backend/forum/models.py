@@ -5,6 +5,10 @@ from user_profile.models import Neighborhood, UserProfile
 from django.db.models import Avg
 
 
+def directory_path(instance, filename):
+    return f'images/banners/{instance.id}/{filename}'
+
+
 class Forum(models.Model):
     class TypeChoices(models.TextChoices):
         DEFAULT = 'D', 'default'
@@ -36,8 +40,8 @@ class Forum(models.Model):
     creation_date = models.DateTimeField(editable=False)
     update_date = models.DateTimeField()
 
-    # Sem banner por enquanto
-    #banner = models.ImageField(upload_to='forum_banners/', blank=True, null=True)
+    banner_image = models.ImageField(upload_to=directory_path, blank=True, null=True)
+    banner_image_low = models.ImageField(upload_to=directory_path, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id:

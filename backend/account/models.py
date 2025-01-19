@@ -6,54 +6,11 @@ from django.db import transaction
 import random
 
 
-def user_directory_path(instance, filename):
-    return f'images/{instance.id}/{filename}'
+def directory_path(instance, filename):
+    return f'images/profiles/{instance.id}/{filename}'
 
 
 class Account(models.Model):
-    """
-    Aggregates user account information and provides methods to manage user states.
-
-    Fields:
-    --------
-    - **user (OneToOneField)**: A one-to-one relationship with the `User` model. Links the account to the user.
-      Deleting the user cascades and deletes the associated account.
-    - **name (CharField)**: The user's first name.
-    - **surname (CharField)**: The user's last name.
-    - **birthday (DateField)**: The user's date of birth.
-    - **cellphone (CharField)**: The user's cellphone number, optional and stored as a string for format flexibility.
-    - **agree_policy (BooleanField)**: Indicates whether the user has agreed to the platform's policies. Must be `True` for account activation.
-    - **email (EmailField)**: The user's email address, unique to each account.
-    - **email_notifications (BooleanField)**: Indicates whether the user allows email notifications. Defaults to `True`.
-    - **last_login (DateTimeField)**: The date and time of the user's last login. Can be `null` if the user never logged in.
-    - **last_activity (DateTimeField)**: The date and time of the user's last recorded activity. Can be `null` if no activity is logged.
-    - **last_password_change (DateTimeField)**: The last date and time the user changed their password. Optional.
-    - **last_neighborhood_change (DateTimeField)**: Tracks when the user last changed their neighborhood. Optional.
-    - **muted (BooleanField)**: Indicates if the user is muted. Defaults to `False`.
-    - **mute_date (DateTimeField)**: The date and time when the user was muted. Optional.
-    - **mute_days (IntegerField)**: Number of days the user will remain muted. Optional.
-    - **mute_count (IntegerField)**: The total number of times the user has been muted. Defaults to `0`.
-    - **suspension_reason (TextField)**: Explains the reason for account suspension. Optional.
-    - **join_date (DateTimeField)**: The date and time when the account was created. Automatically set during creation.
-    - **update_date (DateTimeField)**: The last date and time the account was updated. Automatically updated on each save.
-
-    Methods:
-    --------
-    - **login_active (property)**: Returns `True` if the associated `User` is active, otherwise `False`.
-    - **set_active_user_profile(user_profile: UserProfile)**: Change active user profile.
-    - **mute(days: int)**: Mutes the user for a given number of days and updates mute-related fields.
-    - **unmute()**: Unmutes the user by resetting mute-related fields (`muted`, `mute_date`, `mute_days`).
-    - **ban()**: Deactivates the user by setting their `User`'s `is_active` field to `False`.
-    - **unban()**: Reactivates the user by setting their `User`'s `is_active` field to `True`.
-    - **save(*args, **kwargs)**: Overrides the `save` method to set `join_date` during creation and update `update_date` on every save.
-    - **anonymize(self)**: Anonymizes the user's account by replacing personal data with placeholders.
-    - **__str__()**: Returns the username of the associated `User`.
-
-    Notes:
-    ------
-    This model serves as an extended profile for users, encapsulating additional account-specific data
-    beyond what is provided by Django's default `User` model.
-    """
     class GendersChoices(models.TextChoices):
         FEMALE = 'F', 'Feminino'
         MALE = 'M', 'Masculino'
@@ -68,7 +25,7 @@ class Account(models.Model):
     cellphone = models.CharField(max_length=255, null=True, blank=True)
     biography = models.CharField(max_length=4095, null=True, blank=True)
     agree_policy = models.BooleanField()
-    profile_image = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
+    profile_image = models.ImageField(upload_to=directory_path, null=True, blank=True)
 
     email = models.EmailField(unique=True)
     email_notifications = models.BooleanField(default=True) # Pode vir direto no cadastro
