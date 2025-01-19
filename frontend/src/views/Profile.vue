@@ -26,23 +26,22 @@
                 <div class="flex flex-wrap justify-center">
                   <div class="w-full flex justify-center">
                     <div class="relative">
+                      <input 
+                        type="file" 
+                        ref="fileInput"
+                        accept="image/*"
+                        style="display: none;"
+                        @change="handleImageUpload"
+                      >
                       <img 
                         alt="Foto de Perfil" 
-                        :src="profileImage || team2" 
+                        :src="profileImage || profile" 
                         :value="userStore.user.username"
                         style="width: 200px; height: 200px; min-width: 200px; min-height: 200px; max-width: 200px; max-height: 200px;"
                         class="shadow-xl rounded-full object-cover border-4 border-white transition-transform duration-300"
-                      />
-                      
-                      <!-- Overlay de Upload -->
-                      <div 
-                        v-if="editMode"
-                        class="absolute inset-0 bg-black bg-opacity-30 rounded-full 
-                               flex items-center justify-center opacity-0 group-hover:opacity-100 
-                               transition duration-300"
+                        :class="{ 'cursor-pointer hover:opacity-80': editMode }"
+                        @click="editMode && $refs.fileInput.click()"
                       >
-                     
-                      </div>
                     </div>
                   </div>
                   
@@ -229,12 +228,12 @@ import ModalChangePassword from "../components/Modals/ModalChangePassword.vue";
 import ModalChangeEmail from "../components/Modals/ModalChangeEmail.vue";
 import ModalComplexConfimation from "../components/Modals/ModalComplexConfimation.vue";
 import ModalSimpleConfirmation from "../components/Modals/ModalSimpleConfirmation.vue";
-import { onBeforeMount, reactive } from "vue";
+import { onBeforeMount, reactive, ref } from "vue";
 import { useUserStore } from "../store/user.js";
 import axios from "axios";
 import router from "../router/index.js";
 import { ENDPOINTS } from "../../api.js";
-import team2 from "@/assets/img/team-2-800x800.jpg";
+import profile from "@/assets/img/profilePic.jpg";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -253,7 +252,7 @@ export default {
       profileImage: null,
       errors: {},
       editMode: false,
-      team2,
+      profile,
       isModalNeighChangeOpen: false,
       isModalChangePasswordOpen: false,
       isModalChangeEmailOpen: false,
@@ -265,6 +264,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const toast = useToast();
+    const fileInput = ref(null);
 
     onBeforeMount(() => {
       if (!userStore.user.isAuthenticated) {
@@ -284,10 +284,49 @@ export default {
       status: userStore.user.account.status || "",
     });
 
+    const handleImageUpload = async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Verificar se o arquivo é uma imagem
+      if (!file.type.startsWith('image/')) {
+        toast.error('Por favor, selecione apenas arquivos de imagem.');
+        return;
+      }
+
+      // Verificar o tamanho do arquivo (limite de 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB em bytes
+      if (file.size > maxSize) {
+        toast.error('A imagem deve ter menos de 5MB.');
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('profile_image', file);
+
+        const response = await axios.post(`${ENDPOINTS.UPLOAD_PROFILE_IMAGE}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (response.data.success) {
+          profileImage.value = URL.createObjectURL(file);
+          toast.success('Foto de perfil atualizada com sucesso!');
+        }
+      } catch (error) {
+        console.error('Erro ao fazer upload da imagem:', error);
+        toast.error('Erro ao atualizar a foto de perfil. Tente novamente.');
+      }
+    };
+
     return {
       userStore,
       form,
       toast,
+      fileInput,
+      handleImageUpload,
     };
   },
 
