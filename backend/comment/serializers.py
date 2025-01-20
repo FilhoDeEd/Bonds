@@ -112,63 +112,64 @@ class ReportSerializer(serializers.ModelSerializer):
         except (UserProfile.DoesNotExist, Like.DoesNotExist):
             return 0
 
+
 class OptionSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Option
-        fields = ['option_text']
+        fields = [
+            'id',
+            'option_text',
+            'votes'
+        ]
+        read_only_fields = [
+            'id',
+            'votes'
+        ]
+
 
 class PoolSerializer(serializers.ModelSerializer):
-    
     creator = serializers.CharField(source='get_creator_name', read_only=True)
     post_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-    trust_rate = serializers.SerializerMethodField()
     forum_slug = serializers.SlugRelatedField(
         slug_field='slug',
         read_only=True,
         source='forum'
     )
-    has_liked = serializers.SerializerMethodField()
-    options = OptionSerializer(many=True, write_only=True)
+
+    options = OptionSerializer(many=True, read_only=True)  # Exibe as opções associadas na resposta
 
     class Meta:
-        model = Report
+        model = Pool
         fields = [
             'id',
             'title',
             'content',
             'deadline',
             'post_date',
-            'trust_rate',
             'forum',
             'forum_slug',
             'creator',
-            'has_liked',
-            'type'
+            'options',  # Incluindo 'options' para leitura
         ]
         read_only_fields = [
             'id',
             'post_date',
-            'trust_rate',
             'creator',
             'forum_slug',
-            'has_liked'
         ]
 
+    def create(self, validated_data):
+        # Pega as opções do request
+        options_data = validated_data.pop('options', [])
 
-    def get_trust_rate(self, obj):
-        return obj.trust_rate()
+        # Cria o objeto Pool
+        pool = Pool.objects.create(**validated_data)
 
-    def get_has_liked(self, obj):
-        user = self.context['request'].user
-        
-        if not user.is_authenticated:
-            return 0
+        # Cria as opções associadas à Pool
+        for option_data in options_data:
+            Option.objects.create(pool=pool, **option_data)
 
-        try:
-            account = user.account
-            user_profile = UserProfile.objects.get(account=account, active=True)
-            comment_like = Like.objects.get(comment=obj, user_profile=user_profile)
-            return 1 if comment_like.is_like else -1
-        except (UserProfile.DoesNotExist, Like.DoesNotExist):
-            return 0
-        
+        return pool
+
+

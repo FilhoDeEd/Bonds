@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from forum.models import Forum
 
-from comment.models import Comment, Like, Report
-from comment.serializers import CommentSerializer, ReportSerializer
+from comment.models import Comment, Like, Report, Pool, Option
+from comment.serializers import CommentSerializer, ReportSerializer, PoolSerializer, OptionSerializer
 from user_profile.models import UserProfile
 
 
@@ -315,4 +315,101 @@ class ReportDeleteView(APIView):
         report.delete()
 
         return Response({"detail": "Report deleted successfully."}, status=status.HTTP_200_OK)
-   
+    
+
+class PoolRegisterView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        errors = {}
+
+        # Obter o slug do fórum e buscar o objeto correspondente
+        forum_slug = data.get('forum_slug')
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        data['forum'] = forum.id  # Substituir pelo ID do fórum
+
+        pool_serializer = PoolSerializer(data=data)
+
+        if not pool_serializer.is_valid():
+            add_errors(errors=errors, serializer_errors=pool_serializer.errors)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                account = request.user.account
+                user_profile = UserProfile.objects.get(account=account, active=True)
+
+                # Criar a Pool
+                pool = pool_serializer.save(user_profile=user_profile)
+
+                # Criar as opções associadas
+                options_data = data.get('options', [])
+                for option_data in options_data:
+                    Option.objects.create(pool=pool, **option_data)
+
+        except Exception as e:
+            return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({'detail': 'Pool created successfully.', 'id': pool.id}, status=status.HTTP_201_CREATED)
+
+
+class PoolListView(ListAPIView):
+    """
+    Lista as pools de um fórum específico, filtrando pelo slug do fórum e incluindo as opções associadas.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PoolSerializer
+
+    def get_queryset(self):
+        # Obtém o slug do fórum da URL
+        forum_slug = self.kwargs.get('slug')
+        # Busca o fórum correspondente ou retorna 404
+        forum = get_object_or_404(Forum, slug=forum_slug)
+        # Retorna as pools relacionadas ao fórum encontrado e prefetch as opções associadas
+        return Pool.objects.filter(forum=forum).prefetch_related('options')
+    
+class VoteOptionView(APIView):
+    """
+    View para registrar um voto em uma opção.
+    """
+    def post(self, request, option_id):  # Altere 'pk' para 'option_id' para coincidir com a URL
+        # Obtém a opção pelo ID (option_id) ou retorna 404 se não encontrada
+        option = get_object_or_404(Option, id=option_id)
+
+        # Incrementa o número de votos
+        option.votes += 1
+        option.save()
+
+        # Retorna os detalhes da opção atualizada
+        return Response({
+            'id': option.id,
+            'option_text': option.option_text,
+            'votes': option.votes,
+        }, status=status.HTTP_200_OK)
+    
+class UnvoteOptionView(APIView):
+    """
+    View para remover um voto de uma opção.
+    """
+    def post(self, request, option_id):
+        # Obtém a opção pelo ID (option_id) ou retorna 404 se não encontrada
+        option = get_object_or_404(Option, id=option_id)
+
+        # Verifica se o número de votos é maior que 0 antes de decrementar
+        if option.votes > 0:
+            option.votes -= 1
+            option.save()
+            return Response({
+                'id': option.id,
+                'option_text': option.option_text,
+                'votes': option.votes,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'detail': "O número de votos já é 0 e não pode ser decrementado.",
+            }, status=status.HTTP_400_BAD_REQUEST)
