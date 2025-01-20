@@ -16,7 +16,7 @@
                     <input type="file" ref="fileInput" accept="image/*" style="display: none;" @change="updateBanner">
                     <!-- Imagem do banner -->
                     <img :src="forumData.banner_image || require('@/assets/img/1200x400.png')" alt="Event banner"
-                      class="w-4/5 h-95-px  object-cover rounded-lg shadow-lg cursor-pointer mb-4"
+                      class="w-4/5 h-95-px object-contain rounded-lg shadow-lg cursor-pointer mb-4"
                       :class="{ 'hover:opacity-80': editMode }" @click="editMode && $refs.fileInput.click()">
                   </div>
 
