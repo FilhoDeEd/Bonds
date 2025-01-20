@@ -1831,6 +1831,10 @@ select {
   height: 6rem;
 }
 
+.h-28 {
+  height: 7rem;
+}
+
 .h-350-px {
   height: 350px;
 }
@@ -1851,6 +1855,9 @@ select {
   height: 850px;
 }
 
+.h-85 {
+  height: 85%;
+}
 
 .h-70-px {
   height: 300px;
@@ -1888,12 +1895,32 @@ select {
   height: 20%;
 }
 
+.h-1\/20{
+  height: 2%;
+}
+
+.h-400-px {
+  height: 400px;
+}
+
+.h-450-px {
+  height: 450px;
+}
+
 .h-screen {
   height: 100vh;
 }
 
 .max-h-860-px {
   max-height: 860px;
+}
+
+.max-h-400-px {
+  max-height: 400px;
+}
+
+.max-h-450-px {
+  max-height: 450px;
 }
 
 .min-h-\[800px\] {
