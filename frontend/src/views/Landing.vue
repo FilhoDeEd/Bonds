@@ -32,8 +32,8 @@
                   <img 
                     :src="forum.banner_image_low || banner_list_default" 
                     alt="Forum image" 
-                    class="object-cover w-full h-48" 
-                    style="max-width: 100%; max-height: 150px; object-fit: cover;" />
+                    class="object-fit w-full h-48" 
+                    style="max-width: 100%; max-height: 150px;" />
                 </div>
                   <!-- Conteúdo à direita -->
                   <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
@@ -44,7 +44,7 @@
                           {{ forum.title }}
                         </h2>
                         <h3>Evento</h3>
-                        <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                        <div class="text-2xl text-gray-100 flex flex-col justify-end flex-grow w-half">
                           <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
                           <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
                         </div>

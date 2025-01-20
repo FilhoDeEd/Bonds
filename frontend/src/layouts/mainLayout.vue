@@ -81,8 +81,6 @@ const searchQuery = ref("");
 
 const menuItems = [
     { id: "home", icon: "home", title: "Página Inicial", path: "/home" },
-    { id: "forums", icon: "forum", title: "Fóruns", path: "/forums" },
-
     { id: "about", icon: "info", title: "Sobre", path: "/about" }
 ];
 

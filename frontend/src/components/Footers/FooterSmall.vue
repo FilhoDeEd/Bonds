@@ -40,6 +40,14 @@
                 MIT License
               </a>
             </li>
+            <li>
+              <a
+                href="https://github.com/creativetimofficial/vue-notus/blob/main/LICENSE.md?ref=vn-footer-small"
+                class="text-white hover:text-blueGray-300 text-sm font-semibold block py-1 px-3"
+              >
+                Esqueci minha senha
+              </a>
+            </li>
           </ul>
         </div>
       </div>
