@@ -146,7 +146,7 @@ class ForumBannerEditView(APIView):
             return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
 
         img_low_res = img.copy()
-        img_low_res.thumbnail((600, 200))
+        img_low_res.thumbnail((800, 800))  # Definindo um tamanho máximo para a miniatura, por exemplo, 800x800
         low_res_io = BytesIO()
         img_low_res.save(low_res_io, format='JPEG')
         low_res_io.seek(0)
@@ -159,10 +159,6 @@ class ForumBannerEditView(APIView):
                     old_image_path = forum.banner_image.path
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
-
-                    old_image_low_path = forum.banner_image_low.path
-                    if os.path.exists(old_image_low_path):
-                        os.remove(old_image_low_path)
 
                 forum.banner_image = image
                 forum.banner_image_low = low_res_image
