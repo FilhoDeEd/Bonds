@@ -3,6 +3,11 @@ from user_profile.models import UserProfile
 from django.utils import timezone
 from forum.models import Forum
 
+
+def directory_path(instance, filename):
+    return f'images/comments/{instance.id}/{filename}'
+
+
 class Comment(models.Model):
     class TypeChoices(models.TextChoices):
         COMMENT = 'C', 'comment'
@@ -12,8 +17,8 @@ class Comment(models.Model):
     type = models.CharField(max_length=10, choices=TypeChoices.choices, default=TypeChoices.COMMENT)
     content = models.CharField(max_length=500)
     post_date = models.DateTimeField(auto_now_add=True) 
-    # image = models.ForeignKey('ImageModel', on_delete=models.SET_NULL, null=True, blank=True)  
     denunciations = models.PositiveIntegerField(default=0)  
+    image = models.ImageField(upload_to=directory_path, blank=True, null=True)
 
     ## confirmar esse on_delete CASCADE
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE) 
@@ -124,3 +129,11 @@ class Option(models.Model):
 
     def __str__(self):
         return f"{self.option_text} ({self.votes} votos)"
+    
+class Vote(models.Model):
+
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
+    option = models.ForeignKey(Option, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('user_profile', 'option')

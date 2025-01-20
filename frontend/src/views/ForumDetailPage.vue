@@ -199,10 +199,14 @@
                     </div>
                   </div>
 
-                  <!-- Título ou nome do autor -->
-                  <div class="flex items-center mb-8 ml-auto">
-                    <!-- Imagem do autor (à direita) -->
-                    <img :src="authorImage" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover mr-3">
+                    <!-- Título ou nome do autor -->
+                    <div class="flex items-center mb-8 ml-auto">
+                      <!-- Imagem do autor (à direita) -->
+                      <img 
+                      :src="comment.author_image || profile"
+                      alt="Imagem do autor" 
+                      class="w-10 h-10 rounded-full object-cover mr-3"
+                      >
 
                     <!-- Nome do criador -->
                     <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
@@ -603,6 +607,8 @@ const fetchComments = async () => {
       creator: comment.creator,
       trust_rate: comment.trust_rate,
       has_liked: comment.has_liked,
+      image: comment.image,
+      author_image: comment.author_image
     }));
     //toast.success('Comentários carregados com sucesso');
   } catch (error) {
@@ -625,6 +631,8 @@ const fetchReports = async () => {
       tag: reports.tag,
       solved: reports.solved,
       location: reports.location,
+      image: reports.image,
+      author_image: reports.author_image
     }));
     //toast.success('Comentários carregados com sucesso');
   } catch (error) {
@@ -862,10 +870,6 @@ onUnmounted(() => {
 
 const profileImage = computed(() => {
   return userStore.user.account.profile_image || profile;
-});
-
-const authorImage = computed(() => {
-  return profile;
 });
 
 const updateBanner = async (event) => {
