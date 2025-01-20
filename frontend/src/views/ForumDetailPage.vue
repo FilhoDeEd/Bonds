@@ -835,7 +835,7 @@ const formPoll = {
     option: "",
   }]
 }
-
+const showPollCreator = ref(false);
 const showPostButton = ref(true)
 const showPoll = ref(false)
 const pollOptions = ref([])
