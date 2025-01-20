@@ -3798,6 +3798,10 @@ select {
   padding-left: 5rem;
 }
 
+.pl-64 {
+  padding-left: 16rem;
+}
+
 .pl-3 {
   padding-left: 0.75rem;
 }
@@ -5508,4 +5512,8 @@ textarea[readonly] {
   font-family: "Josefin Sans", sans-serif;
   font-weight: 700;
   font-style: italic;
+}
+
+.h-sideNavigation {
+  height: calc(100vh - 6rem);
 }
