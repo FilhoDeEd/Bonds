@@ -12,7 +12,7 @@ from rest_framework import status
 from forum.models import Forum
 
 from comment.models import Comment, Like, Report, Pool, Option
-from comment.serializers import CommentSerializer, ReportSerializer, PoolSerializer, OptionSerializer
+from comment.serializers import CommentSerializer, ReportSerializer, PoolSerializer, OptionSerializer, PoolEditSerializer
 from user_profile.models import UserProfile
 
 
@@ -355,6 +355,41 @@ class PoolRegisterView(APIView):
             return Response({'detail': f'An unexpected error occurred. {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'detail': 'Pool created successfully.', 'id': pool.id}, status=status.HTTP_201_CREATED)
+
+
+
+class PoolEditView(APIView):
+    """
+    View para editar os campos title, content e deadline de uma Pool usando POST.
+    """
+    def post(self, request, pool_id):
+        # Obtém o Pool pelo ID (pk) ou retorna 404 se não encontrado
+        pool = get_object_or_404(Pool, id=pool_id)
+
+        # Usa o serializer para validar e atualizar os dados
+        serializer = PoolEditSerializer(pool, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            # Salva as alterações no objeto Pool
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PoolDeleteView(APIView):
+    """
+    View para deletar uma Pool com base no ID (pk), utilizando o método POST.
+    """
+    def post(self, request, pool_id):
+        # Obtém o Pool pelo ID (pool_id) ou retorna 404 se não encontrado
+        pool = get_object_or_404(Pool, id=pool_id)
+
+        # Exclui o Pool
+        pool.delete()
+
+        # Retorna uma resposta de sucesso
+        return Response({"message": "Pool deletada com sucesso."}, status=status.HTTP_204_NO_CONTENT)
 
 
 class PoolListView(ListAPIView):

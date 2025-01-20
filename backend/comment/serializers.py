@@ -173,3 +173,10 @@ class PoolSerializer(serializers.ModelSerializer):
         return pool
 
 
+class PoolEditSerializer(serializers.ModelSerializer):
+    """
+    Serializer para editar apenas os campos title, content e deadline de uma Pool.
+    """
+    class Meta:
+        model = Pool
+        fields = ['title', 'content', 'deadline']
