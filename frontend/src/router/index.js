@@ -7,7 +7,6 @@ import AboutPage from '../views/AboutPage.vue'
 // layouts
 import mainLayout from '@/layouts/mainLayout.vue'
 //visualizar forum
-import ForumList from "@/views/ForumList.vue";
 import ForumDetailPage from "@/views/ForumDetailPage.vue";
 
 import Landing from '@/views/Landing.vue'
@@ -95,11 +94,6 @@ const routes = [
     path: "/profile",
     component: Profile,
     name: 'Profile',
-  },
-  {
-    path: "/forums",
-    component: ForumList,
-    name: 'ForumList',
   },
   //para o Edson ter algo com que trabalhar.
   {
