@@ -1,7 +1,25 @@
+import re
+import os
+
 from forum.models import Forum, Event, Review
 from rest_framework import serializers
 from user_profile.models import UserProfile
 from forum.models import Subscriber
+from django.conf import settings
+
+
+def get_default_forum_image_url(slug):
+    clean_slug = re.sub(r'-\d+$', '', slug)
+
+    images_dir = os.path.join(settings.MEDIA_ROOT, 'default_forum_images')
+
+    if not os.path.exists(images_dir):
+        return None
+
+    url = f'/media/default_forum_images/{clean_slug}.png'
+
+    return url
+
 
 class ForumSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source='get_creator_name', read_only=True)
@@ -27,6 +45,12 @@ class ForumSerializer(serializers.ModelSerializer):
 
     def get_banner_image(self, obj):
         request = self.context.get('request')
+
+        if obj.type == Forum.TypeChoices.DEFAULT:
+            image_path =  get_default_forum_image_url(obj.slug)
+            if image_path:
+                return request.build_absolute_uri(image_path) if request else image_path
+
         if obj.banner_image:
             return request.build_absolute_uri(obj.banner_image.url) if request else obj.banner_image.url
         return None
@@ -66,6 +90,12 @@ class ForumListSerializer(serializers.ModelSerializer):
 
     def get_banner_image_low(self, obj):
         request = self.context.get('request')
+
+        if obj.type == Forum.TypeChoices.DEFAULT:
+            image_path =  get_default_forum_image_url(obj.slug)
+            if image_path:
+                return request.build_absolute_uri(image_path) if request else image_path
+
         if obj.banner_image_low:
             return request.build_absolute_uri(obj.banner_image_low.url) if request else obj.banner_image_low.url
         return None
@@ -130,6 +160,12 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_banner_image(self, obj):
         request = self.context.get('request')
+
+        if obj.type == Forum.TypeChoices.DEFAULT:
+            image_path =  get_default_forum_image_url(obj.slug)
+            if image_path:
+                return request.build_absolute_uri(image_path) if request else image_path
+
         if obj.banner_image:
             return request.build_absolute_uri(obj.banner_image.url) if request else obj.banner_image.url
         return None
