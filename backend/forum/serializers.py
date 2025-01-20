@@ -95,7 +95,7 @@ class ForumEditSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     is_sub = serializers.SerializerMethodField(method_name='get_is_sub')
     did_review = serializers.SerializerMethodField(method_name='get_did_review')
-
+    banner_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -112,7 +112,8 @@ class EventSerializer(serializers.ModelSerializer):
             'update_date',
             'creator',
             'is_sub',
-            'did_review'
+            'did_review',
+            'banner_image'
         ]
         read_only_fields = [
             'id',
@@ -121,10 +122,17 @@ class EventSerializer(serializers.ModelSerializer):
             'creation_date',
             'update_date',
             'creator',
-            'is_sub'
+            'is_sub',
+            'banner_image'
         ]
 
     creator = serializers.CharField(source='get_creator_name', read_only=True)
+
+    def get_banner_image(self, obj):
+        request = self.context.get('request')
+        if obj.banner_image:
+            return request.build_absolute_uri(obj.banner_image.url) if request else obj.banner_image.url
+        return None
 
     def get_is_sub(self, obj):
         user = self.context['request'].user

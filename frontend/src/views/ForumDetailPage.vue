@@ -4,60 +4,81 @@
       <!-- Banner Section -->
       <div class="bg-basic h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
-          <!-- Área colorida do banner - aumentada para 85% -->
+          <!-- Área colorida do banner -->
           <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
-              <div class="px-6 py-8">
-                <div class="container mx-auto flex flex-col items-start">
-                  <!-- Banner do evento -->
-                  <div class="flex justify-center w-full">
-                    <img src="@/assets/img/1200x400.png" alt="Event banner"
-                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
-                  </div>
-                  
-                  <!-- Grid 2x2 para informações do evento -->
-                  <div class="grid grid-cols-2 gap-4 w-full">
-                    <!-- Título - Primeira coluna, primeira linha -->
-                    <textarea v-model="forumData.title" :readonly="!editMode"
-                      class="text-white text-base font-bold mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Título do Fórum" 
-                      id="EventTitle">
-                    </textarea>
+              <div class="px-6 py-6">
+                <div class="container mx-auto flex flex-col items-start space-y-4">
+                  <!-- Título do Fórum -->
+                  <textarea 
+                    v-model="forumData.title"
+                    :readonly="!editMode"
+                    class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
+                    :placeholder="editMode ? 'Título do Fórum' : ''"
+                    style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
+                    :class="{ 'cursor-text hover:bg-gray-700/30': editMode }">
+                  </textarea>
 
-                    <!-- Descrição - Primeira coluna, segunda linha -->
-                    <textarea v-model="forumData.description" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Descrição do Evento"
-                      rows="3">
-                    </textarea>
+                  <!-- Banner do evento -->
+                  <div class="flex justify-center w-full relative">
+                    <!-- Campo de arquivo oculto -->
+                    <input 
+                      type="file" 
+                      ref="fileInput"
+                      accept="image/*"
+                      style="display: none;" 
+                      @change="updateBanner"
+                    >
+
+                    <!-- Imagem do banner -->
+                    <img 
+                      :src="forumData.banner_image || require('@/assets/img/1200x400.png')" 
+                      alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg cursor-pointer"
+                      :class="{ 'hover:opacity-80': editMode }"
+                      @click="editMode && $refs.fileInput.click()"
+                    >
                   </div>
-                  
-                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+
+                  <!-- Descrição do Fórum -->
+                  <textarea 
+                    v-model="forumData.description" 
+                    :readonly="!editMode"
+                    class="text-white text-base bg-transparent border-none w-full resize-none"
+                    :class="{ 'hover:bg-gray-700/30': editMode }" 
+                    placeholder="Descrição do Fórum"
+                    rows="2"
+                    style="line-height: 1.4; padding: 4px 8px; height: auto; min-height: 60px;">
+                  </textarea>
                 </div>
               </div>
-            </div>
-            <!-- Botões alinhados ao bottom -->
-            <div class=" flex space-x-4 relative z-10">
-              <button type="button" @click="toggleSubscribe"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
-                style="background-color: rgb(252, 3, 94);">
-                {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
-              </button>
 
-              <button type="button" @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
-                style="background-color: rgb(252, 3, 94);">
-                {{ editMode ? 'Salvar' : 'Editar' }}
-              </button>
+              <!-- Botões alinhados ao bottom -->
+              <div class="flex space-x-4 px-6 pb-4 items-center justify-start">
+                <button 
+                  type="button" 
+                  @click="toggleSubscribe"
+                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                  style="background-color: rgb(252, 3, 94);">
+                  {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
+                </button>
 
-              <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
-                style="background-color: rgb(252, 3, 94);">
-                Denunciar
-              </button>
+                <button 
+                  type="button" 
+                  @click="toggleEdition"
+                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                  style="background-color: rgb(252, 3, 94);">
+                  {{ editMode ? 'Salvar' : 'Editar' }}
+                </button>
+
+                <button 
+                  type="button"
+                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200" 
+                  style="background-color: rgb(252, 3, 94);">
+                  Denunciar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -564,15 +585,18 @@ const formatDate = (dateString) => {
 const fetchForum = async () => {
   try {
     const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${slug.value}/`);
+    const currentBanner = forumData.value.banner_image;
+    
     forumData.value = {
+      ...forumData.value,
       title: response.data.title,
       description: response.data.description,
       popularity: response.data.popularity,
       createdAt: formatDate(response.data.creation_date),
       creator: response.data.creator,
       members: response.data.subscribers_count,
-      tempContent: "",
       isSubscribed: response.data.is_sub,
+      banner_image: response.data.banner_image || currentBanner,
     };
     await fetchComments();
     subscribed();
@@ -867,6 +891,50 @@ const profileImage = computed(() => {
 const authorImage = computed(() => {
   return profile;
 });
+
+const updateBanner = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhum arquivo selecionado");
+    return;
+  }
+
+  // Validação do arquivo (opcional)
+  const maxFileSize = 5 * 1024 * 1024; // 5 MB
+  const allowedTypes = ["image/jpeg", "image/png"];
+
+  if (file.size > maxFileSize) {
+    toast.error("O arquivo excede o limite de 5 MB");
+    return;
+  }
+
+  if (!allowedTypes.includes(file.type)) {
+    toast.error("Formato de arquivo inválido. Apenas JPEG e PNG são permitidos.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await axios.post(
+      `${ENDPOINTS.EDIT_BANNER_IMAGE}/${slug.value}/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Atualiza a imagem do banner no frontend
+    forumData.value.banner_image = response.data.image_url;
+    toast.success("Banner atualizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar o banner:", error.response || error);
+    toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+  }
+};
 </script>
 
 
