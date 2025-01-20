@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from forum.models import Forum
 
-from comment.models import Comment, Like, Report, Pool, Option
-from comment.serializers import CommentSerializer, ReportSerializer, PoolSerializer, OptionSerializer
+from comment.models import Comment, Like, Report, Pool, Option, Vote
+from comment.serializers import CommentSerializer, ReportSerializer, PoolSerializer, OptionSerializer, PoolEditSerializer
 from user_profile.models import UserProfile
 
 
@@ -357,6 +357,41 @@ class PoolRegisterView(APIView):
         return Response({'detail': 'Pool created successfully.', 'id': pool.id}, status=status.HTTP_201_CREATED)
 
 
+
+class PoolEditView(APIView):
+    """
+    View para editar os campos title, content e deadline de uma Pool usando POST.
+    """
+    def post(self, request, pool_id):
+        # Obtém o Pool pelo ID (pk) ou retorna 404 se não encontrado
+        pool = get_object_or_404(Pool, id=pool_id)
+
+        # Usa o serializer para validar e atualizar os dados
+        serializer = PoolEditSerializer(pool, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            # Salva as alterações no objeto Pool
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PoolDeleteView(APIView):
+    """
+    View para deletar uma Pool com base no ID (pk), utilizando o método POST.
+    """
+    def post(self, request, pool_id):
+        # Obtém o Pool pelo ID (pool_id) ou retorna 404 se não encontrado
+        pool = get_object_or_404(Pool, id=pool_id)
+
+        # Exclui o Pool
+        pool.delete()
+
+        # Retorna uma resposta de sucesso
+        return Response({"message": "Pool deletada com sucesso."}, status=status.HTTP_204_NO_CONTENT)
+
+
 class PoolListView(ListAPIView):
     """
     Lista as pools de um fórum específico, filtrando pelo slug do fórum e incluindo as opções associadas.
@@ -375,41 +410,73 @@ class PoolListView(ListAPIView):
     
 class VoteOptionView(APIView):
     """
-    View para registrar um voto em uma opção.
+    View para registrar um voto em uma opção, vinculado ao usuário.
     """
-    def post(self, request, option_id):  # Altere 'pk' para 'option_id' para coincidir com a URL
-        # Obtém a opção pelo ID (option_id) ou retorna 404 se não encontrada
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, option_id):
+        # Obter o perfil do usuário logado
+        try:
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({'detail': 'Perfil de usuário ativo não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Obter a opção pelo ID ou retornar 404
         option = get_object_or_404(Option, id=option_id)
 
-        # Incrementa o número de votos
+        # Verificar se o usuário já votou nesta opção
+        if Vote.objects.filter(user_profile=user_profile, option=option).exists():
+            return Response({'detail': 'Você já votou nesta opção.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Criar o registro de voto
+        Vote.objects.create(user_profile=user_profile, option=option)
+
+        # Incrementar o número de votos na opção
         option.votes += 1
         option.save()
 
-        # Retorna os detalhes da opção atualizada
+        return Response({
+            'id': option.id,
+            'option_text': option.option_text,
+            'votes': option.votes,
+        }, status=status.HTTP_201_CREATED)
+
+
+class UnvoteOptionView(APIView):
+    """
+    View para remover um voto de uma opção, vinculado ao usuário.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, option_id):
+        # Obter o perfil do usuário logado
+        try:
+            account = request.user.account
+            user_profile = UserProfile.objects.get(account=account, active=True)
+        except UserProfile.DoesNotExist:
+            return Response({'detail': 'Perfil de usuário ativo não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Obter a opção pelo ID ou retornar 404
+        option = get_object_or_404(Option, id=option_id)
+
+        # Verificar se o usuário votou nesta opção
+        vote = Vote.objects.filter(user_profile=user_profile, option=option).first()
+        if not vote:
+            return Response({'detail': 'Você ainda não votou nesta opção.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Remover o registro de voto
+        vote.delete()
+
+        # Decrementar o número de votos na opção, se maior que 0
+        if option.votes > 0:
+            option.votes -= 1
+            option.save()
+
         return Response({
             'id': option.id,
             'option_text': option.option_text,
             'votes': option.votes,
         }, status=status.HTTP_200_OK)
-    
-class UnvoteOptionView(APIView):
-    """
-    View para remover um voto de uma opção.
-    """
-    def post(self, request, option_id):
-        # Obtém a opção pelo ID (option_id) ou retorna 404 se não encontrada
-        option = get_object_or_404(Option, id=option_id)
-
-        # Verifica se o número de votos é maior que 0 antes de decrementar
-        if option.votes > 0:
-            option.votes -= 1
-            option.save()
-            return Response({
-                'id': option.id,
-                'option_text': option.option_text,
-                'votes': option.votes,
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                'detail': "O número de votos já é 0 e não pode ser decrementado.",
-            }, status=status.HTTP_400_BAD_REQUEST)

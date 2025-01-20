@@ -124,3 +124,11 @@ class Option(models.Model):
 
     def __str__(self):
         return f"{self.option_text} ({self.votes} votos)"
+    
+class Vote(models.Model):
+
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.PROTECT)
+    option = models.ForeignKey(Option, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('user_profile', 'option')
