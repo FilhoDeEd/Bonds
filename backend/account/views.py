@@ -1,7 +1,9 @@
+from io import BytesIO
 import os
 from account.serializers import AccountSerializer, UserSerializer, UpdateAccountBaseSerializer
 from PIL import Image
 from typing import Dict
+from django.core.files.base import ContentFile
 
 from django.contrib.auth import authenticate
 from django.core.validators import validate_email
@@ -228,6 +230,14 @@ class UpdateAccountProfileImage(APIView):
         except Exception:
             return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        img_low_res = img.copy()
+        img_low_res.thumbnail((160, 160))
+        low_res_io = BytesIO()
+        img_low_res.save(low_res_io, format='JPEG')
+        low_res_io.seek(0)
+
+        low_res_image = ContentFile(low_res_io.read(), name=f'low_res_{image.name}')
+
         try:
             with transaction.atomic():
                 account = request.user.account
@@ -237,7 +247,12 @@ class UpdateAccountProfileImage(APIView):
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
 
+                    old_image_low_path = account.profile_image_low.path
+                    if os.path.exists(old_image_low_path):
+                        os.remove(old_image_low_path)
+
                 account.profile_image = image
+                account.profile_image_low = low_res_image
                 account.save()
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

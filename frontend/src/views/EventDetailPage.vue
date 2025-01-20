@@ -10,22 +10,38 @@
               <!-- Área de título e descrição -->
               <div class="px-6 py-8">
                 <div class="container mx-auto flex flex-col items-start">
-                  <!-- Banner do evento -->
-                  <div class="flex justify-center w-full">
-                    <img src="@/assets/img/1200x400.png" alt="Event banner"
-                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
-                  </div>
-                  
-                  <!-- Grid 2x2 para informações do evento -->
-                  <div class="grid grid-cols-2 gap-4 w-full">
-                    <!-- Título - Primeira coluna, primeira linha -->
-                    <textarea v-model="forumData.title" :readonly="!editMode"
-                      class="text-white text-base font-bold mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Título do Evento" 
-                      id="EventTitle">
-                    </textarea>
+                  <!-- Título do Fórum -->
+                  <textarea 
+                    v-model="forumData.title"
+                    :readonly="!editMode"
+                    class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
+                    :placeholder="editMode ? 'Título do Fórum' : ''"
+                    style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
+                    :class="{ 'cursor-text hover:bg-gray-700/30': editMode }">
+                  </textarea>
 
+                  <!-- Banner do evento -->
+                  <div class="flex justify-center w-full relative">
+                    <!-- Campo de arquivo oculto -->
+                    <input 
+                      type="file" 
+                      ref="fileInput"
+                      accept="image/*"
+                      style="display: none;" 
+                      @change="updateBanner"
+                    >
+
+                    <!-- Imagem do banner -->
+                    <img 
+                      :src="forumData.banner_image || require('@/assets/img/1200x400.png')" 
+                      alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg cursor-pointer"
+                      :class="{ 'hover:opacity-80': editMode }"
+                      @click="editMode && $refs.fileInput.click()"
+                    >
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4 w-full">
                     <!-- Localização - Segunda coluna, primeira linha -->
                     <textarea v-model="forumData.localization" :readonly="!editMode"
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
@@ -88,7 +104,7 @@
           <!-- Área de criação de post -->
           <div class="border rounded-lg p-4">
             <div class="flex items-start space-x-4">
-              <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full" alt="Seu perfil">
+              <img :src="profileImage" class="w-10 h-10 rounded-full" alt="Seu perfil">
               <div class="flex-1">
                 <textarea v-model="newCommentContent"
                   class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
@@ -184,14 +200,6 @@
                   </button>
                 </div>
 
-                <!-- Imagem do autor do comentário -->
-                <div class="w-1/4 h-70-px flex flex-col pt-12 ">
-                  <img src="https://via.placeholder.com/300x200" alt="Imagem do autor" class="object-cover w-full"
-                    style="height: 70%;">
-
-
-                </div>
-
                 <!-- Conteúdo do comentário -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-black flex flex-col h-full justify-between">
@@ -222,7 +230,17 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <h2 class="text-lg text-black font-semibold mb-8">{{ comment.creator }}</h2>
+                    <div class="flex items-center mb-8 ml-auto">
+                      <!-- Imagem do autor (à direita) -->
+                      <img 
+                      :src="authorImage" 
+                      alt="Imagem do autor" 
+                      class="w-10 h-10 rounded-full object-cover mr-3"
+                      >
+
+                      <!-- Nome do criador -->
+                      <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
+                    </div>
 
                     <div class="text-lg text-black flex flex-col justify-between flex-grow">
                       <!-- Exibição do comentário -->
@@ -302,6 +320,12 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
+import { computed } from "vue";
+import { useUserStore } from "../store/user.js";
+
+import profile from "@/assets/img/profilePic.jpg";
+
+const userStore = useUserStore();
 
 const isModalOpen = ref(false);
 const stars = ref(0);
@@ -423,6 +447,7 @@ const fetchEvent = async () => {
       five_star_mean: response.data.five_star_mean,
       isSubscribed: response.data.is_sub,
       did_review: response.data.did_review,
+      banner_image: response.data.banner_image || '', // Adiciona a imagem do banner
     };
     await fetchComments();
     subscribed();
@@ -434,6 +459,7 @@ const fetchEvent = async () => {
     router.push('/home');
   }
 };
+
 const subscribed = () => {
   if (forumData.value.isSubscribed == 1) {
     isSubscribed.value = true;
@@ -680,6 +706,58 @@ watch(
 onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
+
+const profileImage = computed(() => {
+  return userStore.user.account.profile_image || profile;
+});
+
+const authorImage = computed(() => {
+  return profile;
+});
+
+const updateBanner = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhum arquivo selecionado");
+    return;
+  }
+
+  // Validação do arquivo (opcional)
+  const maxFileSize = 5 * 1024 * 1024; // 5 MB
+  const allowedTypes = ["image/jpeg", "image/png"];
+
+  if (file.size > maxFileSize) {
+    toast.error("O arquivo excede o limite de 5 MB");
+    return;
+  }
+
+  if (!allowedTypes.includes(file.type)) {
+    toast.error("Formato de arquivo inválido. Apenas JPEG e PNG são permitidos.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await axios.post(
+      `${ENDPOINTS.EDIT_BANNER_IMAGE}/${slug.value}/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Atualiza a imagem do banner no frontend
+    forumData.value.banner_image = response.data.image_url;
+    toast.success("Banner atualizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar o banner:", error.response || error);
+    toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+  }
+};
 </script>
 
 

@@ -29,8 +29,11 @@
               <div class="flex h-full">
                 <!-- Imagem à esquerda -->
                 <div class="w-1/4 flex items-center">
-                  <img src="https://via.placeholder.com/300x200" alt="Forum image" class="object-cover w-full"
-                    style="height: 70%;" />
+                  <img 
+                    :src="forum.banner_image_low || banner_list_default" 
+                    alt="Forum image" 
+                    class="object-cover w-full h-48" 
+                    style="max-width: 100%; max-height: 150px; object-fit: cover;" />
                 </div>
                   <!-- Conteúdo à direita -->
                   <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
@@ -103,6 +106,7 @@ import InfiniteLoading from "v3-infinite-loading/lib/v3-infinite-loading.es.js";
 import "v3-infinite-loading/lib/style.css";
 import ModalCreateForum from "../components/Modals/ModalCreateForum.vue";
 import ModalCreateEvent from "../components/Modals/ModalCreateEvent.vue";
+import banner_list_default from "@/assets/img/placeholder_banner_list.png";
 
 export default {
   name: "Landing",
@@ -149,6 +153,7 @@ export default {
 
     return {
       forumListStore,
+      banner_list_default,
       onLoadMore,
     };
   },
