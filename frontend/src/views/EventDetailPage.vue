@@ -347,7 +347,7 @@ const handleRating = async (rating) => {
     toast.error("Você já avaliou este evento.");
   }
 };
-const isReview = ref(true);
+const isReview = ref(false);
 
 const checkDate = () =>{
   if (forumData.value.date){
@@ -359,9 +359,10 @@ const checkDate = () =>{
         isReview.value = false;
       }
       
-    }    
+    }  
+      
   }
-  console.log(isReview.value)
+  //console.log(isReview.value)
 }
 const toast = useToast();
 const forumData = ref({
@@ -419,7 +420,18 @@ const slug = ref(route.params.slug);
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  date.setDate(date.getDate() + 1); // Add one day to the date
+  date.setDate(date.getDate()); // Add one day to the date
+  return new Intl.DateTimeFormat('pt-BR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
+};
+
+const formatDateSpecific = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  date.setDate(date.getDate() +1); // Add one day to the date
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
     month: 'long',
@@ -438,7 +450,7 @@ const fetchEvent = async () => {
       creator: response.data.creator,
       members: response.data.subscribers_count,
       tempContent: "",
-      date: formatDate(response.data.date),
+      date: formatDateSpecific(response.data.date),
       localization: response.data.location,
       five_star_mean: response.data.five_star_mean,
       isSubscribed: response.data.is_sub,

@@ -80,10 +80,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
-  background: #007bff;
+  background: #ff0000c6;
+  border-color: black;
   color: white;
   padding: 20px;
   width: 400px;
@@ -126,22 +128,29 @@ h2 {
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
 }
 
-.confirm-btn,
-.cancel-btn {
+.confirm-btn{
   padding: 10px 20px;
   border-radius: 5px;
   border: 2px solid white;
-  background: transparent;
+  color: white;
+  cursor: pointer;
+  background-color: rgb(0, 128, 0);
+}
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: grey;
+  border: 2px solid white;
   color: white;
   cursor: pointer;
 }
 
 .confirm-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.8;
   cursor: not-allowed;
 }
 </style>
