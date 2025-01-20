@@ -67,7 +67,7 @@
               <button type="button"
                 v-show="checkOwnership(forumData.creator)"
                 @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
