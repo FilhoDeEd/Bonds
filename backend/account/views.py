@@ -1,14 +1,19 @@
-from io import BytesIO
 import os
+
+from io import BytesIO
+from account.models import Account
 from account.serializers import AccountSerializer, UserSerializer, UpdateAccountBaseSerializer
 from PIL import Image
-from typing import Dict
-from django.core.files.base import ContentFile
+from typing import Any, Dict
 
+from django.conf import settings
 from django.contrib.auth import authenticate
+from django.core.files.base import ContentFile
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
+from django.template.loader import render_to_string
 
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -22,6 +27,7 @@ from user_profile.serializers import UserProfileSerializer, NeighborhoodSerializ
 from user_profile.models import Neighborhood, UserProfile
 
 
+
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
@@ -31,6 +37,22 @@ def add_errors(errors: Dict, serializer_errors: Dict):
             errors[field].extend(error)
         else:
             errors[field] = error
+
+
+def send_custom_email(subject: str, email: str, template_name: str, context: Dict[str, Any]):
+    subject = subject
+    html_message = render_to_string(template_name=template_name, context=context)
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [email]
+
+    send_mail(
+        subject=subject,
+        message='',
+        from_email=from_email,
+        recipient_list=recipient_list,
+        html_message=html_message,
+        fail_silently=False
+    )
 
 
 class RegisterView(APIView):
@@ -79,6 +101,8 @@ class RegisterView(APIView):
             return Response({'detail': f'Database error occurred: {e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred: {e}.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        send_custom_email('Bem-vindo ao Bonds!', account.email, 'welcome_email.html', {'account': account})
 
         return Response({'detail': 'Account successfully created.'}, status=status.HTTP_201_CREATED)
 
@@ -207,6 +231,8 @@ class UpdateAccountPasswordView(APIView):
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        send_custom_email('Bonds | Senha Alterada com Sucesso', account.email, 'change_password_email.html', {'account': account})
+
         return Response({'detail': 'Account password updated successfully.'}, status=status.HTTP_200_OK)
 
 
