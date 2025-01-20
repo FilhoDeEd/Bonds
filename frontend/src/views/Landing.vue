@@ -44,7 +44,7 @@
                           {{ forum.title }}
                         </h2>
                         <h3>Evento</h3>
-                        <div class="text-2xl text-gray-100 flex flex-col justify-between flex-grow">
+                        <div class="text-2xl text-gray-100 flex flex-col justify-end flex-grow w-half">
                           <p class="mb-auto leading-relaxed">{{ forum.description }}</p>
                           <p class="mt-8">Popularidade: {{ forum.popularity }}</p>
                         </div>

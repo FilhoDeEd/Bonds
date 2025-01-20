@@ -1872,6 +1872,10 @@ select {
   height: 85%;
 }
 
+.h-90 {
+  height: 90%;
+}
+
 .h-70-px {
   height: 300px;
 }
@@ -1884,8 +1888,8 @@ select {
   height: 95px;
 }
 
-.h-150-px {
-  height: 150px;
+.h-225-px {
+  height: 225px;
 }
 
 .h-350-px {
@@ -1937,8 +1941,8 @@ select {
   max-height: 400px;
 }
 
-.max-h-265-px {
-  max-height: 265px;
+.max-h-300-px {
+  max-height: 300px;
 }
 
 .max-h-450-px {

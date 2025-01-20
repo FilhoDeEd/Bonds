@@ -2,10 +2,10 @@
   <MainLayout>
     <div class="w-8/12 h-full py-8 pr-20 pl-20 bg-gray-50">
       <!-- Banner Section -->
-      <div class="bg-basic h-450-px p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic h-600-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner -->
-          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
+          <div class="absolute top-0 left-0 right-0 h-90 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
               <div class="px-6 py-6">
@@ -16,7 +16,7 @@
                     <input type="file" ref="fileInput" accept="image/*" style="display: none;" @change="updateBanner">
                     <!-- Imagem do banner -->
                     <img :src="forumData.banner_image || require('@/assets/img/1200x400.png')" alt="Event banner"
-                      class="w-4/5 h-150-px  object-fill rounded-lg shadow-lg cursor-pointer mb-4"
+                      class="w-4/5 max-h-300-px  object-fill rounded-lg shadow-lg cursor-pointer mb-4"
                       :class="{ 'hover:opacity-80': editMode }" @click="editMode && $refs.fileInput.click()">
                   </div>
 
@@ -79,13 +79,15 @@
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
                   <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/vídeo">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto">
                       <span>📷</span>
                     </button>
 
-                    <button v-show="isReview" @click="callReview" class="p-2 hover:bg-gray-100 rounded-full"
-                      title="Avaliar Evento">
-                      <span>⭐</span>
+                    <button 
+                    v-show="showReportCreator"
+                    @click = "openModal"
+                    class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar um Reporte">
+                    <span>📢</span>
                     </button>
 
                     <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
@@ -479,7 +481,7 @@ const commentOrReport = async () => {
   }
 }
 const showReportCreator = ref(false);
-const showPollCreator = ref(false);
+
 
 const activeReportCreator = () => {
   if (forumData.value.creator === "Sistema") {
