@@ -42,7 +42,7 @@ class Command(BaseCommand):
 
                 forums_to_create.append(Forum(
                     title=title,
-                    description=f'Forum about {title}',
+                    description=f'Fórum sobre {title}',
                     neighborhood=neighborhood,
                     type=Forum.TypeChoices.DEFAULT,
                     creation_date=now(),

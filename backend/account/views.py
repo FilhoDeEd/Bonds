@@ -258,11 +258,15 @@ class UpdateAccountProfileImage(APIView):
 
         img_low_res = img.copy()
         img_low_res.thumbnail((160, 160))
+
+        if img_low_res.mode != 'RGB':
+            img_low_res = img_low_res.convert('RGB')
+
         low_res_io = BytesIO()
         img_low_res.save(low_res_io, format='JPEG')
         low_res_io.seek(0)
 
-        low_res_image = ContentFile(low_res_io.read(), name=f'low_res_{image.name}')
+        low_res_image = ContentFile(low_res_io.read(), name=f'low_res_{image.name.rsplit('.', 1)[0]}.jpeg')
 
         try:
             with transaction.atomic():
