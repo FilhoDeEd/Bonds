@@ -40,19 +40,21 @@ def add_errors(errors: Dict, serializer_errors: Dict):
 
 
 def send_custom_email(subject: str, email: str, template_name: str, context: Dict[str, Any]):
-    subject = subject
-    html_message = render_to_string(template_name=template_name, context=context)
-    from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [email]
+    try:
+        html_message = render_to_string(template_name=template_name, context=context)
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [email]
 
-    send_mail(
-        subject=subject,
-        message='',
-        from_email=from_email,
-        recipient_list=recipient_list,
-        html_message=html_message,
-        fail_silently=False
-    )
+        send_mail(
+            subject=subject,
+            message='',
+            from_email=from_email,
+            recipient_list=recipient_list,
+            html_message=html_message,
+            fail_silently=False
+        )
+    except Exception as e:
+        print(f"Erro ao enviar o e-mail: {e}")
 
 
 class RegisterView(APIView):
