@@ -79,9 +79,38 @@
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
                   <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto">
-                      <span>📷</span>
-                    </button>
+                    <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                      @change="handleImageUpload">
+
+                    <!-- Modifique o botão da câmera -->
+                    <div class="flex-1">
+                      <!-- Prévia da imagem -->
+                      <div v-if="imagePreview" class="mb-4 relative">
+                        <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                        <button @click="removeImage"
+                          class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          title="Remover imagem">
+                          ❌
+                        </button>
+                      </div>
+
+                      <textarea v-model="newCommentContent"
+                        class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
+                        placeholder="No que você está pensando?" rows="3"></textarea>
+
+                      <!-- Botões de ação -->
+                      <div class="flex items-center mt-4 pt-3 border-t">
+                        <div class="flex space-x-2">
+                          <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                            @change="handleImageUpload">
+                          <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto"
+                            @click="$refs.imageInput.click()">
+                            <span>📷</span>
+                          </button>
+                          <!-- ... outros botões ... -->
+                        </div>
+                      </div>
+                    </div>
 
                     <button v-show="showReportCreator" @click="openModal" class="p-2 hover:bg-gray-100 rounded-full"
                       title="Adicionar um Reporte">
@@ -825,7 +854,7 @@ const formPoll = {
     option: "",
   }]
 }
-const showPollCreator = ref(false);
+
 const showPostButton = ref(true)
 const showPoll = ref(false)
 const pollOptions = ref([])
@@ -884,6 +913,72 @@ const createPoll = async () => {
     cancelPoll()
   }
 }
+
+const imagePreview = ref(null);
+const selectedImage = ref(null);
+
+// Modifique a função handleImageUpload
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhuma imagem selecionada");
+    return;
+  }
+
+  // Validações de arquivo
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+  if (file.size > maxSize) {
+    toast.error("A imagem deve ter menos de 5MB");
+    return;
+  }
+
+  if (!validTypes.includes(file.type)) {
+    toast.error("Formato de imagem inválido. Use JPG, PNG ou GIF");
+    return;
+  }
+
+  // Cria a prévia da imagem
+  selectedImage.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+};
+
+// Adicione a função para remover a imagem
+const removeImage = () => {
+  imagePreview.value = null;
+  selectedImage.value = null;
+  if (imageInput.value) {
+    imageInput.value.value = '';
+  }
+};
+
+// Modifique a função createComment para incluir a imagem
+const createComment = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('content', newCommentContent.value);
+    formData.append('forum_slug', slug.value);
+    
+    if (selectedImage.value) {
+      formData.append('image', selectedImage.value);
+    }
+
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    toast.success('Comentário criado com sucesso');
+    newCommentContent.value = '';
+    removeImage(); // Limpa a imagem após enviar
+    await fetchComments();
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao criar comentário');
+  }
+};
 
 onMounted(() => {
   fetchForum();
