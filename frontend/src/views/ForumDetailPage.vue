@@ -428,6 +428,7 @@ const openPoll = () =>{
   isPollOpen.value = true;
 }
 
+
 const toast = useToast();
 const forumData = ref({
   title: '',
@@ -573,6 +574,23 @@ const subscribed = () => {
   }
 };
 
+const polls = ref([]);
+const fetchPoll = async() =>{
+  try{
+    const response = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
+    polls.value = response.data.results.map((poll) =>({
+      id: poll.id,
+      title: poll.title,
+      content: poll.content,
+      deadline: poll.deadline,
+      post_date: poll.post_date,
+      
+    }))
+  }
+  catch(err){
+    toast.error("Erro ao carregar as enquetes")
+  }
+}
 const fetchComments = async () => {
   try {
     const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${slug.value}/`);
