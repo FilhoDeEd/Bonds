@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 h-full pt-32">
+  <div class="container mx-auto px-4 h-full">
     <div class="flex content-center items-end justify-center h-full mt-reg">
       <div class="w-full lg:w-6/12 px-4">
         <div
@@ -10,24 +10,16 @@
               <div class="flex gap-4 space-x-4">
                 <div class="relative w-full mb-3">
                   <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Nome</label>
-                  <input
-                    type="text"
-                    v-model="form.name"
-                    @change="validateField('name')"
+                  <input type="text" v-model="form.name" @change="validateField('name')"
                     class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                    placeholder="Nome"
-                  />
+                    placeholder="Nome" />
                   <p v-if="errors.name" class="text-red-500 text-xs">{{ errors.name }}</p>
                 </div>
                 <div class="relative w-full mb-3">
                   <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Sobrenome</label>
-                  <input
-                    type="text"
-                    v-model="form.surname"
-                    @change="validateField('surname')"
+                  <input type="text" v-model="form.surname" @change="validateField('surname')"
                     class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                    placeholder="Sobrenome"
-                  />
+                    placeholder="Sobrenome" />
                   <p v-if="errors.surname" class="text-red-500 text-xs">{{ errors.surname }}</p>
                 </div>
               </div>
@@ -35,38 +27,26 @@
               <!-- Data de Nascimento -->
               <div class="relative w-full mb-3">
                 <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Data de Nascimento</label>
-                <input
-                  type="date"
-                  v-model="form.birthday"
-                  @change="validateField('birthday')"
-                  class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                />
+                <input type="date" v-model="form.birthday" @change="validateField('birthday')"
+                  class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                 <p v-if="errors.birthday" class="text-red-500 text-xs">{{ errors.birthday }}</p>
               </div>
 
               <!-- Email -->
               <div class="relative w-full mb-3">
                 <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Email</label>
-                <input
-                  type="email"
-                  v-model="form.email"
-                  @change="validateField('email')"
+                <input type="email" v-model="form.email" @change="validateField('email')"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Email"
-                />
+                  placeholder="Email" />
                 <p v-if="errors.email" class="text-red-500 text-xs">{{ errors.email }}</p>
               </div>
 
               <!-- Nome de Usuário -->
               <div class="relative w-full mb-3">
                 <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Nome de Usuário</label>
-                <input
-                  type="text"
-                  v-model="form.username"
-                  @change="validateField('username')"
+                <input type="text" v-model="form.username" @change="validateField('username')"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Nome de Usuário"
-                />
+                  placeholder="Nome de Usuário" />
                 <p v-if="errors.username" class="text-red-500 text-xs">{{ errors.username }}</p>
               </div>
 
@@ -74,22 +54,14 @@
               <div class="flex gap-4 space-x-4">
                 <div class="relative w-full mb-3">
                   <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Senha</label>
-                  <input
-                    type="password"
-                    v-model="form.password"
-                    @change="validateField('password')"
-                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  />
+                  <input type="password" v-model="form.password" @change="validateField('password')"
+                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                   <p v-if="errors.password" class="text-red-500 text-xs">{{ errors.password }}</p>
                 </div>
                 <div class="relative w-full mb-3">
                   <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Confirmar senha</label>
-                  <input
-                    type="password"
-                    v-model="form.confirmPassword"
-                    @change="validateField('confirmPassword')"
-                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  />
+                  <input type="password" v-model="form.confirmPassword" @change="validateField('confirmPassword')"
+                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" />
                   <p v-if="errors.confirmPassword" class="text-red-500 text-xs">{{ errors.confirmPassword }}</p>
                 </div>
               </div>
@@ -97,15 +69,11 @@
               <!-- Concordar com Políticas -->
               <div>
                 <label class="inline-flex items-center cursor-pointer">
-                  <input
-                    id="customCheckLogin"
-                    type="checkbox"
-                    v-model="form.agree_policy"
+                  <input id="customCheckLogin" type="checkbox" v-model="form.agree_policy"
                     @change="validateField('agree_policy')"
-                    class="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150"
-                  />
+                    class="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150" />
                   <span class="ml-2 text-sm font-semibold text-blueGray-600">
-                    Concordo com as 
+                    Concordo com as
                     <a href="javascript:void(0)" class="text-emerald-500">Políticas de Privacidade</a>
                   </span>
                 </label>
@@ -116,8 +84,7 @@
               <div class="text-center mt-6">
                 <button
                   class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-varela uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
-                  type="submit"
-                >
+                  type="submit">
                   Criar conta
                 </button>
               </div>
@@ -126,8 +93,13 @@
         </div>
       </div>
 
+
       <div class="w-full lg:w-6/12 px-4">
-        <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0">
+        <div class="w-full h-half flex flex-col items-center justify-center min-h-[200px] relative ">
+          <img src="@/assets/img/registerLogo.png" alt="Register Logo" class="w-32 h-half mb-4 relative">
+        </div>
+        <div
+          class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0">
           <div class="flex-auto px-4 lg:px-10 py-10">
             <form @submit.prevent="handleLocationSubmit">
               <div class="relative w-full mb-3">
@@ -154,11 +126,8 @@
 
               <div class="relative w-full mt-4">
                 <label class="block uppercase text-blueGray-600 text-xs font-varela mb-2">Bairro</label>
-                <select
-                  v-model="form.neighborhood"
-                  @change = "validateField('neighborhood')"
-                  class="w-full bg-white border border-gray-300 rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring focus:border-blue-500"
-                >
+                <select v-model="form.neighborhood" @change="validateField('neighborhood')"
+                  class="w-full bg-white border border-gray-300 rounded px-4 py-2 text-gray-700 focus:outline-none focus:ring focus:border-blue-500">
                   <option value="">Selecione um Bairro</option>
                   <option v-for="neighborhood in neighborhoods" :key="neighborhood.id" :value="neighborhood.id">
                     {{ neighborhood.name }}
@@ -169,7 +138,7 @@
           </div>
         </div>
       </div>
-      
+
     </div>
   </div>
 </template>
@@ -179,6 +148,7 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ENDPOINTS } from '../../../api.js';
 import { useToast } from 'vue-toastification';
+
 
 /*eslint-disable*/
 export default {
@@ -213,7 +183,7 @@ export default {
     await this.fetchStates();
   },
   methods: {
-    onStateChange(event){
+    onStateChange(event) {
       this.fetchCities();
       this.validateField('state');
     },
@@ -239,7 +209,7 @@ export default {
         alert("Erro ao carregar as cidades.");
       }
     },
-    onCityChange(event){
+    onCityChange(event) {
       this.fetchNeighborhoods();
       this.validateField('locality');
     },
@@ -274,7 +244,7 @@ export default {
             : "O nome é obrigatório.";
           break;
         case "surname":
-          this.errors.surname = this.form.surname 
+          this.errors.surname = this.form.surname
             ? (/^[a-zA-Z\s]+$/.test(this.form.surname) ? "" : "O sobrenome deve conter apenas letras e espaços.")
             : "O sobrenome é obrigatório.";
           break;
@@ -300,13 +270,13 @@ export default {
           this.errors.username = this.form.username ? "" : "O nome de usuário é obrigatório.";
           break;
         case "password":
-        this.errors.password = this.form.password
-          ? (/[A-Z]/.test(this.form.password) ? "" : "A senha deve conter ao menos uma letra maiúscula.") ||
+          this.errors.password = this.form.password
+            ? (/[A-Z]/.test(this.form.password) ? "" : "A senha deve conter ao menos uma letra maiúscula.") ||
             (/[a-z]/.test(this.form.password) ? "" : "A senha deve conter ao menos uma letra minúscula.") ||
             (/\d/.test(this.form.password) ? "" : "A senha deve conter ao menos um número.") ||
             (/[\W_]/.test(this.form.password) ? "" : "A senha deve conter ao menos um caractere especial.") ||
             (this.form.password.length >= 8 ? "" : "A senha deve ter no mínimo 8 caracteres.")
-          : "A senha é obrigatória.";
+            : "A senha é obrigatória.";
           break;
         case "confirmPassword":
           if (!this.form.confirmPassword) {
