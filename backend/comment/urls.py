@@ -12,6 +12,8 @@ from comment.views import (
     ReportDeleteView,
     ReportListView,
     PoolRegisterView,
+    PoolEditView,
+    PoolDeleteView,
     PoolListView,
     VoteOptionView,
     UnvoteOptionView
@@ -31,8 +33,8 @@ urlpatterns = [
     path('report/list/<slug:slug>/', ReportListView.as_view(), name='report_list'),
 
     path('pool/register/',PoolRegisterView.as_view(), name='pool_register'),
-    # path('pool/edit/<int:report_id>/',PoolEditView.as_view(), name='pool_edit'),
-    # path('pool/delete/<int:report_id>/',PoolDeleteView.as_view(), name='pool_edit'),
+    path('pool/edit/<int:pool_id>/',PoolEditView.as_view(), name='pool_edit'),
+    path('pool/delete/<int:pool_id>/',PoolDeleteView.as_view(), name='pool_edit'),
     path('pool/list/<slug:slug>/', PoolListView.as_view(), name='pool_list'),
 
     path('vote/<int:option_id>/', VoteOptionView.as_view(), name='vote'),
