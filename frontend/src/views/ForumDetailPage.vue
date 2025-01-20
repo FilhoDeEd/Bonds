@@ -16,15 +16,15 @@
                     <input type="file" ref="fileInput" accept="image/*" style="display: none;" @change="updateBanner">
                     <!-- Imagem do banner -->
                     <img :src="forumData.banner_image || require('@/assets/img/1200x400.png')" alt="Event banner"
-                      class="w-4/5 h-95-px object-contain rounded-lg shadow-lg cursor-pointer mb-4"
+                      class="w-4/5 h-150-px  object-fill rounded-lg shadow-lg cursor-pointer mb-4"
                       :class="{ 'hover:opacity-80': editMode }" @click="editMode && $refs.fileInput.click()">
                   </div>
 
                   <div class="grid gap-4 w-full">
                     <textarea v-model="forumData.title" :readonly="!editMode"
-                      class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
+                      class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none h-12"
                       :placeholder="editMode ? 'Título do Fórum' : ''"
-                      style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
+                      style="line-height: 1.2; padding: 4px 8px; min-height: 40px; outline: none;"
                       :class="{ 'cursor-text hover:bg-gray-700/30': editMode }">
                     </textarea>
 
