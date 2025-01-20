@@ -88,48 +88,11 @@
                       <span>📢</span>
                     </button>
 
-                    <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                    <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
                       id="pollButton">
                       <span>📊</span>
                     </button>
 
-                    <div v-if="showPoll" class="mt-4 space-y-4">
-                      <!-- Título da enquete -->
-                      <input type="text" v-model="formPoll.title" placeholder="Título da enquete"
-                        class="w-full p-2 border rounded-lg" />
-
-                      <!-- Prazo (deadline) -->
-                      <input type="date" v-model="formPoll.deadline" class="w-full p-2 border rounded-lg" />
-
-                      <!-- Opções da enquete -->
-                      <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
-                        <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
-                          :placeholder="`Opção ${index + 1}`" />
-                        <button v-if="index >= 2" @click="removePollOption(index)"
-                          class="text-red-500 hover:text-red-600">
-                          ❌
-                        </button>
-                      </div>
-
-                      <!-- Botões de ação -->
-                      <div class="flex space-x-2 mt-3">
-                        <button v-if="pollOptions.length < 4" @click="addPollOption"
-                          class="text-blue-500 hover:text-blue-600 text-sm">
-                          + Adicionar opção
-                        </button>
-
-                        <div class="flex space-x-2 ml-auto">
-                          <button @click="cancelPoll"
-                            class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
-                            Cancelar
-                          </button>
-                          <button @click="createPoll" :disabled="!isFormValid" class="px-4 py-1 text-white rounded-lg"
-                            :class="isFormValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'">
-                            Criar Enquete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                   <button v-show="showPostButton" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
@@ -440,6 +403,7 @@
 
     </div>
     <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
+    <ModalPoll v-if="isPollOpen" :isPollOpen = "isPollOpen" @close="isPollOpen = false" :slug = "slug"/>
   </MainLayout>
 
 </template>
@@ -456,8 +420,14 @@ import MainLayout from '../layouts/mainLayout.vue';
 import ModalReport from '../components/Modals/ModalReport.vue';
 import { computed } from "vue";
 import { useUserStore } from "../store/user.js";
-
+import ModalPoll from '../components/Modals/ModalPoll.vue';
 import profile from "@/assets/img/profilePic.jpg";
+
+const isPollOpen = ref(false)
+const openPoll = () =>{
+  isPollOpen.value = true;
+}
+
 
 const toast = useToast();
 const forumData = ref({
@@ -483,6 +453,8 @@ const tags = [
 
 
 const comment_list = ref(true);
+const showReportCreator = ref(true)
+
 const commentOrReport = async () => {
   comment_list.value = !comment_list.value;
   if (comment_list.value) {
@@ -602,6 +574,23 @@ const subscribed = () => {
   }
 };
 
+const polls = ref([]);
+const fetchPoll = async() =>{
+  try{
+    const response = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
+    polls.value = response.data.results.map((poll) =>({
+      id: poll.id,
+      title: poll.title,
+      content: poll.content,
+      deadline: poll.deadline,
+      post_date: poll.post_date,
+      
+    }))
+  }
+  catch(err){
+    toast.error("Erro ao carregar as enquetes")
+  }
+}
 const fetchComments = async () => {
   try {
     const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${slug.value}/`);
@@ -814,76 +803,6 @@ const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
 };
 
-const showReportCreator = ref(false);
-// Enquete  
-const formPoll = {
-  title: "",
-  content: "",
-  deadline: "",
-  forum_slug: slug.value,
-  options: [{
-    option: "",
-  }]
-}
-const showPollCreator = ref(false);
-const showPostButton = ref(true)
-const showPoll = ref(false)
-const pollOptions = ref([])
-
-// Add these methods
-const togglePoll = () => {
-  showPoll.value = !showPoll.value
-  showPostButton.value = !showPoll.value
-}
-
-const isFormValid = () => {
-  // Valida o título, prazo e pelo menos duas opções preenchidas
-  return (
-    this.formPoll.title.trim() !== '' &&
-    this.formPoll.deadline !== '' &&
-    this.pollOptions.filter(option => option.text.trim() !== '').length >= 2
-  );
-}
-
-
-
-const addPollOption = () => {
-  if (pollOptions.value.length < 4) {
-    pollOptions.value.push({ text: '' })
-  }
-}
-
-const removePollOption = (index) => {
-  if (index >= 2) { // Only allow removing extra options
-    pollOptions.value.splice(index, 1)
-  }
-}
-
-const cancelPoll = () => {
-  showPoll.value = false
-  showPostButton.value = true
-  pollOptions.value = [
-    { text: '' },
-    { text: '' }
-  ];
-  formPoll.title = '';
-  formPoll.deadline = '';
-}
-const createPoll = async () => {
-  if (isFormValid) {
-    formPoll.options = pollOptions.filter(option => option.text.trim() !== '')
-    showPostButton.value = true
-    try {
-      await axios.post(`${ENDPOINTS.REGISTER_POLL}`,
-        formPoll
-      );
-      toast.success('Enquete criada')
-    } catch (err) {
-      toast.error("Erro ao criar enquete: " + err)
-    }
-    cancelPoll()
-  }
-}
 
 onMounted(() => {
   fetchForum();
