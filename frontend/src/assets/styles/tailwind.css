@@ -1848,6 +1848,11 @@ select {
   height: 7rem;
 }
 
+.h-36 {
+  height: 9rem;
+}
+
+
 .h-350-px {
   height: 350px;
 }
@@ -1916,6 +1921,11 @@ select {
   height: 20%;
 }
 
+.h-1\/4{
+  height: 25%;
+}
+
+
 .h-1\/20{
   height: 2%;
 }
@@ -1939,6 +1949,10 @@ select {
 
 .max-h-400-px {
   max-height: 400px;
+}
+
+.max-h-265-px {
+  max-height: 265px;
 }
 
 .max-h-300-px {
