@@ -511,8 +511,6 @@ const commentOrReport = async () => {
     await fetchReports();
   }
 }
-const showReportCreator = ref(false);
-
 
 const activeReportCreator = () => {
   if (forumData.value.creator === "Sistema") {
