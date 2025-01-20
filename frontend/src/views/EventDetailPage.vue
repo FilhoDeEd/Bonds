@@ -2,24 +2,14 @@
   <MainLayout>
     <div class="w-8/12 h-full py-8 pr-20 pl-20 bg-gray-50">
       <!-- Banner Section -->
-      <div class="bg-basic h-400-px p-6 rounded-lg shadow mb-8">
+      <div class="bg-basic h-450-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
           <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
               <div class="px-6 py-8">
-                <div class="container mx-auto flex flex-col items-start">
-                  <!-- Título do Fórum -->
-                  <textarea 
-                    v-model="forumData.title"
-                    :readonly="!editMode"
-                    class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
-                    :placeholder="editMode ? 'Título do Fórum' : ''"
-                    style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
-                    :class="{ 'cursor-text hover:bg-gray-700/30': editMode }">
-                  </textarea>
-
+                <div class="container mx-auto flex flex-col items-start space-y-4">
                   <!-- Banner do evento -->
                   <div class="flex justify-center w-full relative">
                     <!-- Campo de arquivo oculto -->
@@ -30,21 +20,29 @@
                       style="display: none;" 
                       @change="updateBanner"
                     >
-
                     <!-- Imagem do banner -->
                     <img 
                       :src="forumData.banner_image || require('@/assets/img/1200x400.png')" 
                       alt="Event banner"
-                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg cursor-pointer"
+                      class="w-4/5 h-95-px  object-cover rounded-lg shadow-lg cursor-pointer mb-4"
                       :class="{ 'hover:opacity-80': editMode }"
                       @click="editMode && $refs.fileInput.click()"
                     >
                   </div>
 
                   <div class="grid grid-cols-2 gap-4 w-full">
+                    <textarea 
+                      v-model="forumData.title"
+                      :readonly="!editMode"
+                      class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none h- 28"
+                      :placeholder="editMode ? 'Título do Evento' : ''"
+                      style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
+                      :class="{ 'cursor-text hover:bg-gray-700/30': editMode }"
+                      rows="1">
+                    </textarea>
                     <!-- Localização - Segunda coluna, primeira linha -->
                     <textarea v-model="forumData.localization" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-24 "
                       :class="{ 'hover:bg-gray-700/30': editMode }" 
                       placeholder="Localização" 
                       rows="2">
@@ -52,7 +50,7 @@
 
                     <!-- Descrição - Primeira coluna, segunda linha -->
                     <textarea v-model="forumData.description" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
                       :class="{ 'hover:bg-gray-700/30': editMode }" 
                       placeholder="Descrição do Evento"
                       rows="3">
@@ -61,15 +59,12 @@
                     <!-- Data - Segunda coluna, segunda linha -->
                     <textarea v-model="forumData.date" :readonly="!editMode"
 
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
+                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
                       :class="{ 'hover:bg-gray-700/30': editMode }" 
                       placeholder="Data do Evento" 
-                      rows="3">
+                      rows="4">
                     </textarea>
                   </div>
-                  
-                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
-
                 </div>
               </div>
             </div>
@@ -266,9 +261,9 @@
 
         <!-- Sidebar -->
 
-        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg sticky top-24 max-h-265-px">
 
-          <div class="bg-banner p-4 rounded-lg shadow">
+          <div class="bg-banner p-4 rounded-lg shadow sticky top-24">
             <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
 
             <div class="space-y-3 ">
@@ -296,11 +291,11 @@
               <div class="text-sm mb-4">
                 <p class="text-white">
                   <span class="josefin-sans-bold-italic">Popularidade: </span> 
-                  <span class="inconsolata-regular"> {{ forumData.popularity }}</span>
+                  <span class="inconsolata-regular"> {{ forumData.five_star_mean }}</span>
                 </p>
               </div>
             </div>
-          </div>
+          </div> 
 
         </aside>
       </div>
