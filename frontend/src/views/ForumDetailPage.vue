@@ -585,6 +585,7 @@ const toggleEdition = async () => {
 
 const comments = ref([]);
 const reports = ref([]);
+const polls = ref([]);
 const newCommentContent = ref('');
 const editMode = ref(false);
 const route = useRoute();
@@ -890,6 +891,27 @@ const addPollOption = () => {
   }
 }
 
+const list_polls = async () => {
+  try {
+    const pollResponse = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
+    polls.value = pollResponse.data.results.map((pollItem) => ({
+      id: pollItem.id,
+      title: pollItem.title,
+      content: pollItem.content,
+      deadline: formatDate(pollItem.deadline), // Ajustado para usar o deadline correto
+      post_date: pollItem.post_date,
+      forum_slug: pollItem.forum_slug, // Mantido o slug correto
+      options: pollItem.options.map((option) => ({
+        id: option.id,
+        option_text: option.option_text,
+        votes: option.votes,
+      })),
+    }));
+  } catch (error) {
+    console.error("Erro ao listar as enquetes:", error);
+    // Adicione tratamento de erro aqui (ex.: notificar o usuário)
+  }
+};
 const removePollOption = (index) => {
   if (index >= 2) { // Only allow removing extra options
     pollOptions.value.splice(index, 1)
