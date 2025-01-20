@@ -857,10 +857,9 @@ const formPoll = {
   title : "",
   content : "",
   deadline : "",
-  slug: slug.value,
+  forum_slug: slug.value,
   options : [{
     option : "",
-    votes : 0,
   }]
 }
 const showPollCreator = ref(false);
@@ -887,7 +886,7 @@ const isFormValid = () => {
 
 const addPollOption = () => {
   if (pollOptions.value.length < 4) {
-    pollOptions.value.push({ text: '', votes: 0 })
+    pollOptions.value.push({ text: ''})
   }
 }
 
@@ -901,17 +900,24 @@ const cancelPoll = () => {
   showPoll.value = false
   showPostButton.value = true
   pollOptions.value = [
-    { text: '', votes: 0 },
-    { text: '', votes: 0 }
+    { text: ''},
+    { text: ''}
   ];
   formPoll.title = '';
   formPoll.deadline = '';
 }
-const createPoll = () => {
+const createPoll = async() => {
   if(isFormValid){
     formPoll.options = pollOptions.filter(option => option.text.trim() !== '')
     showPostButton.value = true
-    toast.success('Poll created:', pollOptions.value)
+    try{
+      await axios.post(`${ENDPOINTS.REGISTER_POLL}`,
+        formPoll
+      );
+      toast.success('Enquete criada')
+    }catch(err){
+      toast.error("Erro ao criar enquete: "+err)
+    }
     cancelPoll()
   }
 }

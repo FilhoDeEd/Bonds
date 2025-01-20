@@ -5,6 +5,7 @@ const FORUM_URL = `${API_URL}/forum`;
 const EVENT_URL = `${FORUM_URL}/event`;
 const COMMENT_URL = `${API_URL}/comment`;
 const REPORT_URL = `${COMMENT_URL}/report`;
+const POLL_URL = `${COMMENT_URL}/poll`;
 
 // Endpoints centralizados
 export const ENDPOINTS = {
@@ -51,5 +52,10 @@ export const ENDPOINTS = {
   REPORT_EDIT: `${REPORT_URL}/edit`,
   REPORT_DELETE: `${REPORT_URL}/delete`,
   REPORT_LIST: `${REPORT_URL}/list`,
+
+  REGISTER_POLL: `${POLL_URL}/register/`,
+  LIST_POLL:`${POLL_URL}/list`,
+  VOTE_POLL:`${COMMENT_URL}/vote`,
+  UNVOTE_POLL:`${COMMENT_URL}/unvote`,
 
 };
