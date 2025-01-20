@@ -102,6 +102,8 @@ import mainLayout from "@/layouts/mainLayout.vue";
 import { useForumListStore } from "@/store/forumListStore.js";
 import { useUserStore } from "@/store/user.js";
 import { onBeforeMount } from "vue";
+import router from "../router";
+import { useToast } from "vue-toastification";
 import InfiniteLoading from "v3-infinite-loading/lib/v3-infinite-loading.es.js";
 import "v3-infinite-loading/lib/style.css";
 import ModalCreateForum from "../components/Modals/ModalCreateForum.vue";
@@ -125,6 +127,7 @@ export default {
   setup() {
     const forumListStore = useForumListStore();
     const userStore = useUserStore();
+    const toast = useToast();
 
     // Função para carregar mais itens
     const onLoadMore = async ($state) => {
@@ -147,7 +150,8 @@ export default {
           forumListStore.fetchForums();
         }
       } else {
-        alert("Usuário Não Autorizado");
+        toast.error("Usuário Não Autorizado");
+        router.push('/login')
       }
     });
 
