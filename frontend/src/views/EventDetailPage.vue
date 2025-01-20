@@ -261,9 +261,9 @@
 
         <!-- Sidebar -->
 
-        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg sticky top-24 max-h-265-px">
 
-          <div class="bg-banner p-4 rounded-lg shadow">
+          <div class="bg-banner p-4 rounded-lg shadow sticky top-24">
             <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
 
             <div class="space-y-3 ">
