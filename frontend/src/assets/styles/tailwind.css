@@ -1344,6 +1344,19 @@ select {
   top: 0px;
 }
 
+.top-4 {
+  top: 1rem;
+}
+
+.top-12 {
+  top: 3rem;
+}
+
+.top-24 {
+  top: 8rem;
+}
+
+
 .top-210-px {
   top: 210px;
 }
@@ -1831,6 +1844,10 @@ select {
   height: 6rem;
 }
 
+.h-28 {
+  height: 7rem;
+}
+
 .h-350-px {
   height: 350px;
 }
@@ -1851,6 +1868,13 @@ select {
   height: 850px;
 }
 
+.h-85 {
+  height: 85%;
+}
+
+.h-90 {
+  height: 90%;
+}
 
 .h-70-px {
   height: 300px;
@@ -1862,6 +1886,10 @@ select {
 
 .h-95-px {
   height: 95px;
+}
+
+.h-225-px {
+  height: 225px;
 }
 
 .h-350-px {
@@ -1888,12 +1916,37 @@ select {
   height: 20%;
 }
 
+.h-1\/20{
+  height: 2%;
+}
+
+.h-400-px {
+  height: 400px;
+}
+
+
+.h-450-px {
+  height: 450px;
+}
+
 .h-screen {
   height: 100vh;
 }
 
 .max-h-860-px {
   max-height: 860px;
+}
+
+.max-h-400-px {
+  max-height: 400px;
+}
+
+.max-h-300-px {
+  max-height: 300px;
+}
+
+.max-h-450-px {
+  max-height: 450px;
 }
 
 .min-h-\[800px\] {
@@ -3798,6 +3851,10 @@ select {
   padding-left: 5rem;
 }
 
+.pl-64 {
+  padding-left: 16rem;
+}
+
 .pl-3 {
   padding-left: 0.75rem;
 }
@@ -5508,4 +5565,8 @@ textarea[readonly] {
   font-family: "Josefin Sans", sans-serif;
   font-weight: 700;
   font-style: italic;
+}
+
+.h-sideNavigation {
+  height: calc(100vh - 6rem);
 }

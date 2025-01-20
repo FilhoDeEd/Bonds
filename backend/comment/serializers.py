@@ -14,6 +14,8 @@ class CommentSerializer(serializers.ModelSerializer):
         source='forum'
     )
     has_liked = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    author_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -27,9 +29,24 @@ class CommentSerializer(serializers.ModelSerializer):
             'forum_slug',
             'creator',
             'has_liked',
-            'type'
+            'type',
+            'image',
+            'author_image'
         ]
-        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked']
+        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked', 'image', 'author_image']
+
+    def get_author_image(self, obj):
+        request = self.context.get('request')
+        account = obj.user_profile.account
+        if account.profile_image_low:
+            return request.build_absolute_uri(account.profile_image_low.url) if request else account.profile_image_low.url
+        return None
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
 
     def get_trust_rate(self, obj):
         return obj.trust_rate()
@@ -73,6 +90,8 @@ class ReportSerializer(serializers.ModelSerializer):
         source='forum'
     )
     has_liked = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    author_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Report
@@ -91,9 +110,24 @@ class ReportSerializer(serializers.ModelSerializer):
             'forum_slug',
             'creator',
             'has_liked',
-            'type'
+            'type',
+            'image',
+            'author_image'
         ]
-        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked']
+        read_only_fields = ['id', 'post_date', 'trust_rate', 'denunciations', 'creator', 'forum_slug', 'has_liked', 'image', 'author_image']
+
+    def get_author_image(self, obj):
+        request = self.context.get('request')
+        account = obj.user_profile.account
+        if account.profile_image_low:
+            return request.build_absolute_uri(account.profile_image_low.url) if request else account.profile_image_low.url
+        return None
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
 
     def get_trust_rate(self, obj):
         return obj.trust_rate()
