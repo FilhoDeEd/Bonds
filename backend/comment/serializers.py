@@ -37,7 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_author_image(self, obj):
         request = self.context.get('request')
-        account = request.user.account
+        account = obj.user_profile.account
         if account.profile_image_low:
             return request.build_absolute_uri(account.profile_image_low.url) if request else account.profile_image_low.url
         return None
@@ -118,7 +118,7 @@ class ReportSerializer(serializers.ModelSerializer):
 
     def get_author_image(self, obj):
         request = self.context.get('request')
-        account = request.user.account
+        account = obj.user_profile.account
         if account.profile_image_low:
             return request.build_absolute_uri(account.profile_image_low.url) if request else account.profile_image_low.url
         return None
