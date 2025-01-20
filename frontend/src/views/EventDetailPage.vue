@@ -13,56 +13,36 @@
                   <!-- Banner do evento -->
                   <div class="flex justify-center w-full relative">
                     <!-- Campo de arquivo oculto -->
-                    <input 
-                      type="file" 
-                      ref="fileInput"
-                      accept="image/*"
-                      style="display: none;" 
-                      @change="updateBanner"
-                    >
+                    <input type="file" ref="fileInput" accept="image/*" style="display: none;" @change="updateBanner">
                     <!-- Imagem do banner -->
-                    <img 
-                      :src="forumData.banner_image || require('@/assets/img/1200x400.png')" 
-                      alt="Event banner"
+                    <img :src="forumData.banner_image || require('@/assets/img/1200x400.png')" alt="Event banner"
                       class="w-4/5 max-h-300-px  object-cover rounded-lg shadow-lg cursor-pointer mb-4"
-                      :class="{ 'hover:opacity-80': editMode }"
-                      @click="editMode && $refs.fileInput.click()"
-                    >
+                      :class="{ 'hover:opacity-80': editMode }" @click="editMode && $refs.fileInput.click()">
                   </div>
 
                   <div class="grid grid-cols-2 gap-4 w-full">
-                    <textarea 
-                      v-model="forumData.title"
-                      :readonly="!editMode"
+                    <textarea v-model="forumData.title" :readonly="!editMode"
                       class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none h- 28"
                       :placeholder="editMode ? 'Título do Evento' : ''"
                       style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
-                      :class="{ 'cursor-text hover:bg-gray-700/30': editMode }"
-                      rows="1">
+                      :class="{ 'cursor-text hover:bg-gray-700/30': editMode }" rows="1">
                     </textarea>
                     <!-- Localização - Segunda coluna, primeira linha -->
                     <textarea v-model="forumData.localization" :readonly="!editMode"
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-24 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Localização" 
-                      rows="2">
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Localização" rows="2">
                     </textarea>
 
                     <!-- Descrição - Primeira coluna, segunda linha -->
                     <textarea v-model="forumData.description" :readonly="!editMode"
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Descrição do Evento"
-                      rows="3">
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Descrição do Evento" rows="3">
                     </textarea>
 
                     <!-- Data - Segunda coluna, segunda linha -->
                     <textarea v-model="forumData.date" :readonly="!editMode"
-
                       class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Data do Evento" 
-                      rows="4">
+                      :class="{ 'hover:bg-gray-700/30': editMode }" placeholder="Data do Evento" rows="4">
                     </textarea>
                   </div>
                 </div>
@@ -83,7 +63,7 @@
               </button>
 
               <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
               </button>
@@ -108,14 +88,39 @@
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
                   <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/">
-                      <span>📷</span>
-                    </button>
+                    <div class="flex-1">
+                      <!-- Prévia da imagem -->
+                      <div v-if="imagePreview" class="mb-4 relative">
+                        <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                        <button @click="removeImage"
+                          class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          title="Remover imagem">
+                          ❌
+                        </button>
+                      </div>
 
-                  <button v-show="isReview" @click="callReview"
-                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
-                    <span>⭐</span>
-                  </button>
+                      <textarea v-model="newCommentContent"
+                        class="w-full p-3 rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none"
+                        placeholder="No que você está pensando?" rows="3"></textarea>
+
+                      <!-- Botões de ação -->
+                      <div class="flex items-center mt-4 pt-3 border-t">
+                        <div class="flex space-x-2">
+                          <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                            @change="handleImageUpload">
+                          <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto"
+                            @click="$refs.imageInput.click()">
+                            <span>📷</span>
+                          </button>
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                    <button v-show="isReview" @click="callReview" class="p-2 hover:bg-gray-100 rounded-full"
+                      title="Avaliar Evento">
+                      <span>⭐</span>
+                    </button>
 
                     <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
                       id="pollButton">
@@ -227,11 +232,8 @@
                     <!-- Título ou nome do autor -->
                     <div class="flex items-center mb-8 ml-auto">
                       <!-- Imagem do autor (à direita) -->
-                      <img 
-                      :src="comment.author_image || profile"
-                      alt="Imagem do autor" 
-                      class="w-10 h-10 rounded-full object-cover mr-3"
-                      >
+                      <img :src="comment.author_image || profile" alt="Imagem do autor"
+                        class="w-10 h-10 rounded-full object-cover mr-3">
 
                       <!-- Nome do criador -->
                       <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
@@ -269,33 +271,33 @@
             <div class="space-y-3 ">
               <div class="text-sm mb-4">
                 <p class="text-white">
-                  <span class="josefin-sans-bold-italic">Criado por: </span> 
+                  <span class="josefin-sans-bold-italic">Criado por: </span>
                   <span class="inconsolata-regular">{{ forumData.creator }}</span>
                 </p>
               </div>
 
               <div class="text-sm mb-4">
                 <p class="text-white ">
-                  <span class="josefin-sans-bold-italic">Criado em: </span> 
+                  <span class="josefin-sans-bold-italic">Criado em: </span>
                   <span class="inconsolata-regular"> {{ forumData.createdAt }}</span>
                 </p>
               </div>
 
               <div class="text-sm mb-4">
                 <p class="text-white">
-                  <span class="josefin-sans-bold-italic">Subscribers: </span> 
+                  <span class="josefin-sans-bold-italic">Subscribers: </span>
                   <span class="inconsolata-regular"> {{ forumData.members }}</span>
                 </p>
               </div>
 
               <div class="text-sm mb-4">
                 <p class="text-white">
-                  <span class="josefin-sans-bold-italic">Popularidade: </span> 
+                  <span class="josefin-sans-bold-italic">Popularidade: </span>
                   <span class="inconsolata-regular"> {{ forumData.five_star_mean }}</span>
                 </p>
               </div>
             </div>
-          </div> 
+          </div>
 
         </aside>
       </div>
@@ -349,18 +351,18 @@ const handleRating = async (rating) => {
 };
 const isReview = ref(false);
 
-const checkDate = () =>{
-  if (forumData.value.date){
-    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()){
-      if (forumData.value.did_review === 1){
+const checkDate = () => {
+  if (forumData.value.date) {
+    if (new Date(formatDateToISO(forumData.value.date)) <= new Date()) {
+      if (forumData.value.did_review === 1) {
         isReview.value = true;
       }
-      else{
+      else {
         isReview.value = false;
       }
-      
-    }  
-      
+
+    }
+
   }
   //console.log(isReview.value)
 }
@@ -375,7 +377,7 @@ const forumData = ref({
   creator: '',
   members: 0,
   five_star_mean: 0,
-  did_review:0,
+  did_review: 0,
 });
 
 const toggleEdition = async () => {
@@ -431,7 +433,7 @@ const formatDate = (dateString) => {
 const formatDateSpecific = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
-  date.setDate(date.getDate() +1); // Add one day to the date
+  date.setDate(date.getDate() + 1); // Add one day to the date
   return new Intl.DateTimeFormat('pt-BR', {
     year: 'numeric',
     month: 'long',
@@ -676,6 +678,74 @@ const createPoll = () => {
   cancelPoll()
 }
 
+
+const imagePreview = ref(null);
+const selectedImage = ref(null);
+
+// Modifique a função handleImageUpload
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhuma imagem selecionada");
+    return;
+  }
+
+  // Validações de arquivo
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+  if (file.size > maxSize) {
+    toast.error("A imagem deve ter menos de 5MB");
+    return;
+  }
+
+  if (!validTypes.includes(file.type)) {
+    toast.error("Formato de imagem inválido. Use JPG, PNG ou GIF");
+    return;
+  }
+
+  // Cria a prévia da imagem
+  selectedImage.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+};
+
+// Adicione a função para remover a imagem
+const removeImage = () => {
+  imagePreview.value = null;
+  selectedImage.value = null;
+  if (imageInput.value) {
+    imageInput.value.value = '';
+  }
+};
+
+// Modifique a função createComment para incluir a imagem
+const createComment = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('content', newCommentContent.value);
+    formData.append('forum_slug', slug.value);
+
+    if (selectedImage.value) {
+      formData.append('image', selectedImage.value);
+    }
+
+    const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    toast.success('Comentário criado com sucesso');
+    newCommentContent.value = '';
+    removeImage(); // Limpa a imagem após enviar
+    await fetchComments();
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao criar comentário');
+  }
+};
+
+
 onMounted(() => {
   fetchEvent();
 });
@@ -768,7 +838,6 @@ const updateBanner = async (event) => {
 
 
 <style scoped>
-
 .h-85 {
   height: 85%;
 }
