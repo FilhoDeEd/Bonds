@@ -29,6 +29,7 @@ export const ENDPOINTS = {
   FORUM_DETAIL: `${FORUM_URL}/detail`,
   REGISTER_FORUM: `${FORUM_URL}/register/`,
   EDIT_FORUM: `${FORUM_URL}/edit`,
+  EDIT_BANNER_IMAGE: `${FORUM_URL}/banner/edit`,
   SUBSCRIBE_FORUM: `${FORUM_URL}/subscribe`,
   UNSUBSCRIBE_FORUM: `${FORUM_URL}/unsubscribe`,
 
@@ -49,6 +50,6 @@ export const ENDPOINTS = {
   REGISTER_REPORT: `${REPORT_URL}/register/`,
   REPORT_EDIT: `${REPORT_URL}/edit`,
   REPORT_DELETE: `${REPORT_URL}/delete`,
-
+  REPORT_LIST: `${REPORT_URL}/list`,
 
 };

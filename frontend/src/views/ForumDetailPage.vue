@@ -4,60 +4,81 @@
       <!-- Banner Section -->
       <div class="bg-basic h-400-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
-          <!-- Área colorida do banner - aumentada para 85% -->
+          <!-- Área colorida do banner -->
           <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
-              <div class="px-6 py-8">
-                <div class="container mx-auto flex flex-col items-start">
-                  <!-- Banner do evento -->
-                  <div class="flex justify-center w-full">
-                    <img src="@/assets/img/1200x400.png" alt="Event banner"
-                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg mb-4">
-                  </div>
-                  
-                  <!-- Grid 2x2 para informações do evento -->
-                  <div class="grid grid-cols-2 gap-4 w-full">
-                    <!-- Título - Primeira coluna, primeira linha -->
-                    <textarea v-model="forumData.title" :readonly="!editMode"
-                      class="text-white text-base font-bold mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Título do Fórum" 
-                      id="EventTitle">
-                    </textarea>
+              <div class="px-6 py-6">
+                <div class="container mx-auto flex flex-col items-start space-y-4">
+                  <!-- Título do Fórum -->
+                  <textarea 
+                    v-model="forumData.title"
+                    :readonly="!editMode"
+                    class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
+                    :placeholder="editMode ? 'Título do Fórum' : ''"
+                    style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
+                    :class="{ 'cursor-text hover:bg-gray-700/30': editMode }">
+                  </textarea>
 
-                    <!-- Descrição - Primeira coluna, segunda linha -->
-                    <textarea v-model="forumData.description" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none"
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Descrição do Evento"
-                      rows="3">
-                    </textarea>
+                  <!-- Banner do evento -->
+                  <div class="flex justify-center w-full relative">
+                    <!-- Campo de arquivo oculto -->
+                    <input 
+                      type="file" 
+                      ref="fileInput"
+                      accept="image/*"
+                      style="display: none;" 
+                      @change="updateBanner"
+                    >
+
+                    <!-- Imagem do banner -->
+                    <img 
+                      :src="forumData.banner_image || require('@/assets/img/1200x400.png')" 
+                      alt="Event banner"
+                      class="w-4/5 h-95-px object-cover rounded-lg shadow-lg cursor-pointer"
+                      :class="{ 'hover:opacity-80': editMode }"
+                      @click="editMode && $refs.fileInput.click()"
+                    >
                   </div>
-                  
-                  <p class="text-white text-lg">{{ forumData.five_star_mean }}</p>
+
+                  <!-- Descrição do Fórum -->
+                  <textarea 
+                    v-model="forumData.description" 
+                    :readonly="!editMode"
+                    class="text-white text-base bg-transparent border-none w-full resize-none"
+                    :class="{ 'hover:bg-gray-700/30': editMode }" 
+                    placeholder="Descrição do Fórum"
+                    rows="2"
+                    style="line-height: 1.4; padding: 4px 8px; height: auto; min-height: 60px;">
+                  </textarea>
                 </div>
               </div>
-            </div>
-            <!-- Botões alinhados ao bottom -->
-            <div class=" flex space-x-4 relative z-10">
-              <button type="button" @click="toggleSubscribe"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
-                style="background-color: rgb(252, 3, 94);">
-                {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
-              </button>
 
-              <button type="button" @click="toggleEdition"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
+              <!-- Botões alinhados ao bottom -->
+              <div class="flex space-x-4 px-6 pb-4 items-center justify-start">
+                <button 
+                  type="button" 
+                  @click="toggleSubscribe"
+                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
+                  style="background-color: rgb(252, 3, 94);">
+                  {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
+                </button>
+
+              <button type="button"
+                v-show="checkOwnership(forumData.creator)"
+                @click="toggleEdition"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
                 style="background-color: rgb(252, 3, 94);">
                 {{ editMode ? 'Salvar' : 'Editar' }}
               </button>
 
-              <button type="button"
-                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
-                style="background-color: rgb(252, 3, 94);">
-                Denunciar
-              </button>
+                <button 
+                  type="button"
+                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200" 
+                  style="background-color: rgb(252, 3, 94);">
+                  Denunciar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -134,11 +155,20 @@
           </div>
         </div>
       </div>
-
+      <div>
+        <button></button>
+      </div>
+      <button @click="commentOrReport" class="px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-600">
+        <span v-if="comment_list">Veja os Reports 📢</span>
+        <span v-else>Veja os Comentários 💬</span>
+      </button>
       <!-- Content Section with Posts and Sidebar -->
       <div class="flex gap-8 space-x-4 ">
-        <!-- Posts Section -->
-        <div class="w-3/4">
+        <!-- Comments Section -->
+        <div 
+        class="w-3/4"
+        v-if="comment_list"
+        >
           <div class="space-y-4">
             <article v-for="comment in comments" :key="comment.createdAt"
               class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
@@ -180,10 +210,12 @@
                       <div v-if="menuStates[comment.id]"
                         class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
                         <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          v-show="checkOwnership(comment.creator)"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Editar
                         </button>
                         <button
+                          v-show="checkOwnership(comment.creator)"
                           @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
@@ -197,13 +229,14 @@
                     </div>
 
                     <!-- Título ou nome do autor -->
-                    <div class="flex items-center mb-8">
-                      <!-- Imagem do autor -->
+                    <div class="flex items-center mb-8 ml-auto">
+                      <!-- Imagem do autor (à direita) -->
                       <img 
-                        :src="profileImage" 
-                        alt="Imagem do autor" 
-                        class="w-8 h-8 rounded-full object-cover mr-4"
+                      :src="authorImage" 
+                      alt="Imagem do autor" 
+                      class="w-10 h-10 rounded-full object-cover mr-3"
                       >
+
                       <!-- Nome do criador -->
                       <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
                     </div>
@@ -229,6 +262,166 @@
             </article>
           </div>
         </div>
+
+        <!-- Reports Section -->
+        <div class="w-3/4 " v-else>
+          <div class="space-y-4 ">
+            <article v-for="comment in reports" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-red-400">
+              <div class="flex h-full">
+
+                <!-- Área de votação -->
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button @click="likeComment(comment)" class="vote" :class="{
+                    'on-up': comment.has_liked === 1,
+                    'hover:text-gray-300': comment.has_liked !== 1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
+                  <button @click="dislikeComment(comment)" class="vote" :class="{
+                    'on-down': comment.has_liked === -1,
+                    'hover:text-gray-300': comment.has_liked !== -1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Conteúdo do comentário -->
+                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                  <div class="text-white flex flex-col h-full justify-between">
+                    <!-- Menu dropdown -->
+                    <div class="relative self-end mb-2">
+                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                        ⋯
+                      </button>
+
+                      <!-- Dropdown menu -->
+                      <div v-if="menuStates[comment.id]"
+                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                          v-show="checkOwnership(comment.creator)"
+                          >
+
+                          Editar
+                        </button>
+                        <button
+                          v-show="checkOwnership(comment.creator)"
+                          @click="() => { menuStates[comment.id] = false; deleteComment(comment)}"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Deletar
+                        </button>
+                        <button @click="menuStates[comment.id] = false"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Reportar
+                        </button>
+
+                      </div>
+                    </div>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <h3 v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.title }}
+                    </h3>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.title" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.content }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.content" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.location }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.location" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte realizado em: {{ comment.date }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.date" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte resolvido? {{comment.solved ? "Sim" : "Não"}}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.solved" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </select>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Tag: {{ comment.tag }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.tag" @blur="cancelEdit(comment)"
+                      @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      
+                        <option disabled :value="comment.tag"></option>
+                        <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+                        {{ tag.name }}
+                      </option>
+                    </select>
+    
+                    </div>
+                    <!-- Detalhes do comentário -->
+                    <p class="mt-8">{{ comment.createdAt }}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+
 
         <!-- Sidebar -->
         <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg h-fit">
@@ -283,7 +476,7 @@
 
 <script setup>
 /* eslint-disable */
-import { ref, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import axios from 'axios';
@@ -307,7 +500,27 @@ const forumData = ref({
   type:'',
   isSubscribed: false,
 });
+const tags = [
+        { id: 'SA', name: 'Saúde' },
+        { id: 'L', name: 'Lixo' },
+        { id: 'I', name: 'Infraestrutura' },
+        { id: 'SG', name: 'Segurança' },
+        { id: 'E', name: 'Educação' },
+        { id: 'T', name: 'Transporte' },
+        { id: 'IL', name: 'Iluminação' },
+        { id: 'O', name: 'Outros' }
+      ];
 
+
+const comment_list = ref(true);
+const commentOrReport = async() =>{
+  comment_list.value = !comment_list.value;
+  if (comment_list.value){
+    await fetchComments();
+  } else {
+    await fetchReports();
+  }
+}
 const showReportCreator = ref(false);
 const showPollCreator = ref(false);
 
@@ -324,8 +537,9 @@ const openModal = () => {
   isModalOpen.value = true; // Atualiza a propriedade `.value` do ref
 };
 
-const closeModal = () => {
+const closeModal = async () => {
   isModalOpen.value = false; // Fecha o modal corretamente
+  await router.push({ name: 'ForumDetailPage', params: { slug: slug.value } });
 };
 
 const userStore = useUserStore();
@@ -358,10 +572,22 @@ const toggleEdition = async () => {
 };
 
 const comments = ref([]);
+const reports = ref([]);
 const newCommentContent = ref('');
 const editMode = ref(false);
 const route = useRoute();
 const slug = ref(route.params.slug);
+const isOwner = ref(true);
+
+const checkOwnership = (name) =>{
+  if ((userStore.user.account.name + " " + userStore.user.account.surname) === name || userStore.user.account.username === name){
+    isOwner.value = true;
+    return true
+  } else{
+    isOwner.value = false;
+    return false
+  }
+};
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -376,15 +602,18 @@ const formatDate = (dateString) => {
 const fetchForum = async () => {
   try {
     const response = await axios.get(`${ENDPOINTS.FORUM_DETAIL}/${slug.value}/`);
+    const currentBanner = forumData.value.banner_image;
+    
     forumData.value = {
+      ...forumData.value,
       title: response.data.title,
       description: response.data.description,
       popularity: response.data.popularity,
       createdAt: formatDate(response.data.creation_date),
       creator: response.data.creator,
       members: response.data.subscribers_count,
-      tempContent: "",
       isSubscribed: response.data.is_sub,
+      banner_image: response.data.banner_image || currentBanner,
     };
     await fetchComments();
     subscribed();
@@ -422,6 +651,29 @@ const fetchComments = async () => {
     toast.error('Erro ao carregar comentários');
   }
 };
+const fetchReports = async () => {
+  try {
+    const reportsResponse = await axios.get(`${ENDPOINTS.REPORT_LIST}/${slug.value}/`);
+    reports.value = reportsResponse.data.results.map((reports) => ({
+      content: reports.content,
+      id: reports.id,
+      createdAt: formatDate(reports.post_date),
+      date: formatDate(reports.date),
+      creator: reports.creator,
+      trust_rate: reports.trust_rate,
+      has_liked: reports.has_liked,
+      title: reports.title,
+      tag: reports.tag,
+      solved: reports.solved,
+      location: reports.location,
+    }));
+    //toast.success('Comentários carregados com sucesso');
+  } catch (error) {
+    console.error(error);
+    toast.error('Erro ao carregar reports');
+  }
+};
+
 
 const createComment = async () => {
   try {
@@ -493,6 +745,26 @@ const editComment = async (comment) => {
     toast.error("Algo deu errado!");
   }
 };
+const editReport = async (report) => {
+  try {
+    const response = await axios.post(`${ENDPOINTS.REPORT_EDIT}/${report.id}/`, {
+      content: report.content,
+      title: report.title,
+      location: report.location,
+      tag: report.tag,
+      solved: report.solved,
+      forum_slug: slug
+    });
+
+    // Atualiza o conteúdo do comentário com a resposta do servidor
+    toast.success('Reporte editado com sucesso');
+    await fetchReports();
+  }
+  catch (err) {
+    console.log(err);
+    toast.error("Algo deu errado!");
+  }
+};
 
 const cancelEdit = async (comment) => {
   try {
@@ -516,12 +788,26 @@ const saveEdit = async (comment) => {
     console.log(err)
   }
 };
+const saveEditReport = async (comment) => {
+  try {
+    if (comment.tempContent !== comment.content && comment.tempContent) {
+      comment.content = comment.tempContent;
+    }
+    editReport(comment);
+    comment.isEditing = false;
+  }
+  catch (err) {
+    console.log(err)
+  }
+};
+
 
 const deleteComment = async (comment) => {
   try {
     await axios.post(`${ENDPOINTS.DELETE_COMMENT}/${comment.id}/`);
     toast.success('Comentário deletado com sucesso');
     await fetchComments(); // Recarrega os comentários
+    await fetchReports();
   } catch (error) {
     console.error("Erro ao deletar o comentário:", error);
     toast.error('Erro ao deletar comentário');
@@ -615,7 +901,57 @@ onUnmounted(() => {
   slug.value = null; // Reseta o slug ao desmontar
 });
 
+const profileImage = computed(() => {
+  return userStore.user.account.profile_image || profile;
+});
 
+const authorImage = computed(() => {
+  return profile;
+});
+
+const updateBanner = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhum arquivo selecionado");
+    return;
+  }
+
+  // Validação do arquivo (opcional)
+  const maxFileSize = 5 * 1024 * 1024; // 5 MB
+  const allowedTypes = ["image/jpeg", "image/png"];
+
+  if (file.size > maxFileSize) {
+    toast.error("O arquivo excede o limite de 5 MB");
+    return;
+  }
+
+  if (!allowedTypes.includes(file.type)) {
+    toast.error("Formato de arquivo inválido. Apenas JPEG e PNG são permitidos.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await axios.post(
+      `${ENDPOINTS.EDIT_BANNER_IMAGE}/${slug.value}/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Atualiza a imagem do banner no frontend
+    forumData.value.banner_image = response.data.image_url;
+    toast.success("Banner atualizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar o banner:", error.response || error);
+    toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+  }
+};
 </script>
 
 
