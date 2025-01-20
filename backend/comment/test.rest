@@ -121,6 +121,22 @@ Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
 ####### 
 
+POST http://localhost:8000/comment/pool/edit/2/
+Content-Type: application/json
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+
+{
+    "title": "Qual é o seu framework favorito?",
+    "content": "Alterando enquete",
+    "deadline": "2025-11-22"
+}
+
+####### 
+POST http://localhost:8000/comment/pool/delete/1/
+Content-Type: application/json
+Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
+
+####### 
 GET http://localhost:8000/comment/pool/list/centro-seguranca-e-emergencias/
 Authorization: Token 079b7a2f44ee70858c702aa697214acf30cccc52
 
