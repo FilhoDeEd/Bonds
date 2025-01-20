@@ -363,10 +363,11 @@ export default {
     async delete_account() {
       try {
         const response_delete = await axios.post(ENDPOINTS.DELETE_ACCOUNT);
-        if (response_delete.success) {
+        if (response_delete.status === 200) {
           this.toast.success("Conta Excluída com sucesso");
           this.logout();
         } else {
+          console.log(response_delete.error)
           this.toast.error("Erro ao excluir a conta")
         }
       } catch (error) {
