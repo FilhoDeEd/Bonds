@@ -64,13 +64,13 @@
                   {{ isSubscribed ? 'Desinscrever' : 'Inscrever' }}
                 </button>
 
-                <button 
-                  type="button" 
-                  @click="toggleEdition"
-                  class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200"
-                  style="background-color: rgb(252, 3, 94);">
-                  {{ editMode ? 'Salvar' : 'Editar' }}
-                </button>
+              <button type="button"
+                v-show="checkOwnership(forumData.creator)"
+                @click="toggleEdition"
+                class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
+                style="background-color: rgb(252, 3, 94);">
+                {{ editMode ? 'Salvar' : 'Editar' }}
+              </button>
 
                 <button 
                   type="button"
@@ -210,10 +210,12 @@
                       <div v-if="menuStates[comment.id]"
                         class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
                         <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          v-show="checkOwnership(comment.creator)"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Editar
                         </button>
                         <button
+                          v-show="checkOwnership(comment.creator)"
                           @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
@@ -304,10 +306,14 @@
                       <div v-if="menuStates[comment.id]"
                         class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
                         <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
-                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                          v-show="checkOwnership(comment.creator)"
+                          >
+
                           Editar
                         </button>
                         <button
+                          v-show="checkOwnership(comment.creator)"
                           @click="() => { menuStates[comment.id] = false; deleteComment(comment)}"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
@@ -571,6 +577,17 @@ const newCommentContent = ref('');
 const editMode = ref(false);
 const route = useRoute();
 const slug = ref(route.params.slug);
+const isOwner = ref(true);
+
+const checkOwnership = (name) =>{
+  if ((userStore.user.account.name + " " + userStore.user.account.surname) === name || userStore.user.account.username === name){
+    isOwner.value = true;
+    return true
+  } else{
+    isOwner.value = false;
+    return false
+  }
+};
 
 const formatDate = (dateString) => {
   if (!dateString) return '';

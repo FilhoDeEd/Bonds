@@ -98,10 +98,6 @@ class Pool(models.Model):
             self.post_date = timezone.now()
         super().save(*args, **kwargs)
 
-    def trust_rate(self):
-        likes = self.likes.filter(is_like=True).count()
-        dislikes = self.likes.filter(is_like=False).count()
-        return likes - dislikes
 
     def create_with_options(self, options):
         """
@@ -119,7 +115,7 @@ class Option(models.Model):
     """
     Representa uma opção de resposta em uma enquete.
     """
-    pool = models.ForeignKey(Pool, on_delete=models.CASCADE, related_name="answers")  
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE, related_name="options")  
     option_text = models.CharField(max_length=255)  
     votes = models.PositiveIntegerField(default=0) 
 
