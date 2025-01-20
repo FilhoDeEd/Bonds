@@ -42,7 +42,7 @@
             </li>
             <li>
               <a
-                href="https://github.com/creativetimofficial/vue-notus/blob/main/LICENSE.md?ref=vn-footer-small"
+               href="https://i0.wp.com/anmtv.com.br/wp-content/uploads/2024/01/bob-construtor-1.jpg?w=800&ssl=1"
                 class="text-white hover:text-blueGray-300 text-sm font-semibold block py-1 px-3"
               >
                 Esqueci minha senha

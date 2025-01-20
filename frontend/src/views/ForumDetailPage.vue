@@ -152,8 +152,8 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
+         </div>
+       </div>
 
 
         <button v-show="showReportCreator" @click="commentOrReport"
@@ -447,7 +447,6 @@
               </div>
             </div>
           </aside>
-
         </div>
         <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
       </div>
@@ -857,8 +856,6 @@ const isFormValid = () => {
   );
 }
 
-
-
 const addPollOption = () => {
   if (pollOptions.value.length < 4) {
     pollOptions.value.push({ text: '' })
@@ -899,6 +896,7 @@ const createPoll = async () => {
 
 const imagePreview = ref(null);
 const selectedImage = ref(null);
+const imageInput = ref(null);
 
 // Função para lidar com o upload da imagem
 const handleImageUpload = async (event) => {
