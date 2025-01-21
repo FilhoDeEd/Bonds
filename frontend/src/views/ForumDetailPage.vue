@@ -532,6 +532,7 @@ const voteIn = async() =>{
     const response = await axios.post(`${ENDPOINTS.VOTE_POLL}/${selectedItem.value}/`);
     if (response.status === 201){
       toast.success("Seu voto foi computado!")
+      fetchPolls()
     }
     else{
       console.log(response)
@@ -539,7 +540,7 @@ const voteIn = async() =>{
     }
   } catch(err){
     if (err.response.data.detail === "Você já votou nesta opção."){
-      toast.success("Seu voto foi computado!")}
+      toast.info("Você já votou nesta opção!")}
       else{
         console.log(err)
         toast.error("Algo deu errado")
