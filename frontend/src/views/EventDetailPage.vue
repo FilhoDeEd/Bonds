@@ -783,6 +783,7 @@ const saveEdit = async (comment) => {
   }
 };
 
+const isOwner = ref(true);
 const deleteComment = async (comment) => {
   try {
     await axios.post(`${ENDPOINTS.DELETE_COMMENT}/${comment.id}/`);
