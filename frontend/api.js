@@ -47,6 +47,7 @@ export const ENDPOINTS = {
   LIKE_COMMENT: `${COMMENT_URL}/like/`,
   DISLIKE_COMMENT: `${COMMENT_URL}/dislike/`,
   UNLIKE_COMMENT: `${COMMENT_URL}/unlike/`,
+  EDIT_IMAGE: `${COMMENT_URL}/image`,
 
   REGISTER_REPORT: `${REPORT_URL}/register/`,
   REPORT_EDIT: `${REPORT_URL}/edit`,

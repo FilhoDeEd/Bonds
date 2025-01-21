@@ -1,3 +1,6 @@
+import os
+from PIL import Image
+
 from django.shortcuts import get_object_or_404, render
 from django.db import transaction
 from rest_framework.authentication import TokenAuthentication
@@ -16,7 +19,7 @@ from comment.serializers import CommentSerializer, ReportSerializer, PoolSeriali
 from user_profile.models import UserProfile
 
 
-
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
 class CommentRegisterView(APIView):
@@ -79,6 +82,43 @@ class CommentEditView(APIView):
             return Response({"success": "Comment updated successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CommentImageUpdateView(APIView):
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+
+        if 'image' not in request.FILES:
+            return Response({'error': 'No image sent.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        image = request.FILES['image']
+
+        if image.size > MAX_FILE_SIZE:
+            return Response({'error': 'File size exceeds 5MB.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            img = Image.open(image)
+            if img.format not in ['JPEG', 'PNG']:
+                return Response({'error': 'Unsupported file format. Please upload JPEG or PNG.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'error': 'Invalid image file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        try:
+            if comment.image:
+                old_image_path = comment.image.path
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+
+            comment.image = image
+            comment.save()
+        except Exception as e:
+            return Response({'error': f'An error occurred while saving the image: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        image_url = request.build_absolute_uri(comment.image.url)
+        return Response({'message': 'Comment image updated successfully.', 'image_url': image_url}, status=status.HTTP_200_OK)
 
 
 class CommentDeleteView(APIView):
