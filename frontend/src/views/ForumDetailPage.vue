@@ -54,6 +54,7 @@
               </button>
 
               <button type="button"
+                @click="denounce"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
@@ -173,6 +174,24 @@
                           <div class="relative">
                             <button @click="toggleMenu(item.id)" class="text-black text-xl hover:text-gray-300">
                               ⋯
+                          </button>
+
+                          <!-- Dropdown menu -->
+                          <div v-if="menuStates[item.id]"
+                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                            <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
+                              v-show="checkOwnership(item.creator)"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Editar
+                            </button>
+                            <button v-show="checkOwnership(item.creator)"
+                              @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Deletar
+                            </button>
+                            <button @click="() => {menuStates[item.id] = false; denounce()}"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Reportar
                             </button>
 
                             <!-- Dropdown menu -->
@@ -240,7 +259,7 @@
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Deletar
                           </button>
-                          <button @click="menuStates[item.id] = false"
+                          <button @click="() => {menuStates[item.id] = false; denounce()}"
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Reportar
                           </button>
@@ -355,7 +374,7 @@
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
                         </button>
-                        <button @click="menuStates[comment.id] = false"
+                        <button @click="() => {menuStates[item.id] = false; denounce()}"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Reportar
                         </button>
@@ -707,6 +726,10 @@ const fetchForum = async () => {
     router.push('/home');
   }
 };
+
+const denounce = ()=>{
+  toast.success("Denúncia realizada, nossos moderadores estarão de olho 👁️‍🗨️")
+}
 
 const subscribed = () => {
   if (forumData.value.isSubscribed == 1) {
