@@ -92,7 +92,6 @@
               </button>
 
               <button type="button"
-                @click="denounce"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4" 
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
@@ -141,47 +140,10 @@
                     <span>📢</span>
                   </button>
 
-                  <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                  <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
                     id="pollButton">
                     <span>📊</span>
                   </button>
-
-                  <div v-if="showPoll" class="mt-4 space-y-4">
-                    <!-- Título da enquete -->
-                    <input type="text" v-model="formPoll.title" placeholder="Título da enquete"
-                      class="w-full p-2 border rounded-lg" />
-
-                    <!-- Prazo (deadline) -->
-                    <input type="date" v-model="formPoll.deadline" class="w-full p-2 border rounded-lg" />
-
-                    <!-- Opções da enquete -->
-                    <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
-                      <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
-                        :placeholder="`Opção ${index + 1}`" />
-                      <button v-if="index >= 2" @click="removePollOption(index)"
-                        class="text-red-500 hover:text-red-600">
-                        ❌
-                      </button>
-                    </div>
-
-                    <!-- Botões de ação -->
-                    <div class="flex space-x-2 mt-3">
-                      <button v-if="pollOptions.length < 4" @click="addPollOption"
-                        class="text-blue-500 hover:text-blue-600 text-sm">
-                        + Adicionar opção
-                      </button>
-
-                      <div class="flex space-x-2 ml-auto">
-                        <button @click="cancelPoll" class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
-                          Cancelar
-                        </button>
-                        <button @click="createPoll" :disabled="!isFormValid" class="px-4 py-1 text-white rounded-lg"
-                          :class="isFormValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'">
-                          Criar Enquete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
                   <button v-show="showPostButton" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
@@ -200,12 +162,14 @@
           <!-- Posts Section -->
           <div class="w-3/4">
             <div class="space-y-4">
-              <article v-for="comment in comments" :key="comment.createdAt"
-                class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
+              <article v-for="comment in combinedItems" :key="comment.createdAt"
+                class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic"
+                :class="comment.type === 'comment' ? 'bg-basic' : 'bg-red-500'">
+
                 <div class="flex h-full">
 
                   <!-- Área de votação -->
-                  <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <div v-if="comment.type === 'comment'" class="flex flex-col items-center text-2xl font-bold w-12">
                     <button @click="likeComment(comment)" class="vote" :class="{
                       'on-up': comment.has_liked === 1,
                       'hover:text-gray-300': comment.has_liked !== 1
@@ -231,6 +195,65 @@
                   <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                     <div class="text-black flex flex-col h-full justify-between">
                       <!-- Menu dropdown -->
+                      <div v-if="comment.type === 'comment'" class="relative flex">
+                      <!-- Left side - Comment image -->
+                      <div class="comment-image-container mr-6">
+                        <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                      </div>
+                      <!-- Right side - Content area -->
+                      <div class="flex-1">
+                        <!-- Menu dropdown -->
+                        <div class="absolute top-0 right-0">
+                          <button @click="toggleMenu(comment.id)" class="text-black text-xl hover:text-gray-300">
+                            ⋯
+                          </button>
+
+                          <!-- Dropdown menu -->
+                          <div v-if="menuStates[comment.id]"
+                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                            <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                              v-show="checkOwnership(comment.creator)"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Editar
+                            </button>
+                            <button v-show="checkOwnership(comment.creator)"
+                              @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Deletar
+                            </button>
+                            <button @click="menuStates[comment.id] = false"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Reportar
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- User image --><!-- Username -->
+                        <div class="mt-8 flex justify-end">
+                          
+                          <img :src="comment.author_image || profile" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover"> 
+                          <div class="mt-2 ml-4 flex justify-end">
+                              <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
+                          </div>
+                        </div>
+                        <div class="text-lg text-black mt-4">
+                          <!-- Exibição do comentário -->
+                          <p v-if="!comment.isEditing" class="leading-relaxed text-black cursor-pointer"
+                            @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                            {{ comment.content }}
+                          </p>
+
+                          <!-- Edição do comentário -->
+                          <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
+                            @keyup.enter="saveEdit(comment)"
+                            class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
+                          </textarea>
+                        </div>
+                        <!-- Detalhes do comentário -->
+                        <p class="mt-4 text-black">{{ comment.createdAt }}</p>
+                      </div>
+                    </div>
+                    <div v-else>
                       <div class="relative self-end mb-2">
                         <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
                           ⋯
@@ -239,55 +262,70 @@
                         <!-- Dropdown menu -->
                         <div v-if="menuStates[comment.id]"
                           class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                          <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }" v-show="false"
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Editar
                           </button>
-                          <button
-                            @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
+                          <button v-show="checkOwnership(comment.creator)"
+                            @click="() => { menuStates[comment.id] = false; deletePoll(comment); }"
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Deletar
                           </button>
-                          <button @click="() => {menuStates[comment.id] = false; denounce()}"
+                          <button @click="menuStates[comment.id] = false"
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Reportar
                           </button>
 
                         </div>
                       </div>
+                      <!-- Container do item de enquete -->
+                      <div class="border rounded-lg shadow-lg p-6 bg-white mb-6">
+                        <!-- Título da enquete -->
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ comment.title || "Título da Enquete" }}
+                        </h2>
 
-                      <!-- Título ou nome do autor -->
-                      <div class="flex items-center mb-8 ml-auto">
-                        <!-- Imagem do autor (à direita) -->
-                        <img 
-                        :src="comment.author_image || profile"
-                        alt="Imagem do autor" 
-                        class="w-10 h-10 rounded-full object-cover mr-3"
-                        >
-
-                        <!-- Nome do criador -->
-                        <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
-                      </div>
-
-                      <div class="text-lg text-black flex flex-col justify-between flex-grow">
-                        <!-- Exibição do comentário -->
-                        <p v-if="!comment.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
-                          @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                          {{ comment.content }}
+                        <!-- Texto descritivo -->
+                        <p class="text-gray-700 mb-4">
+                          {{ comment.content || "Adicione aqui uma descrição da enquete." }}
                         </p>
 
-                        <!-- Edição do comentário -->
-                        <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
-                          @keyup.enter="saveEdit(comment)"
-                          class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                        </textarea>
+                        <!-- Prazo -->
+                        <p class="text-sm text-gray-500 mb-6">
+                          Prazo: {{ comment.deadline ? `Até ${new Date(comment.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
+                        </p>
+
+                        <!-- Opções da enquete -->
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">Opções:</h3>
+                        <ul class="space-y-4">
+                          <li v-for="option in comment.options" :key="option.id" class="flex items-center justify-between">
+                            <!-- Radio para votar -->
+                            <div class="flex items-center">
+                              <input type="radio" :id="`option-${option.id}`" :value="option.id"
+                                :name="`poll-${comment.slug}`" :disabled="new Date(comment.deadline) <= new Date()"
+                                v-model="selectedItem"
+                                class="w-5 h-5 text-green-500 border-gray-300 focus:ring-green-400" />
+                              <label :for="`option-${option.id}`" class="ml-3 text-gray-700 cursor-pointer">
+                                {{ option.option_text || "Opção não definida" }}
+                              </label>
+                            </div>
+                            <!-- Contagem de votos -->
+                            <div class="text-gray-700">
+                              {{ option.votes || 0 }} votos
+                            </div>
+                          </li>
+                        </ul>
+
+                        <!-- Botão de envio -->
+                        <button v-show="new Date(comment.deadline) > new Date()" @click="voteIn()"
+                          class="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                          Enviar Voto
+                        </button>
                       </div>
-                      <!-- Detalhes do comentário -->
-                      <p class="mt-8 text-black ">{{ comment.createdAt }}</p>
                     </div>
                   </div>
                 </div>
-              </article>
+              </div>
+            </article>
             </div>
           </div>
 
@@ -332,6 +370,8 @@
       </div>
       <ModalReview v-if="isModalOpen" :isModalOpen="isModalOpen" @submitRating="handleRating"
         @close="isModalOpen = false" @showToast="handleShowToast" />
+        <ModalPoll v-if="isPollOpen" :isPollOpen="isPollOpen" @close="closePoll" :slug="slug" />
+
     </div>
   </MainLayout>
 </template>
@@ -346,6 +386,7 @@ import router from '../router/index.js';
 import { ENDPOINTS } from '../../api.js';
 import MainLayout from '../layouts/mainLayout.vue';
 import ModalReview from '../components/Modals/ModalReview.vue';
+import ModalPoll from '../components/Modals/ModalPoll.vue';
 import { computed } from "vue";
 import { useUserStore } from "../store/user.js";
 
@@ -359,6 +400,54 @@ const stars = ref(0);
 const callReview = () => {
   isModalOpen.value = true;
 };
+
+const isPollOpen = ref(false)
+const openPoll = () => {
+  isPollOpen.value = true;
+}
+
+const selectedItem = ref()
+const closePoll = () => {
+  isPollOpen.value = false;
+  fetchPolls();
+}
+const deletePoll = async (item) => {
+  try {
+    const response = await axios.post(`${ENDPOINTS.DELETE_POLL}/${item.id}/`);
+    if (response.status === 204) {
+      toast.success("Enquete excluída com sucesso")
+      fetchPolls()
+    } else {
+      toast.error("Erro ao excluir enquete")
+    }
+  } catch (err) {
+    console.log(err);
+    toast.error("Erro ao excluir enquete")
+  }
+}
+
+const voteIn = async () => {
+  try {
+    const response = await axios.post(`${ENDPOINTS.VOTE_POLL}/${selectedItem.value}/`);
+    if (response.status === 201) {
+      toast.success("Seu voto foi computado!")
+      fetchPolls()
+    }
+    else {
+      console.log(response)
+      toast.error("Algo deu errado")
+    }
+  } catch (err) {
+    if (err.response.data.detail === "Você já votou nesta opção.") {
+      toast.info("Você já votou nesta opção!")
+    }
+    else {
+      console.log(err)
+      toast.error("Algo deu errado")
+
+    }
+  }
+}
 
 const handleRating = async (rating) => {
   stars.value = rating;
@@ -498,6 +587,22 @@ const fetchEvent = async () => {
     router.push('/home');
   }
 };
+const polls = ref([]);
+const fetchPolls = async () => {
+  try {
+    const response = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
+    if (response.status === 200) {
+      polls.value = response.data.results;
+    }
+
+    else {
+      toast.error("Erro ao carregar as enquetes")
+    }
+  }
+  catch (err) {
+    toast.error("Erro ao carregar as enquetes")
+  }
+}
 
 const subscribed = () => {
   if (forumData.value.isSubscribed == 1) {
@@ -527,7 +632,14 @@ const fetchComments = async () => {
     console.error(error);
     toast.error('Erro ao carregar comentários');
   }
+  fetchPolls();
 };
+const combinedItems = computed(() => {
+  return [...polls.value.map((poll) => ({ ...poll, type: "poll" })),
+  ...comments.value.map((comment) => ({ ...comment, type: "comment" }))].sort((a, b) =>
+    new Date(b.post_date || b.createdAt) - new Date(a.post_date || a.createdAt)
+  );
+});
 
 
 const createComment = async () => {
@@ -567,6 +679,7 @@ const likeComment = async (comment) => {
   } catch (error) {
     console.error("Erro ao curtir o comentário:", error);
   }
+  fetchComments();
 };
 
 const dislikeComment = async (comment) => {
@@ -586,6 +699,7 @@ const dislikeComment = async (comment) => {
   } catch (error) {
     console.error("Erro ao descurtir o comentário:", error);
   }
+  fetchComments();
 };
 
 const editComment = async (comment) => {
@@ -666,49 +780,7 @@ const toggleMenu = (commentId) => {
 };
 
 
-// Enquete  
-const showPostButton = ref(true)
-const showPoll = ref(false)
-const pollOptions = ref([
-  { text: '', votes: 0 },
-  { text: '', votes: 0 }
-])
 
-// Add these methods
-const togglePoll = () => {
-  showPoll.value = !showPoll.value
-  showPostButton.value = !showPoll.value
-}
-
-const addPollOption = () => {
-  if (pollOptions.value.length < 4) {
-    pollOptions.value.push({ text: '', votes: 0 })
-  }
-}
-
-const removePollOption = (index) => {
-  if (index >= 2) { // Only allow removing extra options
-    pollOptions.value.splice(index, 1)
-  }
-}
-
-const cancelPoll = () => {
-  showPoll.value = false
-  showPostButton.value = true
-  pollOptions.value = [
-    { text: '', votes: 0 },
-    { text: '', votes: 0 }
-  ]
-}
-const createPoll = () => {
-  // Add your poll creation logic here
-  console.log('Poll created:', pollOptions.value)
-  showPostButton.value = true
-  cancelPoll()
-}
-const denounce = ()=>{
-  toast.success("Denúncia realizada, nossos moderadores estarão de olho 👁️‍🗨️")
-}
 const imagePreview = ref(null);
 const selectedImage = ref(null);
 const imageInput = ref(null);
