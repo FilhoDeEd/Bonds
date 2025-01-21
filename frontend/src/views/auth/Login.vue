@@ -69,6 +69,7 @@ import { useUserStore } from '../../store/user.js';
 import { useToast } from "vue-toastification";
 import axios from 'axios';
 import altLogo from "@/assets/img/altLogo.png";
+import { onBeforeMount } from 'vue';
 
 export default {
   data() {
@@ -131,6 +132,10 @@ export default {
           alert('Unexpected error occurred.');
         }
       }
+    },
+    onBeforeMount(){
+      this.router.push('/login')
+      this.userStore.removeToken()
     }
   }
 };
