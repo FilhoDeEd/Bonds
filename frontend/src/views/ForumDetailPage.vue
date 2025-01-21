@@ -812,6 +812,7 @@ const likeComment = async (comment) => {
     // Atualiza o trust_rate e o estado de like do comentário
     comment.trust_rate = response.data.trust_rate;
     comment.has_liked = comment.has_liked === 1 ? 0 : 1;
+    await fetchComments()
   } catch (error) {
     console.error("Erro ao curtir o comentário:", error);
   }
@@ -831,6 +832,7 @@ const dislikeComment = async (comment) => {
     // Atualiza o trust_rate e o estado de dislike do comentário
     comment.trust_rate = response.data.trust_rate;
     comment.has_liked = comment.has_liked === -1 ? 0 : -1;
+    await fetchComments()
   } catch (error) {
     console.error("Erro ao descurtir o comentário:", error);
   }
