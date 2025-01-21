@@ -83,29 +83,19 @@
                       @click="$refs.imageInput.click()">
                       <span>📷</span>
                     </button>
-
                     <input type="file" ref="imageInput" accept="image/*" style="display: none;"
-                      @change="handleImageUpload">
-
-                    <!-- Prévia da imagem -->
-                    <div v-if="imagePreview" class="mb-4 relative">
-                      <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
-                      <button @click="removeImage"
-                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                        title="Remover imagem">
-                        ❌
-                      </button>
-                    </div>
+                      @change="handleImageUpload">            
+                    
                   </div>
                   <button v-show="showReportCreator" @click="openModal" class="p-2 hover:bg-gray-100 rounded-full"
                     title="Adicionar um Reporte">
                     <span>📢</span>
                   </button>
 
-                  <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
-                    id="pollButton">
-                    <span>📊</span>
-                  </button>
+                  <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                      id="pollButton">
+                      <span>📊</span>
+                    </button>
 
                   <div v-if="showPoll" class="mt-4 space-y-4">
                     <!-- Título da enquete -->
@@ -142,8 +132,17 @@
                         </button>
                       </div>
                     </div>
-                  </div>
 
+                  </div>
+                        <!-- Prévia da imagem -->
+                  <div v-if="imagePreview" class="mb-4 relative">
+                      <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                      <button @click="removeImage"
+                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        title="Remover imagem">
+                        ❌
+                      </button>
+                    </div>
                   <button v-show="showPostButton" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
@@ -196,6 +195,10 @@
                   <!-- Conteúdo do comentário -->
                   <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                     <div class="text-black flex flex-col h-full justify-between">
+                      <!--campo de imagem (a testar)-->
+                      <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
+                        <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                      </div>
                       <!-- Menu dropdown -->
                       <div class="relative self-end mb-2">
                         <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
@@ -254,6 +257,7 @@
               </article>
             </div>
           </div>
+
 
           <!-- Reports Section -->
           <div class="w-3/4 " v-else>
@@ -449,7 +453,9 @@
           </aside>
         </div>
         <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
+        <ModalPoll v-if="isPollOpen" :isPollOpen = "isPollOpen" @close="isPollOpen = false" :slug = "slug"/>
       </div>
+
   </MainLayout>
 
 </template>
@@ -466,8 +472,14 @@ import MainLayout from '../layouts/mainLayout.vue';
 import ModalReport from '../components/Modals/ModalReport.vue';
 import { computed } from "vue";
 import { useUserStore } from "../store/user.js";
-
+import ModalPoll from '../components/Modals/ModalPoll.vue';
 import profile from "@/assets/img/profilePic.jpg";
+
+const isPollOpen = ref(false)
+const openPoll = () =>{
+  isPollOpen.value = true;
+}
+
 
 const toast = useToast();
 const forumData = ref({
@@ -493,6 +505,8 @@ const tags = [
 
 
 const comment_list = ref(true);
+const showReportCreator = ref(true)
+
 const commentOrReport = async () => {
   comment_list.value = !comment_list.value;
   if (comment_list.value) {
@@ -612,6 +626,23 @@ const subscribed = () => {
   }
 };
 
+const polls = ref([]);
+const fetchPoll = async() =>{
+  try{
+    const response = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
+    polls.value = response.data.results.map((poll) =>({
+      id: poll.id,
+      title: poll.title,
+      content: poll.content,
+      deadline: poll.deadline,
+      post_date: poll.post_date,
+      
+    }))
+  }
+  catch(err){
+    toast.error("Erro ao carregar as enquetes")
+  }
+}
 const fetchComments = async () => {
   try {
     const commentsResponse = await axios.get(`${ENDPOINTS.LIST_COMMENTS}/${slug.value}/`);
@@ -824,76 +855,7 @@ const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
 };
 
-const showReportCreator = ref(false);
-// Enquete  
-const formPoll = {
-  title: "",
-  content: "",
-  deadline: "",
-  forum_slug: slug.value,
-  options: [{
-    option: "",
-  }]
-}
-const showPollCreator = ref(false);
-const showPostButton = ref(true)
-const showPoll = ref(false)
-const pollOptions = ref([])
-
-// Add these methods
-const togglePoll = () => {
-  showPoll.value = !showPoll.value
-  showPostButton.value = !showPoll.value
-  imagePreview.value = null;
-}
-
-const isFormValid = () => {
-  // Valida o título, prazo e pelo menos duas opções preenchidas
-  return (
-    this.formPoll.title.trim() !== '' &&
-    this.formPoll.deadline !== '' &&
-    this.pollOptions.filter(option => option.text.trim() !== '').length >= 2
-  );
-}
-
-const addPollOption = () => {
-  if (pollOptions.value.length < 4) {
-    pollOptions.value.push({ text: '' })
-  }
-}
-
-const removePollOption = (index) => {
-  if (index >= 2) { // Only allow removing extra options
-    pollOptions.value.splice(index, 1)
-  }
-}
-
-const cancelPoll = () => {
-  showPoll.value = false
-  showPostButton.value = true
-  pollOptions.value = [
-    { text: '' },
-    { text: '' }
-  ];
-  formPoll.title = '';
-  formPoll.deadline = '';
-}
-const createPoll = async () => {
-  if (isFormValid) {
-    formPoll.options = pollOptions.filter(option => option.text.trim() !== '')
-    showPostButton.value = true
-    try {
-      await axios.post(`${ENDPOINTS.REGISTER_POLL}`,
-        formPoll
-      );
-      toast.success('Enquete criada')
-    } catch (err) {
-      toast.error("Erro ao criar enquete: " + err)
-    }
-    cancelPoll()
-  }
-}
-
+const showPostButton = ref(true);
 const imagePreview = ref(null);
 const selectedImage = ref(null);
 const imageInput = ref(null);

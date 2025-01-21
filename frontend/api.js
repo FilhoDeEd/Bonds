@@ -5,7 +5,7 @@ const FORUM_URL = `${API_URL}/forum`;
 const EVENT_URL = `${FORUM_URL}/event`;
 const COMMENT_URL = `${API_URL}/comment`;
 const REPORT_URL = `${COMMENT_URL}/report`;
-const POLL_URL = `${COMMENT_URL}/poll`;
+const POLL_URL = `${COMMENT_URL}/pool`;
 
 // Endpoints centralizados
 export const ENDPOINTS = {
