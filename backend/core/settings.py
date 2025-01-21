@@ -71,8 +71,8 @@ else:
 
 
 if ENVIRONMENT == Envs.PRODUCTION:
-    STATIC_URL = 'https://api.{DOMAIN}/static/' # Não funciona. Atencion
-    MEDIA_URL = 'https://api.{DOMAIN}/media/'
+    STATIC_URL = f'https://api.{DOMAIN}/static/' # Não funciona. Atencion
+    MEDIA_URL = f'https://api.{DOMAIN}/media/'
     STATIC_ROOT = '/static/'
     MEDIA_ROOT = '/media/'
 elif ENVIRONMENT == Envs.DEVELOPMENT:
