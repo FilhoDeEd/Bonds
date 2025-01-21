@@ -145,7 +145,7 @@
                     <span>📊</span>
                   </button>
 
-                  <button v-show="showPostButton" @click="createComment"
+                  <button v-show="true" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
                   </button>
@@ -643,6 +643,10 @@ const combinedItems = computed(() => {
 
 
 const createComment = async () => {
+  if(!newCommentContent.value){
+    toast.error("Você precisa de um texto para realizar o post")
+    return
+  }
   try {
     // Usamos diretamente o valor de `slug`, que reflete a rota atual
     const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, {
