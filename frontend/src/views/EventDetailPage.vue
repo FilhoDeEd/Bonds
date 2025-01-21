@@ -405,7 +405,15 @@ const closeModal = () =>{
     toast.success("Obrigado por avaliar!")
   }
 }
-
+const checkOwnership = (name) => {
+  if ((userStore.user.account.name + " " + userStore.user.account.surname) === name || userStore.user.account.username === name) {
+    isOwner.value = true;
+    return true
+  } else {
+    isOwner.value = false;
+    return false
+  }
+};
 const isPollOpen = ref(false)
 const openPoll = () => {
   isPollOpen.value = true;
@@ -691,7 +699,7 @@ const add_image = async (comment_id) => {
 
     } catch (error) {
       console.error("Erro ao atualizar imagem:", error.response || error);
-      toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+      // toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
     }
 
     fetchComments();
