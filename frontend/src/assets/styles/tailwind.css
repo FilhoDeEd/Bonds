@@ -1502,6 +1502,10 @@ select {
   margin-left: -1rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .-mt-20 {
   margin-top: -5rem;
 }

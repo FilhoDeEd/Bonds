@@ -194,10 +194,11 @@
 
                         <!-- User image --><!-- Username -->
                         <div class="mt-8 flex justify-end">
-                          <div class="mt-2 flex justify-end">
+                          
+                          <img :src="item.author_image || profile" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover"> 
+                          <div class="mt-2 ml-4 flex justify-end">
                               <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
                           </div>
-                          <img :src="item.author_image || profile" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover"> 
                         </div>
                         <div class="text-lg text-black mt-4">
                           <!-- Exibição do comentário -->
