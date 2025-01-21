@@ -16,12 +16,14 @@ from comment.views import (
     PoolDeleteView,
     PoolListView,
     VoteOptionView,
-    UnvoteOptionView
+    UnvoteOptionView,
+    CommentImageUpdateView
 )
 
 urlpatterns = [
     path('register/',CommentRegisterView.as_view(), name='comment_register'),
     path('edit/<int:comment_id>/',CommentEditView.as_view(), name='comment_edit'),
+    path('image/<int:comment_id>/', CommentImageUpdateView.as_view(), name='comment_update_image'),
     path('delete/<int:comment_id>/', CommentDeleteView.as_view(), name='comment-delete'),
     path('list/<slug:slug>/', CommentListView.as_view(), name='comment_list'),
     path('like/<int:comment_id>/', LikeView.as_view(), name='like'),
