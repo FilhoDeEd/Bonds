@@ -160,63 +160,74 @@
                 <!-- Conteúdo do comentário ou poll -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-black flex flex-col h-full justify-between">
-                    <div v-if="item.type === 'comment'">
-                      <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
-                        <img :src="item.image" class="rounded-lg max-h-48">
-                      </div>
-                      <!-- Right side - Content area -->
-                      <div class="flex-1">
-                        <!-- Menu dropdown -->
-                        <div class="absolute top-0 right-0">
-                          <button @click="toggleMenu(item.id)" class="text-black text-xl hover:text-gray-300">
-                            ⋯
-                          </button>
+                    <div v-if="item.type === 'comment'" class="flex gap-4">
+  <!-- Left side - Comment image -->
+  <div class="flex-shrink-0">
+    <img :src="item.image" class="rounded-lg max-h-48 w-auto">
+  </div>
 
-                          <!-- Dropdown menu -->
-                          <div v-if="menuStates[item.id]"
-                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                            <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                              v-show="checkOwnership(item.creator)"
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                              Editar
-                            </button>
-                            <button v-show="checkOwnership(item.creator)"
-                              @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                              Deletar
-                            </button>
-                            <button @click="menuStates[item.id] = false"
-                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                              Reportar
-                            </button>
-                          </div>
-                        </div>
+  <!-- Right side - Content area -->
+  <div class="flex-1">
+    <!-- Menu dropdown -->
+    <div class="flex justify-end mb-4">
+      <div class="relative">
+        <button @click="toggleMenu(item.id)" 
+                class="text-black text-xl hover:text-gray-300">
+          ⋯
+        </button>
 
-                        <!-- User image --><!-- Username -->
-                        <div class="mt-8 flex justify-end">
-                          
-                          <img :src="item.author_image || profile" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover"> 
-                          <div class="mt-2 ml-4 flex justify-end">
-                              <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
-                          </div>
-                        </div>
-                        <div class="text-lg text-black mt-4">
-                          <!-- Exibição do comentário -->
-                          <p v-if="!item.isEditing" class="leading-relaxed text-black cursor-pointer"
-                            @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
-                            {{ item.content }}
-                          </p>
+        <!-- Dropdown menu -->
+        <div v-if="menuStates[item.id]"
+             class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+          <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
+                  v-show="checkOwnership(item.creator)"
+                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+            Editar
+          </button>
+          <button v-show="checkOwnership(item.creator)"
+                  @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+            Deletar
+          </button>
+          <button @click="menuStates[item.id] = false"
+                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+            Reportar
+          </button>
+        </div>
+      </div>
+    </div>
 
-                          <!-- Edição do comentário -->
-                          <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
-                            @keyup.enter="saveEdit(item)"
-                            class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
-                          </textarea>
-                        </div>
-                        <!-- Detalhes do comentário -->
-                        <p class="mt-4 text-black">{{ item.createdAt }}</p>
-                      </div>
-                    </div>
+    <!-- User info -->
+    <div class="flex justify-end items-center gap-3 mb-4">
+      <img :src="item.author_image || profile" 
+           alt="Imagem do autor" 
+           class="w-10 h-10 rounded-full object-cover">
+      <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
+    </div>
+
+    <!-- Comment content -->
+    <div class="text-lg text-black">
+      <!-- Comment display -->
+      <p v-if="!item.isEditing" 
+         class="leading-relaxed text-black cursor-pointer"
+         @dblclick="() => { item.isEditing = true; }" 
+         title="Clique duas vezes para editar">
+        {{ item.content }}
+      </p>
+
+      <!-- Comment editing -->
+      <textarea v-else 
+                v-model="item.tempContent" 
+                @blur="cancelEdit(item)"
+                @keyup.enter="saveEdit(item)"
+                class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
+      </textarea>
+    </div>
+
+    <!-- Creation date -->
+    <p class="mt-4 text-black">{{ item.createdAt }}</p>
+  </div>
+</div>
                     <div v-else>
                       <div class="relative self-end mb-2">
                         <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
