@@ -164,7 +164,7 @@
                     <div v-if="item.type === 'comment'" class="flex gap-4">
                       <!-- Left side - Comment image -->
                       <div class="flex-shrink-0">
-                        <img :src="item.image" class="rounded-lg max-h-48 w-auto">
+                        <img :src="item.image" class="rounded-lg max-h-48 w-auto ml-4">
                       </div>
 
                       <!-- Right side - Content area -->
@@ -202,7 +202,7 @@
                         <div class="flex justify-end items-center gap-3 mb-4">
                           <img :src="item.author_image || profile" 
                               alt="Imagem do autor" 
-                              class="w-10 h-10 rounded-full object-cover">
+                              class="w-10 h-10 rounded-full object-cover mr-2">
                           <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
                         </div>
 
@@ -835,6 +835,8 @@ const add_image = async (comment_id) => {
             },
           }
         );
+
+        removeImage();
 
     } catch (error) {
       console.error("Erro ao atualizar imagem:", error.response || error);
