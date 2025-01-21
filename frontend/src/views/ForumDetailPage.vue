@@ -161,10 +161,9 @@
                 <!-- Conteúdo do comentário ou poll -->
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-black flex flex-col h-full justify-between">
-                    <div v-if="item.type === 'comment'" class="relative flex">
-                      <!-- Left side - Comment image -->
-                      <div class="comment-image-container mr-6">
-                        <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                    <div v-if="item.type === 'comment'">
+                      <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
+                        <img :src="item.image" class="rounded-lg max-h-48">
                       </div>
                       <!-- Right side - Content area -->
                       <div class="flex-1">
@@ -329,7 +328,7 @@
                   <div class="text-white flex flex-col h-full justify-between">
                     <!-- Campo de imagem -->
                     <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
-                      <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                      <img v-if="selectedImage" :src="comment.image" alt="Uploaded Image" class="rounded-lg max-h-48">
                     </div>
                     <!-- Menu dropdown -->
                     <div class="relative self-end mb-2">
@@ -617,7 +616,7 @@ const openModal = () => {
 
 const closeModal = async () => {
   isModalOpen.value = false; // Fecha o modal corretamente
-  await router.push({ name: 'ForumDetailPage', params: { slug: slug.value } });
+  await fetchReports();
 };
 
 const userStore = useUserStore();
@@ -793,6 +792,9 @@ const createComment = async () => {
       forum_slug: slug.value, // `slug` já é atualizado via rota
     });
 
+    if(selectedImage) {
+      add_image(response.data.id);
+    }
     console.log(response);
     toast.success('Comentário criado com sucesso');
     newCommentContent.value = ''; // Limpa o campo de comentário
@@ -802,6 +804,29 @@ const createComment = async () => {
     toast.error('Erro ao criar comentário');
   }
 };
+
+const add_image = async (comment_id) => {
+  try {
+        const formData = new FormData();
+        formData.append("image", selectedImage.value);
+
+        const response = await axios.post(
+          `${ENDPOINTS.EDIT_IMAGE}/${comment_id}/`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+    } catch (error) {
+      console.error("Erro ao atualizar imagem:", error.response || error);
+      toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+    }
+
+    fetchComments();
+}
 
 const likeComment = async (comment) => {
   try {
