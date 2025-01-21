@@ -135,15 +135,13 @@
                       </button>
                     </div>
                   </div>
-                  <button v-show="showReportCreator" @click="openModal" class="p-2 hover:bg-gray-100 rounded-full"
-                    title="Adicionar um Reporte">
-                    <span>📢</span>
-                  </button>
 
                   <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
                     id="pollButton">
                     <span>📊</span>
                   </button>
+
+                  <button @click="callReview" v-show="true">⭐</button>
 
                   <button v-show="true" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
@@ -369,7 +367,7 @@
         </aside>
       </div>
       <ModalReview v-if="isModalOpen" :isModalOpen="isModalOpen" @submitRating="handleRating"
-        @close="isModalOpen = false" @showToast="handleShowToast" />
+        @close="closeModal" @showToast="handleShowToast" />
         <ModalPoll v-if="isPollOpen" :isPollOpen="isPollOpen" @close="closePoll" :slug="slug" />
 
     </div>
@@ -400,6 +398,12 @@ const stars = ref(0);
 const callReview = () => {
   isModalOpen.value = true;
 };
+const closeModal = () =>{
+  isModalOpen.value = false
+  if(stars.value>0 && isReview === false){
+    toast.success("Obrigado por avaliar!")
+  }
+}
 
 const isPollOpen = ref(false)
 const openPoll = () => {

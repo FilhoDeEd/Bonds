@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { useToast } from 'vue-toastification';
 export default {
   props: {
     isModalOpen: Boolean,
@@ -42,7 +43,9 @@ export default {
     return {
       selectedStars: 0, // Armazena a quantidade de estrelas selecionadas
       hoverStars: 0,    // Armazena as estrelas sendo "hovered" (para efeito visual)
+      toast: useToast()
     };
+
   },
   methods: {
     closeModal() {
@@ -59,7 +62,7 @@ export default {
     },
     confirmRating() {
       if (this.selectedStars === 0) {
-        this.$toast.error("Por favor, selecione uma avaliação.");
+        this.toast.error("Por favor, selecione uma avaliação.");
         return;
       }
       this.$emit("submitRating", this.selectedStars);
