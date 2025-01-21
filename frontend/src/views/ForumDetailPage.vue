@@ -161,73 +161,67 @@
                 <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
                   <div class="text-black flex flex-col h-full justify-between">
                     <div v-if="item.type === 'comment'" class="flex gap-4">
-  <!-- Left side - Comment image -->
-  <div class="flex-shrink-0">
-    <img :src="item.image" class="rounded-lg max-h-48 w-auto">
-  </div>
+                      <!-- Left side - Comment image -->
+                      <div class="flex-shrink-0">
+                        <img :src="item.image" class="rounded-lg max-h-48 w-auto">
+                      </div>
 
-  <!-- Right side - Content area -->
-  <div class="flex-1">
-    <!-- Menu dropdown -->
-    <div class="flex justify-end mb-4">
-      <div class="relative">
-        <button @click="toggleMenu(item.id)" 
-                class="text-black text-xl hover:text-gray-300">
-          ⋯
-        </button>
+                      <!-- Right side - Content area -->
+                      <div class="flex-1">
+                        <!-- Menu dropdown -->
+                        <div class="flex justify-end mb-4">
+                          <div class="relative">
+                            <button @click="toggleMenu(item.id)" class="text-black text-xl hover:text-gray-300">
+                              ⋯
+                            </button>
 
-        <!-- Dropdown menu -->
-        <div v-if="menuStates[item.id]"
-             class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-          <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                  v-show="checkOwnership(item.creator)"
-                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-            Editar
-          </button>
-          <button v-show="checkOwnership(item.creator)"
-                  @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
-                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-            Deletar
-          </button>
-          <button @click="menuStates[item.id] = false"
-                  class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-            Reportar
-          </button>
-        </div>
-      </div>
-    </div>
+                            <!-- Dropdown menu -->
+                            <div v-if="menuStates[item.id]"
+                              class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                              <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
+                                v-show="checkOwnership(item.creator)"
+                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                                Editar
+                              </button>
+                              <button v-show="checkOwnership(item.creator)"
+                                @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                                Deletar
+                              </button>
+                              <button @click="menuStates[item.id] = false"
+                                class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                                Reportar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
 
-    <!-- User info -->
-    <div class="flex justify-end items-center gap-3 mb-4">
-      <img :src="item.author_image || profile" 
-           alt="Imagem do autor" 
-           class="w-10 h-10 rounded-full object-cover">
-      <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
-    </div>
+                        <!-- User info -->
+                        <div class="flex justify-end items-center gap-3 mb-4">
+                          <img :src="item.author_image || profile" alt="Imagem do autor"
+                            class="w-10 h-10 rounded-full object-cover">
+                          <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
+                        </div>
 
-    <!-- Comment content -->
-    <div class="text-lg text-black">
-      <!-- Comment display -->
-      <p v-if="!item.isEditing" 
-         class="leading-relaxed text-black cursor-pointer"
-         @dblclick="() => { item.isEditing = true; }" 
-         title="Clique duas vezes para editar">
-        {{ item.content }}
-      </p>
+                        <!-- Comment content -->
+                        <div class="text-lg text-black">
+                          <!-- Comment display -->
+                          <p v-if="!item.isEditing" class="leading-relaxed text-black cursor-pointer"
+                            @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
+                            {{ item.content }}
+                          </p>
 
-      <!-- Comment editing -->
-      <textarea v-else 
-                v-model="item.tempContent" 
-                @blur="cancelEdit(item)"
-                @keyup.enter="saveEdit(item)"
-                class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
-      </textarea>
-    </div>
+                          <!-- Comment editing -->
+                          <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
+                            @keyup.enter="saveEdit(item)"
+                            class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
+                          </textarea>
+                        </div>
 
-    <!-- Creation date -->
-    <p class="mt-4 text-black">{{ item.createdAt }}</p>
-  </div>
-</div>
+                        <!-- Creation date -->
+                        <p class="mt-4 text-black">{{ item.createdAt }}</p>
+                      </div>
+                    </div>
                     <div v-else>
                       <div class="relative self-end mb-2">
                         <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
@@ -266,7 +260,8 @@
 
                         <!-- Prazo -->
                         <p class="text-sm text-gray-500 mb-6">
-                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
+                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum
+                          prazo definido" }}
                         </p>
 
                         <!-- Opções da enquete -->
@@ -799,7 +794,7 @@ const createComment = async () => {
       forum_slug: slug.value, // `slug` já é atualizado via rota
     });
 
-    if(selectedImage) {
+    if (selectedImage) {
       add_image(response.data.id);
     }
     console.log(response);
@@ -814,25 +809,25 @@ const createComment = async () => {
 
 const add_image = async (comment_id) => {
   try {
-        const formData = new FormData();
-        formData.append("image", selectedImage.value);
+    const formData = new FormData();
+    formData.append("image", selectedImage.value);
 
-        const response = await axios.post(
-          `${ENDPOINTS.EDIT_IMAGE}/${comment_id}/`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+    const response = await axios.post(
+      `${ENDPOINTS.EDIT_IMAGE}/${comment_id}/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-    } catch (error) {
-      console.error("Erro ao atualizar imagem:", error.response || error);
-      toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
-    }
+  } catch (error) {
+    console.error("Erro ao atualizar imagem:", error.response || error);
+    toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+  }
 
-    fetchComments();
+  fetchComments();
 }
 
 const likeComment = async (comment) => {
