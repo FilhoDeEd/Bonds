@@ -260,8 +260,7 @@
 
                         <!-- Prazo -->
                         <p class="text-sm text-gray-500 mb-6">
-                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum
-                          prazo definido" }}
+                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
                         </p>
 
                         <!-- Opções da enquete -->
