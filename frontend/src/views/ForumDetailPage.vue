@@ -79,9 +79,12 @@
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
                   <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto"
+                      @click="$refs.imageInput.click()">
                       <span>📷</span>
                     </button>
+                    <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                      @change="handleImageUpload">
 
                     <button v-show="showReportCreator" @click="openModal" class="p-2 hover:bg-gray-100 rounded-full"
                       title="Adicionar um Reporte">
@@ -92,193 +95,197 @@
                       id="pollButton">
                       <span>📊</span>
                     </button>
-
+                  </div>
+                  <!-- Prévia da imagem -->
+                  <div v-if="imagePreview" class="mb-4 relative">
+                    <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                    <button @click="removeImage"
+                      class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      title="Remover imagem">
+                      ❌
+                    </button>
                   </div>
                   <button v-show="showPostButton" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div>
-      <button></button>
-    </div>
-    <button v-show="showReportCreator" @click="commentOrReport"
-      class="px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-600">
-      <span v-if="comment_list">Veja os Reports 📢</span>
-      <span v-else>Veja os Comentários 💬</span>
-    </button>
-    <!-- Content Section with Posts and Sidebar -->
-    <div class="flex gap-8 space-x-4 ">
 
-      <!-- Comments Section -->
-    <div class="w-3/4" v-if="comment_list">
-         <div class="space-y-4">
-      <article v-for="item in combinedItems" :key="item.createdAt"
-        class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200" 
-        :class="item.type === 'comment' ? 'bg-basic' : 'bg-red-400'">
-        <div class="flex h-full">
 
-        <!-- Área de votação (se for comment ou poll) -->
-        <div v-if="item.type === 'comment'" class="flex flex-col items-center text-2xl font-bold w-12">
-          <button @click="likeComment(item)" class="vote" :class="{
-            'on-up': item.has_liked === 1,
-            'hover:text-gray-300': item.has_liked !== 1
-          }">
-            <svg width="36" height="36" viewBox="0 0 36 36">
-              <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path"></path>
-            </svg>
-          </button>
-          <span class="my-1 text-white">{{ item.trust_rate }}</span>
-          <button @click="dislikeComment(item)" class="vote" :class="{
-            'on-down': item.has_liked === -1,
-            'hover:text-gray-300': item.has_liked !== -1
-          }">
-            <svg width="36" height="36" viewBox="0 0 36 36">
-              <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path"></path>
-            </svg>
-          </button>
-        </div>
 
-        <!-- Conteúdo do comentário ou poll -->
-        <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-          <div class="text-black flex flex-col h-full justify-between">
-            <div v-if="item.type === 'comment'">
-                  <!-- Menu dropdown -->
-                  <div class="relative self-end mb-2">
-                    <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
-                      ⋯
-                    </button>
+      <button v-show="showReportCreator" @click="commentOrReport"
+        class="px-4 py-2 bg-black text-white rounded-lg hover:bg-blue-600">
+        <span v-if="comment_list">Veja os Reports 📢</span>
+        <span v-else>Veja os Comentários 💬</span>
+      </button>
+      <!-- Content Section with Posts and Sidebar -->
+      <div class="flex gap-8 space-x-4 ">
 
-                    <!-- Dropdown menu -->
-                    <div v-if="menuStates[item.id]"
-                      class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                      <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                        v-show="checkOwnership(item.creator)"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Editar
-                      </button>
-                      <button v-show="checkOwnership(item.creator)"
-                        @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Deletar
-                      </button>
-                      <button @click="menuStates[item.id] = false"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Reportar
-                      </button>
+        <!-- Comments Section -->
+        <div class="w-3/4" v-if="comment_list">
+          <div class="space-y-4">
+            <article v-for="item in combinedItems" :key="item.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200"
+              :class="item.type === 'comment' ? 'bg-basic' : 'bg-red-400'">
+              <div class="flex h-full">
 
-                    </div>
-                  </div>
-
-                  <!-- Título ou nome do autor -->
-                  <div class="flex items-center mb-8 ml-auto">
-                    <!-- Imagem do autor (à direita) -->
-                    <img :src="item.author_image || profile" alt="Imagem do autor"
-                      class="w-10 h-10 rounded-full object-cover mr-3">
-
-                    <!-- Nome do criador -->
-                    <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
-                  </div>
-
-                  <div class="text-lg text-black flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!item.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
-                      @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
-                      {{ item.content }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
-                      @keyup.enter="saveEdit(item)"
-                      class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                      </textarea>
-                  </div>
-                  <!-- Detalhes do comentário -->
-                  <p class="mt-8 text-black ">{{ item.createdAt }}</p>
+                <!-- Área de votação (se for comment ou poll) -->
+                <div v-if="item.type === 'comment'" class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button @click="likeComment(item)" class="vote" :class="{
+                    'on-up': item.has_liked === 1,
+                    'hover:text-gray-300': item.has_liked !== 1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="my-1 text-white">{{ item.trust_rate }}</span>
+                  <button @click="dislikeComment(item)" class="vote" :class="{
+                    'on-down': item.has_liked === -1,
+                    'hover:text-gray-300': item.has_liked !== -1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
                 </div>
-                <div v-else>
-                  <div class="relative self-end mb-2">
-                    <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
-                      ⋯
-                    </button>
 
-                    <!-- Dropdown menu -->
-                    <div v-if="menuStates[item.id]"
-                      class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                      <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                        v-show="false" 
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Editar
-                      </button>
-                      <button v-show="checkOwnership(item.creator)"
-                        @click="() => { menuStates[item.id] = false; deletePoll(item);}"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Deletar
-                      </button>
-                      <button @click="menuStates[item.id] = false"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Reportar
-                      </button>
+                <!-- Conteúdo do comentário ou poll -->
+                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                  <div class="text-black flex flex-col h-full justify-between">
+                    <div v-if="item.type === 'comment'">
+                      <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
+                        <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                      </div>
+                      <!-- Menu dropdown -->
+                      <div class="relative self-end mb-2">
+                        <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
+                          ⋯
+                        </button>
 
+                        <!-- Dropdown menu -->
+                        <div v-if="menuStates[item.id]"
+                          class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                          <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
+                            v-show="checkOwnership(item.creator)"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Editar
+                          </button>
+                          <button v-show="checkOwnership(item.creator)"
+                            @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Deletar
+                          </button>
+                          <button @click="menuStates[item.id] = false"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Reportar
+                          </button>
+
+                        </div>
+                      </div>
+
+                      <!-- Título ou nome do autor -->
+                      <div class="flex items-center mb-8 ml-auto">
+                        <!-- Imagem do autor (à direita) -->
+                        <img :src="item.author_image || profile" alt="Imagem do autor"
+                          class="w-10 h-10 rounded-full object-cover mr-3">
+
+                        <!-- Nome do criador -->
+                        <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
+                      </div>
+
+                      <div class="text-lg text-black flex flex-col justify-between flex-grow">
+                        <!-- Exibição do comentário -->
+                        <p v-if="!item.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
+                          @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
+                          {{ item.content }}
+                        </p>
+
+                        <!-- Edição do comentário -->
+                        <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
+                          @keyup.enter="saveEdit(item)"
+                          class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                          </textarea>
+                      </div>
+                      <!-- Detalhes do comentário -->
+                      <p class="mt-8 text-black ">{{ item.createdAt }}</p>
                     </div>
-                  </div>
-          <!-- Container do item de enquete -->
-          <div class="border rounded-lg shadow-lg p-6 bg-white mb-6">
-            <!-- Título da enquete -->
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ item.title || "Título da Enquete" }}</h2>
+                    <div v-else>
+                      <div class="relative self-end mb-2">
+                        <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
+                          ⋯
+                        </button>
 
-            <!-- Texto descritivo -->
-            <p class="text-gray-700 mb-4">
-              {{ item.content || "Adicione aqui uma descrição da enquete." }}
-            </p>
+                        <!-- Dropdown menu -->
+                        <div v-if="menuStates[item.id]"
+                          class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                          <button @click="() => { menuStates[item.id] = false; item.isEditing = true }" v-show="false"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Editar
+                          </button>
+                          <button v-show="checkOwnership(item.creator)"
+                            @click="() => { menuStates[item.id] = false; deletePoll(item); }"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Deletar
+                          </button>
+                          <button @click="menuStates[item.id] = false"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Reportar
+                          </button>
 
-            <!-- Prazo -->
-            <p class="text-sm text-gray-500 mb-6">
-              Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
-            </p>
+                        </div>
+                      </div>
+                      <!-- Container do item de enquete -->
+                      <div class="border rounded-lg shadow-lg p-6 bg-white mb-6">
+                        <!-- Título da enquete -->
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ item.title || "Título da Enquete" }}
+                        </h2>
 
-            <!-- Opções da enquete -->
-            <h3 class="text-lg font-medium text-gray-800 mb-3">Opções:</h3>
-            <ul class="space-y-4">
-              <li v-for="option in item.options" :key="option.id" class="flex items-center justify-between">
-                <!-- Radio para votar -->
-                <div class="flex items-center">
-                  <input
-                    type="radio"
-                    :id="`option-${option.id}`"
-                    :value="option.id"
-                    :name="`poll-${item.slug}`"
-                    :disabled="new Date(item.deadline) <= new Date()"
-                    v-model="selectedItem"
-                    class="w-5 h-5 text-green-500 border-gray-300 focus:ring-green-400"
-                  />
-                  <label :for="`option-${option.id}`" class="ml-3 text-gray-700 cursor-pointer">
-                    {{ option.option_text || "Opção não definida" }}
-                  </label>
-                </div>
-                <!-- Contagem de votos -->
-                <div class="text-gray-700">
-                  {{ option.votes || 0 }} votos
-                </div>
-              </li>
-            </ul>
+                        <!-- Texto descritivo -->
+                        <p class="text-gray-700 mb-4">
+                          {{ item.content || "Adicione aqui uma descrição da enquete." }}
+                        </p>
 
-            <!-- Botão de envio -->
-            <button
-              v-show="new Date(item.deadline) > new Date()"
-              @click="voteIn()"
-              class="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-            >
-              Enviar Voto
-            </button>
-                    </div>
+                        <!-- Prazo -->
+                        <p class="text-sm text-gray-500 mb-6">
+                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum
+                          prazo definido" }}
+                        </p>
+
+                        <!-- Opções da enquete -->
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">Opções:</h3>
+                        <ul class="space-y-4">
+                          <li v-for="option in item.options" :key="option.id" class="flex items-center justify-between">
+                            <!-- Radio para votar -->
+                            <div class="flex items-center">
+                              <input type="radio" :id="`option-${option.id}`" :value="option.id"
+                                :name="`poll-${item.slug}`" :disabled="new Date(item.deadline) <= new Date()"
+                                v-model="selectedItem"
+                                class="w-5 h-5 text-green-500 border-gray-300 focus:ring-green-400" />
+                              <label :for="`option-${option.id}`" class="ml-3 text-gray-700 cursor-pointer">
+                                {{ option.option_text || "Opção não definida" }}
+                              </label>
+                            </div>
+                            <!-- Contagem de votos -->
+                            <div class="text-gray-700">
+                              {{ option.votes || 0 }} votos
+                            </div>
+                          </li>
+                        </ul>
+
+                        <!-- Botão de envio -->
+                        <button v-show="new Date(item.deadline) > new Date()" @click="voteIn()"
+                          class="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                          Enviar Voto
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -287,202 +294,205 @@
           </div>
         </div>
 
-      <!-- Reports Section -->
-      <div class="w-3/4 " v-else>
-        <div class="space-y-4 ">
-          <article v-for="comment in reports" :key="comment.createdAt"
-            class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-red-400">
-            <div class="flex h-full">
+        <!-- Reports Section -->
+        <div class="w-3/4 " v-else>
+          <div class="space-y-4 ">
+            <article v-for="comment in reports" :key="comment.createdAt"
+              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-red-400">
+              <div class="flex h-full">
 
-              <!-- Área de votação -->
-              <div class="flex flex-col items-center text-2xl font-bold w-12">
-                <button @click="likeComment(comment)" class="vote" :class="{
-                  'on-up': comment.has_liked === 1,
-                  'hover:text-gray-300': comment.has_liked !== 1
-                }">
-                  <svg width="36" height="36" viewBox="0 0 36 36">
-                    <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
-                    </path>
-                  </svg>
-                </button>
-                <span class="my-1 text-white">{{ comment.trust_rate }}</span>
-                <button @click="dislikeComment(comment)" class="vote" :class="{
-                  'on-down': comment.has_liked === -1,
-                  'hover:text-gray-300': comment.has_liked !== -1
-                }">
-                  <svg width="36" height="36" viewBox="0 0 36 36">
-                    <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
-                    </path>
-                  </svg>
-                </button>
-              </div>
+                <!-- Área de votação -->
+                <div class="flex flex-col items-center text-2xl font-bold w-12">
+                  <button @click="likeComment(comment)" class="vote" :class="{
+                    'on-up': comment.has_liked === 1,
+                    'hover:text-gray-300': comment.has_liked !== 1}">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
+                  <button @click="dislikeComment(comment)" class="vote" :class="{
+                    'on-down': comment.has_liked === -1,
+                    'hover:text-gray-300': comment.has_liked !== -1
+                  }">
+                    <svg width="36" height="36" viewBox="0 0 36 36">
+                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
 
-              <!-- Conteúdo do comentário -->
-              <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                <div class="text-white flex flex-col h-full justify-between">
-                  <!-- Menu dropdown -->
-                  <div class="relative self-end mb-2">
-                    <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
-                      ⋯
-                    </button>
-
-                    <!-- Dropdown menu -->
-                    <div v-if="menuStates[comment.id]"
-                      class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                      <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                        v-show="checkOwnership(comment.creator)">
-
-                        Editar
+                <!-- Conteúdo do comentário -->
+                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                  <div class="text-white flex flex-col h-full justify-between">
+                    <!-- Campo de imagem -->
+                    <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
+                      <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                    </div>
+                    <!-- Menu dropdown -->
+                    <div class="relative self-end mb-2">
+                      <button @click="toggleMenu(comment.id)" class="text-white text-xl hover:text-gray-300">
+                        ⋯
                       </button>
-                      <button v-show="checkOwnership(comment.creator)"
-                        @click="() => { menuStates[comment.id] = false; deleteComment(comment) }"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Deletar
-                      </button>
-                      <button @click="menuStates[comment.id] = false"
-                        class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                        Reportar
-                      </button>
+
+                      <!-- Dropdown menu -->
+                      <div v-if="menuStates[comment.id]"
+                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                          v-show="checkOwnership(comment.creator)">
+
+                          Editar
+                        </button>
+                        <button v-show="checkOwnership(comment.creator)"
+                          @click="() => { menuStates[comment.id] = false; deleteComment(comment) }"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Deletar
+                        </button>
+                        <button @click="menuStates[comment.id] = false"
+                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                          Reportar
+                        </button>
+
+                      </div>
+                    </div>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <h3 v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.title }}
+                      </h3>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.title" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.content }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.content" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-lg flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        {{ comment.location }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.location" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte realizado em: {{ comment.date }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <textarea v-else v-model="comment.date" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
+                      </textarea>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Reporte resolvido? {{ comment.solved ? "Sim" : "Não" }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.solved" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </select>
+                    </div>
+                    <div class="text-xs flex flex-col justify-between flex-grow">
+                      <!-- Exibição do comentário -->
+                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
+                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                        Tag: {{ comment.tag }}
+                      </p>
+
+                      <!-- Edição do comentário -->
+                      <select v-else v-model="comment.tag" @blur="cancelEdit(comment)"
+                        @keyup.enter="saveEditReport(comment)"
+                        class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
+                        <option disabled :value="comment.tag"></option>
+                        <option v-for="tag in tags" :key="tag.id" :value="tag.id">
+                          {{ tag.name }}
+                        </option>
+                      </select>
 
                     </div>
+                    <!-- Detalhes do comentário -->
+                    <p class="mt-8">{{ comment.createdAt }}</p>
                   </div>
-
-                  <div class="text-lg flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <h3 v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      {{ comment.title }}
-                    </h3>
-
-                    <!-- Edição do comentário -->
-                    <textarea v-else v-model="comment.title" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                      </textarea>
-                  </div>
-
-                  <div class="text-lg flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      {{ comment.content }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <textarea v-else v-model="comment.content" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                      </textarea>
-                  </div>
-                  <div class="text-lg flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      {{ comment.location }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <textarea v-else v-model="comment.location" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                      </textarea>
-                  </div>
-                  <div class="text-xs flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      Reporte realizado em: {{ comment.date }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <textarea v-else v-model="comment.date" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
-                      </textarea>
-                  </div>
-                  <div class="text-xs flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      Reporte resolvido? {{ comment.solved ? "Sim" : "Não" }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <select v-else v-model="comment.solved" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
-                      <option value="true">Sim</option>
-                      <option value="false">Não</option>
-                    </select>
-                  </div>
-                  <div class="text-xs flex flex-col justify-between flex-grow">
-                    <!-- Exibição do comentário -->
-                    <p v-if="!comment.isEditing" class="mb-auto leading-relaxed cursor-pointer"
-                      @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                      Tag: {{ comment.tag }}
-                    </p>
-
-                    <!-- Edição do comentário -->
-                    <select v-else v-model="comment.tag" @blur="cancelEdit(comment)"
-                      @keyup.enter="saveEditReport(comment)"
-                      class="w-full sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">
-                      <option disabled :value="comment.tag"></option>
-                      <option v-for="tag in tags" :key="tag.id" :value="tag.id">
-                        {{ tag.name }}
-                      </option>
-                    </select>
-
-                  </div>
-                  <!-- Detalhes do comentário -->
-                  <p class="mt-8">{{ comment.createdAt }}</p>
                 </div>
               </div>
-            </div>
-          </article>
-        </div>
-      </div>
-      <!-- Sidebar -->
-      <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg sticky top-24 max-h-265-px ">
-
-        <div class="bg-banner p-4 rounded-lg shadow sticky top-24">
-          <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
-
-          <div class="space-y-3 ">
-            <div class="text-sm mb-4">
-              <p class="text-white">
-                <span class="josefin-sans-bold-italic">Participantes: </span>
-                <span class="inconsolata-regular">{{ forumData.members }}</span>
-              </p>
-            </div>
-
-            <div class="text-sm mb-4">
-              <p class="text-white ">
-                <span class="josefin-sans-bold-italic">Criado em: </span>
-                <span class="inconsolata-regular"> {{ forumData.createdAt }}</span>
-              </p>
-            </div>
-
-            <div class="text-sm mb-4">
-              <p class="text-white">
-                <span class="josefin-sans-bold-italic">Criado por: </span>
-                <span class="inconsolata-regular"> {{ forumData.creator }}</span>
-              </p>
-            </div>
-
-            <div class="text-sm mb-4">
-              <p class="text-white">
-                <span class="josefin-sans-bold-italic">Popularidade: </span>
-                <span class="inconsolata-regular"> {{ forumData.popularity }}</span>
-              </p>
-            </div>
+            </article>
           </div>
         </div>
-      </aside>
+        <!-- Sidebar -->
+        <aside class="w-1/4 bg-banner p-4 rounded-lg shadow-lg sticky top-24 max-h-265-px ">
 
-    </div>
-    <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
-    <ModalPoll v-if="isPollOpen" :isPollOpen = "isPollOpen" @close="closePoll" :slug = "slug"/>
+          <div class="bg-banner p-4 rounded-lg shadow sticky top-24">
+            <h3 class="text-xl font-semibold mb-4 text-white">Mais informações</h3>
+
+            <div class="space-y-3 ">
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Participantes: </span>
+                  <span class="inconsolata-regular">{{ forumData.members }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white ">
+                  <span class="josefin-sans-bold-italic">Criado em: </span>
+                  <span class="inconsolata-regular"> {{ forumData.createdAt }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Criado por: </span>
+                  <span class="inconsolata-regular"> {{ forumData.creator }}</span>
+                </p>
+              </div>
+
+              <div class="text-sm mb-4">
+                <p class="text-white">
+                  <span class="josefin-sans-bold-italic">Popularidade: </span>
+                  <span class="inconsolata-regular"> {{ forumData.popularity }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+      <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
+      <ModalPoll v-if="isPollOpen" :isPollOpen="isPollOpen" @close="closePoll" :slug="slug" />
   </MainLayout>
 
 </template>
@@ -503,49 +513,50 @@ import ModalPoll from '../components/Modals/ModalPoll.vue';
 import profile from "@/assets/img/profilePic.jpg";
 
 const isPollOpen = ref(false)
-const openPoll = () =>{
+const openPoll = () => {
   isPollOpen.value = true;
 }
 
 const selectedItem = ref()
-const closePoll = () =>{
+const closePoll = () => {
   isPollOpen.value = false;
   fetchPolls();
 }
-const deletePoll = async(item) => {
-  try{
+const deletePoll = async (item) => {
+  try {
     const response = await axios.post(`${ENDPOINTS.DELETE_POLL}/${item.id}/`);
-    if (response.status === 204){
+    if (response.status === 204) {
       toast.success("Enquete excluída com sucesso")
       fetchPolls()
-    } else{
+    } else {
       toast.error("Erro ao excluir enquete")
     }
-  } catch(err){
+  } catch (err) {
     console.log(err);
     toast.error("Erro ao excluir enquete")
   }
 }
 
-const voteIn = async() =>{
-  try{
+const voteIn = async () => {
+  try {
     const response = await axios.post(`${ENDPOINTS.VOTE_POLL}/${selectedItem.value}/`);
-    if (response.status === 201){
+    if (response.status === 201) {
       toast.success("Seu voto foi computado!")
       fetchPolls()
     }
-    else{
+    else {
       console.log(response)
       toast.error("Algo deu errado")
     }
-  } catch(err){
-    if (err.response.data.detail === "Você já votou nesta opção."){
-      toast.info("Você já votou nesta opção!")}
-      else{
-        console.log(err)
-        toast.error("Algo deu errado")
+  } catch (err) {
+    if (err.response.data.detail === "Você já votou nesta opção.") {
+      toast.info("Você já votou nesta opção!")
+    }
+    else {
+      console.log(err)
+      toast.error("Algo deu errado")
 
-      }
+    }
   }
 }
 
@@ -701,18 +712,18 @@ const subscribed = () => {
 };
 
 const polls = ref([]);
-const fetchPolls = async() =>{
-  try{
+const fetchPolls = async () => {
+  try {
     const response = await axios.get(`${ENDPOINTS.LIST_POLL}/${slug.value}/`);
-    if (response.status === 200){
+    if (response.status === 200) {
       polls.value = response.data.results;
     }
-    
-    else{
+
+    else {
       toast.error("Erro ao carregar as enquetes")
     }
   }
-  catch(err){
+  catch (err) {
     toast.error("Erro ao carregar as enquetes")
   }
 }
@@ -737,8 +748,8 @@ const fetchComments = async () => {
   fetchPolls();
 };
 const combinedItems = computed(() => {
-  return [...polls.value.map((poll) => ({ ...poll, type: "poll" })), 
-          ...comments.value.map((comment) => ({ ...comment, type: "comment" }))].sort((a, b) => 
+  return [...polls.value.map((poll) => ({ ...poll, type: "poll" })),
+  ...comments.value.map((comment) => ({ ...comment, type: "comment" }))].sort((a, b) =>
     new Date(b.post_date || b.createdAt) - new Date(a.post_date || a.createdAt)
   );
 });
@@ -934,6 +945,46 @@ const menuStates = ref({});
 // Função para alternar o menu de um comentário específico
 const toggleMenu = (commentId) => {
   menuStates.value[commentId] = !menuStates.value[commentId];
+};
+
+const imagePreview = ref(null);
+const selectedImage = ref(null);
+const imageInput = ref(null);
+
+// Função para lidar com o upload da imagem
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhuma imagem selecionada");
+    return;
+  }
+
+  // Validações de arquivo
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+  if (file.size > maxSize) {
+    toast.error("A imagem deve ter menos de 5MB");
+    return;
+  }
+
+  if (!validTypes.includes(file.type)) {
+    toast.error("Formato de imagem inválido. Use JPG, PNG ou GIF");
+    return;
+  }
+
+  // Cria a prévia da imagem
+  selectedImage.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+};
+
+// Função para remover a imagem
+const removeImage = () => {
+  imagePreview.value = null;
+  selectedImage.value = null;
+  if (imageInput.value) {
+    imageInput.value.value = '';
+  }
 };
 
 
