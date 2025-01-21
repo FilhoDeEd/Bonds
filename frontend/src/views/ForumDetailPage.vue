@@ -164,58 +164,57 @@
                       <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
                         <img :src="item.image" class="rounded-lg max-h-48">
                       </div>
-                      <!-- Menu dropdown -->
-                      <div class="relative self-end mb-2">
-                        <button @click="toggleMenu(item.id)" class="text-black  text-xl hover:text-gray-300">
-                          ⋯
-                        </button>
-
-                        <!-- Dropdown menu -->
-                        <div v-if="menuStates[item.id]"
-                          class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                          <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                            v-show="checkOwnership(item.creator)"
-                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                            Editar
-                          </button>
-                          <button v-show="checkOwnership(item.creator)"
-                            @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
-                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                            Deletar
-                          </button>
-                          <button @click="menuStates[item.id] = false"
-                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                            Reportar
+                      <!-- Right side - Content area -->
+                      <div class="flex-1">
+                        <!-- Menu dropdown -->
+                        <div class="absolute top-0 right-0">
+                          <button @click="toggleMenu(item.id)" class="text-black text-xl hover:text-gray-300">
+                            ⋯
                           </button>
 
+                          <!-- Dropdown menu -->
+                          <div v-if="menuStates[item.id]"
+                            class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                            <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
+                              v-show="checkOwnership(item.creator)"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Editar
+                            </button>
+                            <button v-show="checkOwnership(item.creator)"
+                              @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Deletar
+                            </button>
+                            <button @click="menuStates[item.id] = false"
+                              class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                              Reportar
+                            </button>
+                          </div>
                         </div>
-                      </div>
 
-                      <!-- Título ou nome do autor -->
-                      <div class="flex items-center mb-8 ml-auto">
-                        <!-- Imagem do autor (à direita) -->
-                        <img :src="item.author_image || profile" alt="Imagem do autor"
-                          class="w-10 h-10 rounded-full object-cover mr-3">
+                        <!-- User image --><!-- Username -->
+                        <div class="mt-8 flex justify-end">
+                          <div class="mt-2 flex justify-end">
+                              <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
+                          </div>
+                          <img :src="item.author_image || profile" alt="Imagem do autor" class="w-10 h-10 rounded-full object-cover"> 
+                        </div>
+                        <div class="text-lg text-black mt-4">
+                          <!-- Exibição do comentário -->
+                          <p v-if="!item.isEditing" class="leading-relaxed text-black cursor-pointer"
+                            @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
+                            {{ item.content }}
+                          </p>
 
-                        <!-- Nome do criador -->
-                        <h2 class="text-lg font-semibold">{{ item.creator }}</h2>
-                      </div>
-
-                      <div class="text-lg text-black flex flex-col justify-between flex-grow">
-                        <!-- Exibição do comentário -->
-                        <p v-if="!item.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
-                          @dblclick="() => { item.isEditing = true; }" title="Clique duas vezes para editar">
-                          {{ item.content }}
-                        </p>
-
-                        <!-- Edição do comentário -->
-                        <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
-                          @keyup.enter="saveEdit(item)"
-                          class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                          <!-- Edição do comentário -->
+                          <textarea v-else v-model="item.tempContent" @blur="cancelEdit(item)"
+                            @keyup.enter="saveEdit(item)"
+                            class="w-full text-black sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none">
                           </textarea>
+                        </div>
+                        <!-- Detalhes do comentário -->
+                        <p class="mt-4 text-black">{{ item.createdAt }}</p>
                       </div>
-                      <!-- Detalhes do comentário -->
-                      <p class="mt-8 text-black ">{{ item.createdAt }}</p>
                     </div>
                     <div v-else>
                       <div class="relative self-end mb-2">
@@ -304,7 +303,8 @@
                 <div class="flex flex-col items-center text-2xl font-bold w-12">
                   <button @click="likeComment(comment)" class="vote" :class="{
                     'on-up': comment.has_liked === 1,
-                    'hover:text-gray-300': comment.has_liked !== 1}">
+                    'hover:text-gray-300': comment.has_liked !== 1
+                  }">
                     <svg width="36" height="36" viewBox="0 0 36 36">
                       <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
                       </path>
