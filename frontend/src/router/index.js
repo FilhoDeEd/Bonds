@@ -23,6 +23,7 @@ import Maps from "@/views/admin/Maps.vue";
 // views without layouts
 import Index from "@/views/Index.vue";
 import EventDetailPage from '../views/EventDetailPage.vue';
+import { useUserStore } from '../store/user';
 
 /* eslint-disable */
 
@@ -55,6 +56,12 @@ const routes = [
     path: "/auth",
     redirect: "/auth/login",
     component: Auth,
+    beforeEnter: (to, from, next) => {
+      const userStore = useUserStore(); // Acessa a store
+      userStore.removeToken(); // Remove o token
+      next(); // Prossegue para a rota
+    },
+
     children: [
       {
         path: "/auth/login",

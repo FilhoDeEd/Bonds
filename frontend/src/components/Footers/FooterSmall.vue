@@ -15,26 +15,29 @@
             class="text-sm text-blueGray-500 font-semibold py-1 text-center md:text-left"
           >
             Copyright © {{ date }}  |  
+            <router-link to="/about" >
             <a
               class="fredoka text-white hover:text-blueGray-300 text-sm font-semibold py-1"
             >
             | Bonds
             </a>
+            </router-link>
           </div>
         </div>
         <div class="w-full md:w-8/12 px-4">
           <ul class="flex flex-wrap list-none md:justify-end justify-center">
             <li>
+              <router-link to="/about" >
               <a
-                href="https://www.creative-tim.com/presentation?ref=vn-footer-small"
                 class="text-white hover:text-blueGray-300 text-sm font-semibold block py-1 px-3"
               >
                 About Us
               </a>
+              </router-link>
             </li>
             <li>
               <a
-                href="https://github.com/creativetimofficial/vue-notus/blob/main/LICENSE.md?ref=vn-footer-small"
+                href="https://github.com/FilhoDeEd/Bonds/blob/main/LICENSE"
                 class="text-white hover:text-blueGray-300 text-sm font-semibold block py-1 px-3"
               >
                 MIT License
@@ -45,7 +48,7 @@
                href="https://i0.wp.com/anmtv.com.br/wp-content/uploads/2024/01/bob-construtor-1.jpg?w=800&ssl=1"
                 class="text-white hover:text-blueGray-300 text-sm font-semibold block py-1 px-3"
               >
-                Esqueci minha senha
+                Esqueci minha senh<a href="https://youtu.be/YzGaw9raX88?t=67">a</a>
               </a>
             </li>
           </ul>
