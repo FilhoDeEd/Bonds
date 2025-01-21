@@ -840,7 +840,7 @@ const add_image = async (comment_id) => {
 
     } catch (error) {
       console.error("Erro ao atualizar imagem:", error.response || error);
-      toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+      // toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
     }
 
     fetchComments();
