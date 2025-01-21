@@ -113,6 +113,16 @@ class Pool(models.Model):
         for option_text in options:
             Option.objects.create(pool=self, option_text=option_text)
 
+    def get_creator_name(self):
+        """
+        Retorna o nome completo do criador do comentário a partir do modelo Account, que está relacionado ao UserProfile.
+        Se o usuário não estiver relacionado, retorna 'Sistema'.
+        """
+        if self.user_profile and self.user_profile.account: 
+            return self.user_profile.account.full_name()  
+        else:
+            return 'Sistema' 
+
     def __str__(self):
         return self.title
 
