@@ -493,6 +493,7 @@
       </div>
       <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
       <ModalPoll v-if="isPollOpen" :isPollOpen="isPollOpen" @close="closePoll" :slug="slug" />
+    </div>
   </MainLayout>
 
 </template>
