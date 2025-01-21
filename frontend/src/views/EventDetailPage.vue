@@ -141,7 +141,7 @@
                     <span>📊</span>
                   </button>
 
-                  <button @click="callReview" v-show="true">⭐</button>
+                  <button @click="callReview" v-show="isReview">⭐</button>
 
                   <button v-show="true" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
