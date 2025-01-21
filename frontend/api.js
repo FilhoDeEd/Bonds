@@ -58,5 +58,7 @@ export const ENDPOINTS = {
   LIST_POLL:`${POLL_URL}/list`,
   VOTE_POLL:`${COMMENT_URL}/vote`,
   UNVOTE_POLL:`${COMMENT_URL}/unvote`,
+  DELETE_POLL:`${POLL_URL}/delete`,
+
 
 };

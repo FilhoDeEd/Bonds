@@ -1,7 +1,9 @@
 <template>
   <div class="flex content-center items-center justify-center min-h-screen">
     <div class="w-1/2 h-full flex flex-col items-center justify-center z-10">
+      <router-link to="/about" >
       <img :src="altLogo" alt="Alt Logo" class="w-32 h-auto mb-4" >
+      </router-link>
       <p class="text-4xl text-white font-bold text-center">
         Your Community Hub
       </p>
@@ -69,6 +71,7 @@ import { useUserStore } from '../../store/user.js';
 import { useToast } from "vue-toastification";
 import axios from 'axios';
 import altLogo from "@/assets/img/altLogo.png";
+import { onBeforeMount } from 'vue';
 
 export default {
   data() {
@@ -131,6 +134,10 @@ export default {
           alert('Unexpected error occurred.');
         }
       }
+    },
+    onBeforeMount(){
+      this.router.push('/login')
+      this.userStore.removeToken()
     }
   }
 };

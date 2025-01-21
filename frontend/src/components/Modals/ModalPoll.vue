@@ -122,12 +122,12 @@
         ];
       },
       addPollOption() {
-        if (this.pollOptions.value.length < 4) {
-            this.pollOptions.value.push({ option_text: '' }); // Certifique-se de usar "option_text"
+        if (this.pollOptions.length < 4) {
+            this.pollOptions.push({ option_text: '' }); // Adiciona nova opção
         } else {
             this.toast.error('Não é possível adicionar mais de 4 opções.');
         }
-    },
+        },
       removePollOption(index) {
         if (index >= 2) {
           this.pollOptions.splice(index, 1);
@@ -159,6 +159,7 @@
           if (response.status === 201) {
             this.toast.success('Enquete criada com sucesso!');
             this.closeModal();
+            
           } else {
             this.toast.error('Erro ao criar enquete.');
           }
