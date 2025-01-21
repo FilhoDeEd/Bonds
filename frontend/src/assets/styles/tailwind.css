@@ -1963,6 +1963,10 @@ select {
   max-height: 450px;
 }
 
+.max-h-48 {
+  max-height: 12rem;
+}
+
 .min-h-\[800px\] {
   min-height: 500px;
 }

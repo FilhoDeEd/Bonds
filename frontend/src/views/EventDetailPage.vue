@@ -5,7 +5,7 @@
       <div class="bg-basic h-600-px p-6 rounded-lg shadow mb-8">
         <div class="relative h-full">
           <!-- Área colorida do banner - aumentada para 85% -->
-          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: rgba(124, 122, 187, 1);">
+          <div class="absolute top-0 left-0 right-0 h-85 rounded-lg" style="background-color: #f07575;">
             <div class="relative h-full flex flex-col justify-between">
               <!-- Área de título e descrição -->
               <div class="px-6 py-8">
@@ -31,39 +31,48 @@
                   </div>
 
                   <div class="grid grid-cols-2 gap-4 w-full">
-                    <textarea 
-                      v-model="forumData.title"
-                      :readonly="!editMode"
-                      class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none h- 28"
-                      :placeholder="editMode ? 'Título do Evento' : ''"
-                      style="line-height: 1.2; padding: 4px 8px; height: auto; min-height: 40px; outline: none;"
-                      :class="{ 'cursor-text hover:bg-gray-700/30': editMode }"
-                      rows="1">
-                    </textarea>
-                    <!-- Localização - Segunda coluna, primeira linha -->
-                    <textarea v-model="forumData.localization" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-24 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Localização" 
-                      rows="2">
-                    </textarea>
+                    <!-- Coluna 1: Título, Localização e Data -->
+                    <div class="flex flex-col space-y-2">
+                      <textarea 
+                        v-model="forumData.title" 
+                        :readonly="!editMode"
+                        class="text-white text-3xl font-bold bg-transparent border-none w-full resize-none"
+                        :placeholder="editMode ? 'Título do Evento' : ''"
+                        style="line-height: 1.2; padding: 4px 8px; min-height: 40px; outline: none;"
+                        :class="{ 'cursor-text hover:bg-gray-700/30': editMode }" 
+                        rows="1"
+                      ></textarea>
 
-                    <!-- Descrição - Primeira coluna, segunda linha -->
-                    <textarea v-model="forumData.description" :readonly="!editMode"
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Descrição do Evento"
-                      rows="3">
-                    </textarea>
+                      <textarea 
+                        v-model="forumData.localization" 
+                        :readonly="!editMode"
+                        class="text-white text-base bg-transparent border-none w-full resize-none h-8"
+                        :class="{ 'hover:bg-gray-700/30': editMode }" 
+                        placeholder="Localização" 
+                        rows="2"
+                      ></textarea>
 
-                    <!-- Data - Segunda coluna, segunda linha -->
-                    <textarea v-model="forumData.date" :readonly="!editMode"
+                      <textarea 
+                        v-model="forumData.date" 
+                        :readonly="!editMode"
+                        class="text-white text-base bg-transparent border-none w-full resize-none h-8"
+                        :class="{ 'hover:bg-gray-700/30': editMode }" 
+                        placeholder="Data do Evento" 
+                        rows="1"
+                      ></textarea>
+                    </div>
 
-                      class="text-white text-base mb-4 bg-transparent border-none w-full resize-none h-12 "
-                      :class="{ 'hover:bg-gray-700/30': editMode }" 
-                      placeholder="Data do Evento" 
-                      rows="4">
-                    </textarea>
+                    <!-- Coluna 2: Descrição -->
+                    <div>
+                      <textarea 
+                        v-model="forumData.description" 
+                        :readonly="!editMode"
+                        class="text-white text-base bg-transparent border-none w-full resize-none h-24"
+                        :class="{ 'hover:bg-gray-700/30': editMode }" 
+                        placeholder="Descrição do Evento" 
+                        rows="6"
+                      ></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -108,46 +117,67 @@
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
                   <div class="flex space-x-2">
-                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto/">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto"
+                      @click="$refs.imageInput.click()">
                       <span>📷</span>
                     </button>
 
-                  <button v-show="isReview" @click="callReview"
-                    class="p-2 hover:bg-gray-100 rounded-full" title="Avaliar Evento">
-                    <span>⭐</span>
+                    <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                      @change="handleImageUpload">
+
+                    <!-- Prévia da imagem -->
+                    <div v-if="imagePreview" class="mb-4 relative">
+                      <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                      <button @click="removeImage"
+                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        title="Remover imagem">
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                  <button v-show="showReportCreator" @click="openModal" class="p-2 hover:bg-gray-100 rounded-full"
+                    title="Adicionar um Reporte">
+                    <span>📢</span>
                   </button>
 
-                    <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
-                      id="pollButton">
-                      <span>📊</span>
-                    </button>
+                  <button @click="togglePoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                    id="pollButton">
+                    <span>📊</span>
+                  </button>
 
-                    <div v-if="showPoll" class="mt-4 space-y-2">
-                      <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
-                        <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
-                          :placeholder="`Opção ${index + 1}`">
-                        <button v-if="index >= 2" @click="removePollOption(index)"
-                          class="text-red-500 hover:text-red-600">
-                          ❌
+                  <div v-if="showPoll" class="mt-4 space-y-4">
+                    <!-- Título da enquete -->
+                    <input type="text" v-model="formPoll.title" placeholder="Título da enquete"
+                      class="w-full p-2 border rounded-lg" />
+
+                    <!-- Prazo (deadline) -->
+                    <input type="date" v-model="formPoll.deadline" class="w-full p-2 border rounded-lg" />
+
+                    <!-- Opções da enquete -->
+                    <div v-for="(option, index) in pollOptions" :key="index" class="flex items-center space-x-2">
+                      <input type="text" v-model="option.text" class="flex-1 p-2 border rounded-lg"
+                        :placeholder="`Opção ${index + 1}`" />
+                      <button v-if="index >= 2" @click="removePollOption(index)"
+                        class="text-red-500 hover:text-red-600">
+                        ❌
+                      </button>
+                    </div>
+
+                    <!-- Botões de ação -->
+                    <div class="flex space-x-2 mt-3">
+                      <button v-if="pollOptions.length < 4" @click="addPollOption"
+                        class="text-blue-500 hover:text-blue-600 text-sm">
+                        + Adicionar opção
+                      </button>
+
+                      <div class="flex space-x-2 ml-auto">
+                        <button @click="cancelPoll" class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
+                          Cancelar
                         </button>
-                      </div>
-
-                      <div class="flex space-x-2 mt-3">
-                        <button v-if="pollOptions.length < 4" @click="addPollOption"
-                          class="text-blue-500 hover:text-blue-600 text-sm">
-                          + Adicionar opção
+                        <button @click="createPoll" :disabled="!isFormValid" class="px-4 py-1 text-white rounded-lg"
+                          :class="isFormValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'">
+                          Criar Enquete
                         </button>
-
-                        <div class="flex space-x-2 ml-auto">
-                          <button @click="cancelPoll"
-                            class="px-4 py-1 text-gray-600 border rounded-lg hover:bg-gray-100">
-                            Cancelar
-                          </button>
-                          <button @click="createPoll"
-                            class="px-4 py-1 bg-blueGray-600 text-white rounded-lg hover:bg-blue-600">
-                            Criar Enquete
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -157,107 +187,108 @@
                     ✔️
                   </button>
                 </div>
+               </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      
 
-      <!-- Content Section with Posts and Sidebar -->
-      <div class="flex gap-8 space-x-4 ">
-        <!-- Posts Section -->
-        <div class="w-3/4">
-          <div class="space-y-4">
-            <article v-for="comment in comments" :key="comment.createdAt"
-              class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
-              <div class="flex h-full">
+        <!-- Content Section with Posts and Sidebar -->
+        <div class="flex gap-8 space-x-4 ">
+          <!-- Posts Section -->
+          <div class="w-3/4">
+            <div class="space-y-4">
+              <article v-for="comment in comments" :key="comment.createdAt"
+                class="p-4 shadow rounded hover:shadow-lg transition-shadow duration-200 bg-basic">
+                <div class="flex h-full">
 
-                <!-- Área de votação -->
-                <div class="flex flex-col items-center text-2xl font-bold w-12">
-                  <button @click="likeComment(comment)" class="vote" :class="{
-                    'on-up': comment.has_liked === 1,
-                    'hover:text-gray-300': comment.has_liked !== 1
-                  }">
-                    <svg width="36" height="36" viewBox="0 0 36 36">
-                      <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
-                      </path>
-                    </svg>
-                  </button>
-                  <span class="my-1 text-white">{{ comment.trust_rate }}</span>
-                  <button @click="dislikeComment(comment)" class="vote" :class="{
-                    'on-down': comment.has_liked === -1,
-                    'hover:text-gray-300': comment.has_liked !== -1
-                  }">
-                    <svg width="36" height="36" viewBox="0 0 36 36">
-                      <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
-                      </path>
-                    </svg>
-                  </button>
-                </div>
+                  <!-- Área de votação -->
+                  <div class="flex flex-col items-center text-2xl font-bold w-12">
+                    <button @click="likeComment(comment)" class="vote" :class="{
+                      'on-up': comment.has_liked === 1,
+                      'hover:text-gray-300': comment.has_liked !== 1
+                    }">
+                      <svg width="36" height="36" viewBox="0 0 36 36">
+                        <path d="M2 26h32L18 10 2 26z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                        </path>
+                      </svg>
+                    </button>
+                    <span class="my-1 text-white">{{ comment.trust_rate }}</span>
+                    <button @click="dislikeComment(comment)" class="vote" :class="{
+                      'on-down': comment.has_liked === -1,
+                      'hover:text-gray-300': comment.has_liked !== -1
+                    }">
+                      <svg width="36" height="36" viewBox="0 0 36 36">
+                        <path d="M2 10h32L18 26 2 10z" stroke="white" stroke-width="2" fill="none" class="svg-path">
+                        </path>
+                      </svg>
+                    </button>
+                  </div>
 
-                <!-- Conteúdo do comentário -->
-                <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
-                  <div class="text-black flex flex-col h-full justify-between">
-                    <!-- Menu dropdown -->
-                    <div class="relative self-end mb-2">
-                      <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
-                        ⋯
-                      </button>
-
-                      <!-- Dropdown menu -->
-                      <div v-if="menuStates[comment.id]"
-                        class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
-                        <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
-                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                          Editar
-                        </button>
-                        <button
-                          @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
-                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                          Deletar
-                        </button>
-                        <button @click="menuStates[comment.id] = false"
-                          class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
-                          Reportar
+                  <!-- Conteúdo do comentário -->
+                  <div class="flex-1 pl-8 text-right flex flex-col justify-between h-full">
+                    <div class="text-black flex flex-col h-full justify-between">
+                      <!-- Menu dropdown -->
+                      <div class="relative self-end mb-2">
+                        <button @click="toggleMenu(comment.id)" class="text-black  text-xl hover:text-gray-300">
+                          ⋯
                         </button>
 
+                        <!-- Dropdown menu -->
+                        <div v-if="menuStates[comment.id]"
+                          class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
+                          <button @click="() => { menuStates[comment.id] = false; comment.isEditing = true }"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Editar
+                          </button>
+                          <button
+                            @click="() => { menuStates[comment.id] = false; deleteComment(comment); comment.isEditing = true }"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Deletar
+                          </button>
+                          <button @click="menuStates[comment.id] = false"
+                            class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
+                            Reportar
+                          </button>
+
+                        </div>
                       </div>
+
+                      <!-- Título ou nome do autor -->
+                      <div class="flex items-center mb-8 ml-auto">
+                        <!-- Imagem do autor (à direita) -->
+                        <img 
+                        :src="comment.author_image || profile"
+                        alt="Imagem do autor" 
+                        class="w-10 h-10 rounded-full object-cover mr-3"
+                        >
+
+                        <!-- Nome do criador -->
+                        <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
+                      </div>
+
+                      <div class="text-lg text-black flex flex-col justify-between flex-grow">
+                        <!-- Exibição do comentário -->
+                        <p v-if="!comment.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
+                          @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
+                          {{ comment.content }}
+                        </p>
+
+                        <!-- Edição do comentário -->
+                        <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
+                          @keyup.enter="saveEdit(comment)"
+                          class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
+                        </textarea>
+                      </div>
+                      <!-- Detalhes do comentário -->
+                      <p class="mt-8 text-black ">{{ comment.createdAt }}</p>
                     </div>
-
-                    <!-- Título ou nome do autor -->
-                    <div class="flex items-center mb-8 ml-auto">
-                      <!-- Imagem do autor (à direita) -->
-                      <img 
-                      :src="comment.author_image || profile"
-                      alt="Imagem do autor" 
-                      class="w-10 h-10 rounded-full object-cover mr-3"
-                      >
-
-                      <!-- Nome do criador -->
-                      <h2 class="text-lg font-semibold">{{ comment.creator }}</h2>
-                    </div>
-
-                    <div class="text-lg text-black flex flex-col justify-between flex-grow">
-                      <!-- Exibição do comentário -->
-                      <p v-if="!comment.isEditing" class="mb-auto leading-relaxed text-black  cursor-pointer"
-                        @dblclick="() => { comment.isEditing = true; }" title="Clique duas vezes para editar">
-                        {{ comment.content }}
-                      </p>
-
-                      <!-- Edição do comentário -->
-                      <textarea v-else v-model="comment.tempContent" @blur="cancelEdit(comment)"
-                        @keyup.enter="saveEdit(comment)"
-                        class="w-full text-black  sm:w-11/12 md:w-10/12 lg:w-8/12 max-w-4xl p-3 bg-pattern rounded-lg border border-gray-200 focus:outline-none focus:border-gray-300 resize-none ml-auto">                      >
-                      </textarea>
-                    </div>
-                    <!-- Detalhes do comentário -->
-                    <p class="mt-8 text-black ">{{ comment.createdAt }}</p>
                   </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </div>
           </div>
-        </div>
 
         <!-- Sidebar -->
 
@@ -296,7 +327,6 @@
               </div>
             </div>
           </div> 
-
         </aside>
       </div>
       <ModalReview v-if="isModalOpen" :isModalOpen="isModalOpen" @submitRating="handleRating"
@@ -675,6 +705,46 @@ const createPoll = () => {
   showPostButton.value = true
   cancelPoll()
 }
+
+const imagePreview = ref(null);
+const selectedImage = ref(null);
+const imageInput = ref(null);
+// Função para lidar com o upload da imagem
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    toast.error("Nenhuma imagem selecionada");
+    return;
+  }
+
+  // Validações de arquivo
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+  if (file.size > maxSize) {
+    toast.error("A imagem deve ter menos de 5MB");
+    return;
+  }
+
+  if (!validTypes.includes(file.type)) {
+    toast.error("Formato de imagem inválido. Use JPG, PNG ou GIF");
+    return;
+  }
+
+  // Cria a prévia da imagem
+  selectedImage.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+};
+
+// Função para remover a imagem
+const removeImage = () => {
+  imagePreview.value = null;
+  selectedImage.value = null;
+  if (imageInput.value) {
+    imageInput.value.value = '';
+  }
+};
+
 
 onMounted(() => {
   fetchEvent();
