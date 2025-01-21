@@ -213,12 +213,12 @@
                     <div v-if="menuStates[item.id]"
                       class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg py-2 z-10">
                       <button @click="() => { menuStates[item.id] = false; item.isEditing = true }"
-                        v-show="checkOwnership(item.creator)"
+                        v-show="false" 
                         class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                         Editar
                       </button>
                       <button v-show="checkOwnership(item.creator)"
-                        @click="() => { menuStates[item.id] = false; deleteComment(item); item.isEditing = true }"
+                        @click="() => { menuStates[item.id] = false; deletePoll(item);}"
                         class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                         Deletar
                       </button>
@@ -229,38 +229,55 @@
 
                     </div>
                   </div>
-                    <!-- Container do item de enquetes -->
-                    <div class="border rounded-lg shadow-lg p-6 bg-white mb-6">
-                        <!-- Título do item -->
-                        <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ item.title || "Título da Enquete" }}</h2>
+          <!-- Container do item de enquete -->
+          <div class="border rounded-lg shadow-lg p-6 bg-white mb-6">
+            <!-- Título da enquete -->
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ item.title || "Título da Enquete" }}</h2>
 
-                        <!-- Texto descritivo -->
-                        <p class="text-gray-700 mb-4">
-                        {{ item.content || "Adicione aqui uma descrição da enquete." }}
-                        </p>
+            <!-- Texto descritivo -->
+            <p class="text-gray-700 mb-4">
+              {{ item.content || "Adicione aqui uma descrição da enquete." }}
+            </p>
 
-                        <!-- Prazo -->
-                        <p class="text-sm text-gray-500 mb-6">
-                        Prazo: {{ formatDate(item.deadline) || "Nenhuma data definida" }}
-                        </p>
+            <!-- Prazo -->
+            <p class="text-sm text-gray-500 mb-6">
+              Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
+            </p>
 
-                        <!-- Opções da enquete -->
-                        <div>
-                        <h3 class="text-lg font-medium text-gray-800 mb-3">Opções:</h3>
-                        <ul class="space-y-2">
-                            <li v-for="option in item.options" :key="option.id" class="flex items-center">
-                            <!-- Exibição do texto da opção -->
-                            <button
-                                v-show="new Date(item.deadline) > new Date()"
-                                @click="vote_in(option.id)"
-                                class="hover:text-green-600  ml-2"
-                                title="Selecionar Este">
-                                O
-                            </button>
-                            <span class="flex-grow text-gray-700">{{ option.option_text || "Opção não definida" }}</span>
-                            </li>
-                        </ul>
-                        </div>
+            <!-- Opções da enquete -->
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Opções:</h3>
+            <ul class="space-y-4">
+              <li v-for="option in item.options" :key="option.id" class="flex items-center justify-between">
+                <!-- Radio para votar -->
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    :id="`option-${option.id}`"
+                    :value="option.id"
+                    :name="`poll-${item.slug}`"
+                    :disabled="new Date(item.deadline) <= new Date()"
+                    v-model="selectedItem"
+                    class="w-5 h-5 text-green-500 border-gray-300 focus:ring-green-400"
+                  />
+                  <label :for="`option-${option.id}`" class="ml-3 text-gray-700 cursor-pointer">
+                    {{ option.option_text || "Opção não definida" }}
+                  </label>
+                </div>
+                <!-- Contagem de votos -->
+                <div class="text-gray-700">
+                  {{ option.votes || 0 }} votos
+                </div>
+              </li>
+            </ul>
+
+            <!-- Botão de envio -->
+            <button
+              v-show="new Date(item.deadline) > new Date()"
+              @click="voteIn()"
+              class="mt-6 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Enviar Voto
+            </button>
                     </div>
                     </div>
                   </div>
@@ -465,7 +482,7 @@
 
     </div>
     <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
-    <ModalPoll v-if="isPollOpen" :isPollOpen = "isPollOpen" @close="isPollOpen = false" :slug = "slug"/>
+    <ModalPoll v-if="isPollOpen" :isPollOpen = "isPollOpen" @close="closePoll" :slug = "slug"/>
   </MainLayout>
 
 </template>
@@ -488,6 +505,47 @@ import profile from "@/assets/img/profilePic.jpg";
 const isPollOpen = ref(false)
 const openPoll = () =>{
   isPollOpen.value = true;
+}
+
+const selectedItem = ref()
+const closePoll = () =>{
+  isPollOpen.value = false;
+  fetchPolls();
+}
+const deletePoll = async(item) => {
+  try{
+    const response = await axios.post(`${ENDPOINTS.DELETE_POLL}/${item.id}/`);
+    if (response.status === 204){
+      toast.success("Enquete excluída com sucesso")
+      fetchPolls()
+    } else{
+      toast.error("Erro ao excluir enquete")
+    }
+  } catch(err){
+    console.log(err);
+    toast.error("Erro ao excluir enquete")
+  }
+}
+
+const voteIn = async() =>{
+  try{
+    const response = await axios.post(`${ENDPOINTS.VOTE_POLL}/${selectedItem.value}/`);
+    if (response.status === 201){
+      toast.success("Seu voto foi computado!")
+    }
+    else{
+      console.log(response)
+      toast.error("Algo deu errado")
+    }
+  } catch(err){
+    if (err.response.data.detail === "Você já votou nesta opção."){
+      toast.success("Seu voto foi computado!")}
+      else{
+        console.log(err)
+        toast.error("Algo deu errado")
+
+      }
+  }
 }
 
 
@@ -648,6 +706,7 @@ const fetchPolls = async() =>{
     if (response.status === 200){
       polls.value = response.data.results;
     }
+    
     else{
       toast.error("Erro ao carregar as enquetes")
     }
