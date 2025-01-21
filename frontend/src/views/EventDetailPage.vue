@@ -116,30 +116,31 @@
 
                 <!-- Botões de ação -->
                 <div class="flex items-center mt-4 pt-3 border-t">
+
                   <div class="flex space-x-2">
                     <button class="p-2 hover:bg-gray-100 rounded-full" title="Adicionar foto"
                       @click="$refs.imageInput.click()">
                       <span>📷</span>
                     </button>
 
+                    <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
+                      id="pollButton">
+                      <span>📊</span>
+                    </button>
+
                     <input type="file" ref="imageInput" accept="image/*" style="display: none;"
                       @change="handleImageUpload">
-
-                    <!-- Prévia da imagem -->
-                    <div v-if="imagePreview" class="mb-4 relative">
-                      <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
-                      <button @click="removeImage"
+                      
+                      <!-- Prévia da imagem -->
+                      <div v-if="imagePreview" class="mb-4 relative">
+                        <img :src="imagePreview" alt="Preview" class="max-h-48 rounded-lg object-contain">
+                        <button @click="removeImage"
                         class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                         title="Remover imagem">
                         ❌
                       </button>
                     </div>
                   </div>
-
-                  <button @click="openPoll" class="p-2 hover:bg-gray-100 rounded-full" title="Enquete"
-                    id="pollButton">
-                    <span>📊</span>
-                  </button>
 
                   <button @click="callReview" v-show="isReview">⭐</button>
 
@@ -196,7 +197,7 @@
                       <div v-if="comment.type === 'comment'" class="relative flex">
                       <!-- Left side - Comment image -->
                       <div class="comment-image-container mr-6">
-                        <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                        <img :src="comment.image" class="rounded-lg max-h-48 ml-4">
                       </div>
                       <!-- Right side - Content area -->
                       <div class="flex-1">
@@ -658,6 +659,9 @@ const createComment = async () => {
       forum_slug: slug.value, // `slug` já é atualizado via rota
     });
 
+    if(selectedImage) {
+      add_image(response.data.id);
+    }
     console.log(response);
     toast.success('Comentário criado com sucesso');
     newCommentContent.value = ''; // Limpa o campo de comentário
@@ -668,7 +672,30 @@ const createComment = async () => {
   }
 };
 
+const add_image = async (comment_id) => {
+  try {
+        const formData = new FormData();
+        formData.append("image", selectedImage.value);
 
+        const response = await axios.post(
+          `${ENDPOINTS.EDIT_IMAGE}/${comment_id}/`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        removeImage();
+
+    } catch (error) {
+      console.error("Erro ao atualizar imagem:", error.response || error);
+      toast.error(error.response?.data?.detail || "Erro ao atualizar o banner.");
+    }
+
+    fetchComments();
+}
 
 const likeComment = async (comment) => {
   try {
