@@ -786,6 +786,10 @@ const fetchReports = async () => {
 
 
 const createComment = async () => {
+  if(!newCommentContent.value){
+    toast.error("Você precisa de um texto para realizar o post")
+    return
+  }
   try {
     // Usamos diretamente o valor de `slug`, que reflete a rota atual
     const response = await axios.post(`${ENDPOINTS.CREATE_COMMENT}`, {
