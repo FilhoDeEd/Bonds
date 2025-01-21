@@ -145,7 +145,7 @@
                     <span>📊</span>
                   </button>
 
-                  <button v-show="showPostButton" @click="createComment"
+                  <button v-show="true" @click="createComment"
                     class="ml-auto px-6 py-2 bg-blue-500 text-Black rounded-lg hover:bg-blue-600 font-semibold">
                     ✔️
                   </button>
