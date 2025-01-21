@@ -22,6 +22,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from datetime import timedelta
+from django.utils.timezone import now
 
 from user_profile.serializers import UserProfileSerializer, NeighborhoodSerializer
 from user_profile.models import Neighborhood, UserProfile
@@ -328,6 +330,16 @@ class UpdateNeighborhoodView(APIView):
 
         try:
             with transaction.atomic():
+
+                if account.last_neighborhood_change:
+                    six_months_ago = now() - timedelta(days=6 * 30)
+                    if account.last_neighborhood_change > six_months_ago:
+                        remaining_time = (account.last_neighborhood_change + timedelta(days=6 * 30)) - now()
+                        return Response({
+                            'detail': 'You cannot change neighborhoods yet.',
+                            'remaining_time': f'{remaining_time.days} days remaining.'
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
                 current_user_profile = UserProfile.objects.get(account=account, active=True)
                 current_user_profile.active = False
                 current_user_profile.save()
@@ -338,6 +350,10 @@ class UpdateNeighborhoodView(APIView):
                     new_user_profile.save()
                 except UserProfile.DoesNotExist:
                     UserProfile.objects.create(account=account, neighborhood=neighborhood, active=True)
+
+                account.last_neighborhood_change = now()
+                account.save()
+
         except Exception as e:
             return Response({'detail': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
