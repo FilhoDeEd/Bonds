@@ -54,6 +54,7 @@
               </button>
 
               <button type="button"
+                @click="denounce"
                 class="px-6 py-3 rounded-lg hover:bg-gray-100 text-white transition-colors duration-200 mt-4"
                 style="background-color: rgb(252, 3, 94);">
                 Denunciar
@@ -185,7 +186,7 @@
                               class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                               Deletar
                             </button>
-                            <button @click="menuStates[item.id] = false"
+                            <button @click="() => {menuStates[item.id] = false; denounce()}"
                               class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                               Reportar
                             </button>
@@ -235,7 +236,7 @@
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Deletar
                           </button>
-                          <button @click="menuStates[item.id] = false"
+                          <button @click="() => {menuStates[item.id] = false; denounce()}"
                             class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                             Reportar
                           </button>
@@ -350,7 +351,7 @@
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Deletar
                         </button>
-                        <button @click="menuStates[comment.id] = false"
+                        <button @click="() => {menuStates[item.id] = false; denounce()}"
                           class="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100">
                           Reportar
                         </button>
@@ -702,6 +703,10 @@ const fetchForum = async () => {
     router.push('/home');
   }
 };
+
+const denounce = ()=>{
+  toast.success("Denúncia realizada, nossos moderadores estarão de olho 👁️‍🗨️")
+}
 
 const subscribed = () => {
   if (forumData.value.isSubscribed == 1) {
