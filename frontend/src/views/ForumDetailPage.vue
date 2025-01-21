@@ -255,8 +255,7 @@
 
                         <!-- Prazo -->
                         <p class="text-sm text-gray-500 mb-6">
-                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum
-                          prazo definido" }}
+                          Prazo: {{ item.deadline ? `Até ${new Date(item.deadline).toLocaleDateString()}` : "Nenhum prazo definido" }}
                         </p>
 
                         <!-- Opções da enquete -->
@@ -493,6 +492,7 @@
       </div>
       <ModalReport v-if="isModalOpen" :isModalOpen="isModalOpen" @close="closeModal" :slug="slug" />
       <ModalPoll v-if="isPollOpen" :isPollOpen="isPollOpen" @close="closePoll" :slug="slug" />
+    </div>
   </MainLayout>
 
 </template>
