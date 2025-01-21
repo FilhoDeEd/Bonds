@@ -327,7 +327,7 @@
                   <div class="text-white flex flex-col h-full justify-between">
                     <!-- Campo de imagem -->
                     <div class="comment-image-container" style="display: inline-block; margin-left: 10px;">
-                      <img v-if="selectedImage" :src="imagePreview" alt="Uploaded Image" class="rounded-lg max-h-48">
+                      <img v-if="selectedImage" :src="comment.image" alt="Uploaded Image" class="rounded-lg max-h-48">
                     </div>
                     <!-- Menu dropdown -->
                     <div class="relative self-end mb-2">
